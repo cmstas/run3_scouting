@@ -50,6 +50,10 @@
 #include "TrackingTools/TransientTrack/interface/GsfTransientTrack.h"
 #include "TrackingTools/TransientTrack/interface/TrackTransientTrack.h"
 
+#include "RecoTracker/Record/interface/TrackerRecoGeometryRecord.h"
+#include "DataFormats/GeometrySurface/interface/RectangularPlaneBounds.h"
+#include "DataFormats/GeometrySurface/interface/TrapezoidalPlaneBounds.h"
+
 #include "TLorentzVector.h"
 
 // for quick debugging. remove later
@@ -82,6 +86,7 @@ private:
   edm::ESHandle<Propagator> propagatorHandle_;
   edm::ESGetToken<Propagator, TrackingComponentsRecord> propagatorToken_;
 
+  edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
 };
 
 #endif

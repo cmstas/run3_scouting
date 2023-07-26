@@ -70,6 +70,10 @@ void HitMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     edm::Handle<Run3ScoutingVertexCollection> dvHandle;
     iEvent.getByToken(dvToken_, dvHandle);
+    
+    //edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_; 
+    //const TrackerGeometry *trackerGeom_ = nullptr;
+    const TrackerGeometry trackerGeom_ = iSetup.get<TrackerRecoGeometryRecord>().get(geomToken_);
 
     if (debug) {
         std::cout << std::endl;
@@ -110,6 +114,55 @@ void HitMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
             dv_x = dv.x();
             dv_y = dv.y();
             dv_z = dv.z();
+            //from MkFit Geom ESProd
+            for (auto &det : trackerGeom_.detsPXB()){
+                float xy[4][2];
+                float dz;
+                const Bounds *b = &((det->surface()).bounds());
+
+                if (const TrapezoidalPlaneBounds *b2 = dynamic_cast<const TrapezoidalPlaneBounds *>(b)) {
+                // See sec. "TrapezoidalPlaneBounds parameters" in doc/reco-geom-notes.txt
+                std::array<const float, 4> const &par = b2->parameters();
+                xy[0][0] = -par[0];
+                xy[0][1] = -par[3];
+                xy[1][0] = -par[1];
+                xy[1][1] = par[3];
+                xy[2][0] = par[1];
+                xy[2][1] = par[3];
+                xy[3][0] = par[0];
+                xy[3][1] = -par[3];
+                dz = par[2];
+                }
+                else if (const RectangularPlaneBounds *b2 = dynamic_cast<const RectangularPlaneBounds *>(b)) {
+                // Rectangular
+                float dx = b2->width() * 0.5;   // half width
+                float dy = b2->length() * 0.5;  // half length
+                xy[0][0] = -dx;
+                xy[0][1] = -dy;
+                xy[1][0] = -dx;
+                xy[1][1] = dy;
+                xy[2][0] = dx;
+                xy[2][1] = dy;
+                xy[3][0] = dx;
+                xy[3][1] = -dy;
+                dz = b2->thickness() * 0.5;  // half thickness
+                }
+                std::cout << xy[0][0] << dz << std::endl;
+/*
+
+for (int i = 0; i < 4; ++i) {
+    Local3DPoint lp1(xy[i][0], xy[i][1], -dz);
+    Local3DPoint lp2(xy[i][0], xy[i][1], dz);
+    GlobalPoint gp1 = det->surface().toGlobal(lp1);
+    GlobalPoint gp2 = det->surface().toGlobal(lp2);
+
+*/
+
+
+
+
+
+            }
         }
         TLorentzVector lv;
         lv.SetPtEtaPhiM(muon.pt(), muon.eta(), muon.phi(), 0.10566);
