@@ -1,0 +1,4 @@
+import model --modelname HAHM_variablesw_v3_UFO
+define f = u c d s u~ c~ d~ s~ b b~ e+ e- m+ m- tt+ tt- ve vm vt ve~ vm~ vt~
+generate zp > f f
+output process_mZd_{ZDMASS}_eps_{EPSILON}
