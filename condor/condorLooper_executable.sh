@@ -8,6 +8,7 @@ YEAR=$2
 PROCESS=$3
 STARTFILE=$4
 NFILES=$5
+ISCONDOR=1
 
 function stageout {
     COPY_SRC=$1
@@ -47,8 +48,8 @@ cd /cvmfs/cms.cern.ch/$SCRAMARCH/cms/cmssw/$CMSSWVERSION/src ; eval `scramv1 run
 
 tar xvf package.tar.gz
 cd ScoutingRun3/cpp
-echo $OUTDIR $YEAR $PROCESS $STARTFILE $NFILES
-./main.exe $OUTDIR $YEAR $PROCESS $STARTFILE $NFILES
+echo $OUTDIR $YEAR $PROCESS $STARTFILE $NFILES $ISCONDOR
+./main.exe $OUTDIR $YEAR $PROCESS $STARTFILE $NFILES $ISCONDOR
 
 for FILE in $(ls $OUTDIR);
 do

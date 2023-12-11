@@ -23,6 +23,7 @@ parser.add_argument("--data", default=False, action="store_true", help="Plot dat
 parser.add_argument("--signal", default=False, action="store_true", help="Plot signal")
 parser.add_argument("--generator", default=False, action="store_true", help="Plot GEN-level histograms")
 parser.add_argument("--year", default="2022", help="Year to be processes. Default: 2022")
+parser.add_argument("--inYears", default=[], nargs="+", help="Choose years if data/simulation from different years is used (using year if not set)")
 parser.add_argument("--partialUnblinding", default=False, action="store_true", help="Have processed x% (default: x=50) of available data")
 parser.add_argument("--partialUnblindingFraction", default="0.5", help="Fraction of available data that have been processed")
 parser.add_argument("--dimuonMassSel", default=[], nargs="+", help="Selection on dimuon mass: first (or only) value is lower cut, second (optional) value is upper cut")
@@ -39,6 +40,8 @@ parser.add_argument("--lxySel", default=[], nargs="+", help="Selection on lxy: f
 parser.add_argument("--relaxedSVSel", default=False, action="store_true", help="Extend range for 1D histograms of SV selection variables")
 parser.add_argument("--doRatio", default=False, action="store_true", help="Plot ratios for 1D histograms")
 parser.add_argument("--shape", default=False, action="store_true", help="Shape normalization")
+parser.add_argument("--weightSignal", default=False, action="store_true", help="Signal normalization")
+parser.add_argument("--rebinWindow", default=0, help="Rebin mass window, set to 1 for automattic rebinning")
 parser.add_argument("--logY", default=False, action="store_true", help="Log-scale for Y axis")
 parser.add_argument("--zoomMass", default=[], nargs="+", help="Zoom mass [1] < mass < [0] GeV")
 parser.add_argument("--zoomLxy", default=[], nargs="+", help="Zoom lxy [1] < lxy < [0] cm")
@@ -68,14 +71,19 @@ skimFraction = float(args.partialUnblindingFraction)
 skimEvents = args.partialUnblinding
 if not isData:
     skimEvents = False
-luminosity = 35.144834218
+luminosity2022 = 35.144834218
 luminosity2022B = 0.085456340
 luminosity2022C = 5.070714851
 luminosity2022D = 3.006332096
 luminosity2022E = 5.866801170
 luminosity2022F = 18.006671456
 luminosity2022G = 3.108858306
-if samples[0]!="Data" and len(samples)==1:
+luminosity2023 = 27.208114203999997
+luminosity2023B = 0.622430830
+luminosity2023C = 5.557004785
+luminosity2023C_triggerV10 = 11.503479528
+luminosity2023D = 9.525199061
+if samples[0]!="Data" and len(samples)==1 and args.year=="2022":
     ts = samples[0]
     if ts=="DataB":
         luminosity = luminosity2022B
@@ -89,13 +97,33 @@ if samples[0]!="Data" and len(samples)==1:
         luminosity = luminosity2022F
     elif ts=="DataG":
         luminosity = luminosity2022G
+elif samples[0]=="Data" and args.year=="2022":
+    luminosity = luminosity2022
+elif samples[0]!="Data" and len(samples)==1 and args.year=="2023":
+    ts = samples[0]
+    if ts=="DataB":
+        luminosity = luminosity2023B
+    elif ts=="DataC":
+        luminosity = luminosity2023C
+    elif ts=="DataC-triggerV10":
+        luminosity = luminosity2023C_triggerV10
+    elif ts=="DataD":
+        luminosity = luminosity2023D
+elif samples[0]=="Data" and args.year=="2023":
+    luminosity = luminosity2023
 luminosity      = 0.1*luminosity
+luminosity2022  = 0.1*luminosity2022
 luminosity2022B = 0.1*luminosity2022B
 luminosity2022C = 0.1*luminosity2022C
 luminosity2022D = 0.1*luminosity2022D
 luminosity2022E = 0.1*luminosity2022E
 luminosity2022F = 0.1*luminosity2022F
 luminosity2022G = 0.1*luminosity2022G
+luminosity2023  = 0.1*luminosity2023
+luminosity2023B = 0.1*luminosity2023B
+luminosity2023C = 0.1*luminosity2023C
+luminosity2023C_triggerV10 = 0.1*luminosity2023C_triggerV10
+luminosity2023D = 0.1*luminosity2023D
 if skimEvents and skimFraction>0.0:
     luminosity      = skimFraction*luminosity
     luminosity2022B = skimFraction*luminosity2022B
@@ -106,26 +134,26 @@ if skimEvents and skimFraction>0.0:
     luminosity2022G = skimFraction*luminosity2022G
 
 colors = dict()
-colors["Data"]  = ROOT.kBlack
+colors["Data"]  = [ROOT.kBlack, ROOT.kBlue]
 colors["DataB"] = ROOT.kYellow+1
 colors["DataC"] = ROOT.kOrange+1
 colors["DataD"] = ROOT.kRed+1
 colors["DataE"] = ROOT.kPink+1
 colors["DataF"] = ROOT.kMagenta+1
 colors["DataG"] = ROOT.kViolet+1
-colors["signal"] = [ROOT.kBlue+1, ROOT.kAzure+1, ROOT.kCyan+1, ROOT.kTeal+1, ROOT.kGreen+1]
+colors["signal"] = [ROOT.kAzure+2, ROOT.kOrange+7, ROOT.kGreen+2, ROOT.kRed+1, ROOT.kMagenta-2]
+colors["mc"] = [ROOT.kRed-3]
+
 
 colorsMultiDir = [ROOT.kBlack,
-                  ROOT.kOrange+1,
-                  ROOT.kRed+1,
-                  ROOT.kPink+1,
-                  ROOT.kMagenta+1,
-                  ROOT.kViolet+1,
-                  ROOT.kBlue+1,
-                  ROOT.kAzure+1,
-                  ROOT.kCyan+1,
-                  ROOT.kTeal+1,
-                  ROOT.kGreen+1]
+                  ROOT.kBlue,
+                  ROOT.kRed,
+                  ROOT.kOrange,
+                  ROOT.kYellow,
+                  ROOT.kGreen+1,
+                  ROOT.kCyan,
+                  ROOT.kAzure]
+
 
 legnames = dict()
 legnames["Data"]  = "Data"
@@ -135,17 +163,31 @@ legnames["DataD"] = "Run2022D (%.2f/fb)"%luminosity2022D
 legnames["DataE"] = "Run2022E (%.2f/fb)"%luminosity2022E
 legnames["DataF"] = "Run2022F (%.2f/fb)"%luminosity2022F
 legnames["DataG"] = "Run2022G (%.2f/fb)"%luminosity2022G
+legnames["DileptonMinBias"] = "MinBias simulation"
+legnames["Signal_HTo2ZdTo2mu2x_MZd10_Epsilon1e-06"] = "HAHM: 10, #epsilon = 1x10^{-6}"
+legnames["Signal_HTo2ZdTo2mu2x_MZd10_Epsilon5e-07"] = "HAHM: 10, #epsilon = 5x10^{-7}"
+legnames["Signal_HTo2ZdTo2mu2x_MZd10_Epsilon1e-07"] = "HAHM: 10, #epsilon = 1x10^{-7}"
+legnames["Signal_HTo2ZdTo2mu2x_MZd10_Epsilon3e-08"] = "HAHM: 10, #epsilon = 3x10^{-8}"
+legnames["Signal_ScenB1_30_9p9_4p8_ctau_1mm"] = "ScenB1: m = 4.8 GeV, c#tau = 1 mm"
+legnames["Signal_ScenB1_30_9p9_4p8_ctau_10mm"] = "ScenB1: m = 4.8 GeV, c#tau = 10 mm"
+legnames["Signal_ScenB1_30_9p9_4p8_ctau_100mm"] = "ScenB1: m = 4.8 GeV, c#tau = 100 mm"
 
 for s in samples:
-    if "Signal" in s:
+    if "Signal" in s and s not in legnames.keys():
         legnames[s] = s.replace("_"," ")
+    if 'Signal_HTo2ZdTo2mu2x_MZd' in s and 'ctau' in s:
+        legtxt = "HAHM: m = {} GeV, c#tau = {} mm".format(s.split('MZd-')[1].split('_')[0].replace('p', '.'), s.split( 'ctau-')[1].split('mm')[0])
+        legnames[s] = legtxt
 
 samplecol   = []
 for s in samples:
     if "Signal" in s:
         samplecol.append("signal")
-    else:
+    elif "Data" in s:
         samplecol.append(s)
+    else:
+        samplecol.append("mc")
+
 
 indir  = args.inDir
 outdir = args.outDir
@@ -157,7 +199,7 @@ if not os.path.exists(outdir):
     os.makedirs(outdir)
 os.system('cp '+os.environ.get("PWD")+'/utils/index.php '+outdir)
 
-isMultiDir = (len(samples)==1 and len(args.inMultiDir)>1)
+isMultiDir = (len(samples)==1 and len(args.inMultiDir)>1 or len(samples)==len(args.inMultiDir))
 inmultidirs = []
 inmultilegs = []
 if isMultiDir:
@@ -176,19 +218,29 @@ if not doRatio:
     roff=0.01
 
 infiles = []
+inyears = []
+if len(args.inYears) > 0:
+    inyears = args.inYears
+else:
+    inyears = [args.year for s in samples]
 hname = "histograms"
 if args.generator:
     hname = "histograms_GEN"
 if not isMultiDir:
-    for s in samples:
-        if not os.path.isfile("%s/%s_%s_%s_all.root"%(indir,hname,s,args.year)):
-            os.system('hadd '+indir+'/'+hname+'_'+s+'_'+args.year+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_'+args.year+'_*.root")')
-        infiles.append(indir+'/'+hname+'_'+s+'_'+args.year+'_all.root')
+    for i,s in enumerate(samples):
+        if not os.path.isfile("%s/%s_%s_%s_all.root"%(indir,hname,s,inyears[i])):
+            os.system('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_'+inyears[i]+'*.root")')
+        infiles.append(indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root')
 else:
-    for d in inmultidirs:
-        if not os.path.isfile("%s/%s_%s_%s_all.root"%(d,hname,samples[0],args.year)):
-            os.system('hadd '+d+'/'+hname+'_'+samples[0]+'_'+args.year+'_all.root $(find '+d+' -name "'+hname+'_'+samples[0]+'*_'+args.year+'_*.root")')
-        infiles.append(d+'/'+hname+'_'+samples[0]+'_'+args.year+'_all.root')        
+    for i,d in enumerate(inmultidirs):
+        if len(samples) == len(inmultidirs):
+            if not os.path.isfile("%s/%s_%s_%s_all.root"%(d,hname,samples[i],inyears[i])):
+                os.system('hadd '+d+'/'+hname+'_'+samples[i]+'_'+inyears[i]+'_all.root $(find '+d+' -name "'+hname+'_'+samples[i]+'*_'+inyears[i]+'_*.root")')
+            infiles.append(d+'/'+hname+'_'+samples[i]+'_'+inyears[i]+'_all.root')        
+        else:
+            if not os.path.isfile("%s/%s_%s_%s_all.root"%(d,hname,samples[0],inyears[i])):
+                os.system('hadd '+d+'/'+hname+'_'+samples[0]+'_'+inyears[i]+'_all.root $(find '+d+' -name "'+hname+'_'+samples[0]+'*_'+inyears[i]+'_*.root")')
+            infiles.append(d+'/'+hname+'_'+samples[0]+'_'+inyears[i]+'_all.root')        
 
 if len(infiles)<1:
     print("No matching input file was found in %s."%indir)
@@ -209,20 +261,20 @@ h2d = []
 inf = []
 
 ncl = 1
-xol = 0.0
-if len(samples)>1 or len(inmultidirs)>1:
+xol = 0.35
+if len(samples)>5 or len(inmultidirs)>5:
     ncl=2
-    xol=0.25
-if len(samples)>4 or len(inmultidirs)>4:
-    ncl=3
     xol=0.5
-leg = ROOT.TLegend(0.69-xol, 0.89-0.06*max(len(samples),len(inmultidirs)+1)/ncl, 0.89, 0.89)
+leg = ROOT.TLegend(0.62-xol, 0.89-0.06*max(len(samples),len(inmultidirs)+1)/ncl, 0.89, 0.89)
 leg.SetNColumns(ncl)
 leg.SetFillColor(0)
 leg.SetFillStyle(0)
 leg.SetLineWidth(0)
+leg.SetTextSize(0.036)
 
+nDataSamples = 0
 nSigSamples = 0
+nMCSamples = 0
 for fn,f in enumerate(infiles):
     inf.append(ROOT.TFile(f))
     if len(h1dn)>0:
@@ -257,25 +309,44 @@ for fn,f in enumerate(infiles):
         #ht.SetDirectory(0)
         h1d[fn].append(copy.deepcopy(ht))
         if not isMultiDir:
-            if "signal" not in samplecol[fn]:
-                h1d[fn][len(h1d[fn])-1].SetLineColor  (colors[samplecol[fn]])
-                h1d[fn][len(h1d[fn])-1].SetMarkerColor(colors[samplecol[fn]])
-            else:
+            if ("signal" not in samplecol[fn]) and ("mc" not in samplecol[fn]):
+                h1d[fn][len(h1d[fn])-1].SetLineColor  (colors[samplecol[fn]][nDataSamples])
+                h1d[fn][len(h1d[fn])-1].SetMarkerColor(colors[samplecol[fn]][nDataSamples])
+                h1d[fn][len(h1d[fn])-1].SetMarkerStyle(20)
+            elif "mc" not in samplecol[fn]:
                 h1d[fn][len(h1d[fn])-1].SetLineColor  (colors[samplecol[fn]][nSigSamples])
                 h1d[fn][len(h1d[fn])-1].SetMarkerColor(colors[samplecol[fn]][nSigSamples])
-                nSigSamples = nSigSamples+1
+            else:
+                h1d[fn][len(h1d[fn])-1].SetLineColor  (colors[samplecol[fn]][nMCSamples])
+                h1d[fn][len(h1d[fn])-1].SetMarkerColor(colors[samplecol[fn]][nMCSamples])
+                h1d[fn][len(h1d[fn])-1].SetFillColorAlpha(colors[samplecol[fn]][nMCSamples], 0.5)
         else:
             h1d[fn][len(h1d[fn])-1].SetLineColor  (colorsMultiDir[fn])
             h1d[fn][len(h1d[fn])-1].SetMarkerColor(colorsMultiDir[fn])
+    if not isMultiDir:
+        if "Data" in samplecol[fn]:
+            nDataSamples = nDataSamples+1
+        if "signal" in samplecol[fn]:
+            nSigSamples = nSigSamples+1
+        if "mc" in samplecol[fn]:
+            nMCSamples = nMCSamples+1
     for hn in h2dn:
+        if not args.plotOSV:
+            if "osv" in hn:
+                continue
         if args.noPreSel:
             if "hsvsel_" in hn:
                 continue
         if args.noDiMuon:
+            if "dimuon" in hn:
+                continue
             if "hsvselass_" in hn:
                 continue
-        else:
-            if "hsvselass_" in hn and "osv" in hn:
+        if args.noFourMuon:
+            if ("fourmu" in hn and "osv" not in hn):
+                continue
+        if args.noFourMuonOSV:
+            if ("fourmu" in h and "osv" in h):
                 continue
         ht = inf[fn].Get(hn).Clone("%s_%d"%(hn,fn))
         #ht.SetDirectory(0)
@@ -284,19 +355,42 @@ for fn,f in enumerate(infiles):
     if len(h1d[fn])>0:
         if not isMultiDir:
             if "Data" in samples[fn]:
-                leg.AddEntry(h1d[fn][0], legnames[samples[fn]], "PEL")
+                leg.AddEntry(h1d[fn][0], legnames[samples[fn]] + " ({})".format(inyears[fn]), "PEL")
+            elif "mc" in samplecol[fn]:
+                leg.AddEntry(h1d[fn][0], legnames[samples[fn]], "F")
             else:
                 leg.AddEntry(h1d[fn][0], legnames[samples[fn]], "L")
         else:
             leg.SetHeader(legnames[samples[0].split(" ")[0]])
             if "Data" in samples[0]:
-                leg.AddEntry(h1d[fn][0], inmultilegs[fn], "PEL")
+                leg.AddEntry(h1d[fn][0], inmultilegs[fn] + " ({})".format(inyears[fn]), "PEL")
             else:
                 leg.AddEntry(h1d[fn][0], inmultilegs[fn], "L")
 
 # Draw histograms
 unityArea = args.shape
+weightSignal = not args.shape and args.weightSignal 
 doLogy = args.logY
+rebinWindow = int(args.rebinWindow)
+
+# Weights
+# Default xsec of 1 pb for every signal
+nevents = {}
+with open("data/Info_SignalMC.txt", "r") as file_:
+    info = file_.readlines()
+    for s in info:
+        if s[0]=="#": continue
+        s.replace('\n','')
+        nevents[s.split(',')[0]] = float(s.split(',')[1])
+weights = []
+for s_,s in enumerate(samples):
+    if "Signal" in s:
+        if "2022" in inyears[s_]:
+            weights.append(1000.0*luminosity2022/nevents[s])
+        elif "2023" in inyears[s_]:
+            weights.append(1000.0*luminosity2023/nevents[s])
+    else:
+        weights.append(1.0) # Default for data (MC not considered)
 
 # Labels
 yearenergy = "%.2f fb^{-1} (%s, 13.6 TeV)"%(luminosity,args.year)
@@ -315,7 +409,7 @@ latex.SetNDC(True)
 #
 latexCMS = ROOT.TLatex()
 latexCMS.SetTextFont(61)
-latexCMS.SetTextSize(0.04)
+latexCMS.SetTextSize(0.045)
 latexCMS.SetNDC(True)
 #
 latexCMSExtra = ROOT.TLatex()
@@ -373,7 +467,7 @@ for hn,hnn in enumerate(h1dn):
                     isZoom = True
                     if len(args.zoomLxy)>1:
                         xmin=float(args.zoomLxy[1])
-                if "selass" in hnn or "dimuon" in hnn:
+                if ("selass" in hnn or "dimuon" in hnn) and "sig" not in hnn:
                     if len(args.lxySel)>0:
                         xmin=float(args.lxySel[0])
                         isZoom = True
@@ -391,6 +485,12 @@ for hn,hnn in enumerate(h1dn):
                         isZoom = True
                         if len(args.dimuonMassSel)>1:
                             xmax=float(args.dimuonMassSel[1])
+                if "fourmuon_mass" in hnn:
+                    if len(args.fourmuonMassSel)>0:
+                        xmin=float(args.fourmuonMassSel[0])
+                        isZoom = True
+                        if len(args.fourmuonMassSel)>1:
+                            xmax=float(args.fourmuonMassSel[1])
             if "sv" in hnn and ("xerr" in hnn or "yerr" in hnn):
                 xmax=0.05*sfSVrange
             if "sv" in hnn and "zerr" in hnn:
@@ -405,6 +505,24 @@ for hn,hnn in enumerate(h1dn):
                     ytitle = h1d[fn][hn].GetYaxis().GetTitle()
                     ytitle = ytitle.replace("0.01","0.1")
                     h1d[fn][hn].GetYaxis().SetTitle(ytitle)
+                if "sv" in hnn and "sig" in hnn:
+                    h1d[fn][hn].Rebin(5)
+                    ytitle = h1d[fn][hn].GetYaxis().GetTitle()
+                    ytitle = ytitle.replace("0.1","0.5")
+                    h1d[fn][hn].GetYaxis().SetTitle(ytitle)
+            else:
+                if "mass" in hnn and "reld" not in hnn and rebinWindow > 0:
+                    if rebinWindow == 1:
+                        width = xmax - xmin
+                        nbins = int(width/0.01)
+                        for n in range(30, 51):
+                            if nbins%n==0:
+                                h1d[fn][hn].Rebin(int(nbins/n))
+                                break
+                    else: 
+                        h1d[fn][hn].Rebin(rebinWindow)
+        if weightSignal:
+            h1d[fn][hn].Scale(weights[fn])
         h1dr[fn].append(h1d[fn][hn].Clone("%s_ratio"%hnn))
         tbm = 1
         tbM = h1d[fn][hn].GetNbinsX()
@@ -444,10 +562,14 @@ for hn,hnn in enumerate(h1dn):
             h1d[fn][hn].SetLineWidth(2)
             ytitle = h1d[fn][hn].GetYaxis().GetTitle()
             if not unityArea:
-                tmaxY = max(tmaxY, h1d[fn][hn].GetMaximum())
+                tmaxY = max(tmaxY, 1.4*h1d[fn][hn].GetMaximum())
                 tminY = 0.0
                 if doLogy:
+                    tmaxY = 100*tmaxY
                     tminY = 0.9
+                    if weightSignal:
+                        tminY = 0.001
+        h1d[fn][hn].SetLineWidth(2)
         if unityArea:
             ytitle = ytitle.replace("Events", "Fraction of events")
             integral = h1d[fn][hn].Integral(0,-1)
@@ -460,13 +582,18 @@ for hn,hnn in enumerate(h1dn):
             if doLogy:
                 minb = 1e100
                 for b in range(1,h1d[fn][hn].GetNbinsX()+1):
+                    if b > tbM or b < tbm:
+                        continue
                     if h1d[fn][hn].GetBinContent(b)<minb and h1d[fn][hn].GetBinContent(b)>0.0:
                         minb = h1d[fn][hn].GetBinContent(b)
                 if integral>0.0:
                     tminY = min(tminY, max(0.1*minb,0.1/integral))
+                    tmaxY = max(10000*tmaxY/integral, 1.0)
                 else:
                     tminY = min(tminY, 0.1)
                     tmaxY = max(tmaxY, 1.0)
+            else:
+                tminY = 0.0
         h1dr[fn][hn].Divide(h1dr_den[hn])
         if "hsv" in hnn and not "mind" in hnn and not "maxd" in hnn:
             ytitle = ytitle.replace("Events", "Number of SVs")
@@ -512,20 +639,27 @@ maxR = []
 for hn,hnn in enumerate(h1dn):
     pads = []
     if doRatio:
-        pads.append(ROOT.TPad("1","1",0.0,0.18,1.0,1.0))
-        pads.append(ROOT.TPad("2","2",0.0,0.0,1.0,0.19))
+        pads.append(ROOT.TPad("1","1",0.0,0.3,1.0,1.0))
+        pads.append(ROOT.TPad("2","2",0.0,0.01,1.0,0.3))
         pads[0].SetTopMargin(0.08)
-        pads[0].SetBottomMargin(0.13)
+        pads[0].SetBottomMargin(0.015)
         pads[0].SetLeftMargin(0.10)
         pads[0].SetRightMargin(0.05)
+        pads[1].SetTopMargin(0.05)
         pads[1].SetLeftMargin(0.10)
         pads[1].SetRightMargin(0.05)
+        pads[1].SetBottomMargin(0.4)
     else:
         pads.append(ROOT.TPad("1","1",0,0,1,1))
         pads[0].SetTopMargin(0.08)
         pads[0].SetLeftMargin(0.10)
         pads[0].SetRightMargin(0.05)
     if doRatio:
+        h_axis[hn].GetXaxis().SetTitleSize(0.0)
+        h_axis[hn].GetXaxis().SetLabelSize(0.0)
+        h_axis[hn].GetYaxis().SetTitleSize(0.05)
+        h_axis[hn].GetYaxis().SetLabelSize(0.045)
+        h_axis[hn].GetYaxis().SetTitleOffset(1.05)
         minR.append(0.0)
         maxR.append(2.0)
         ty = np.array([])
@@ -543,16 +677,17 @@ for hn,hnn in enumerate(h1dn):
         h_axis_ratio[hn].SetMinimum(minR[hn])
         h_axis_ratio[hn].SetMaximum(maxR[hn])
         h_axis_ratio[hn].SetTitle(";;Ratio")
-        h_axis_ratio[hn].GetYaxis().SetTitleSize(0.16)
+        h_axis_ratio[hn].GetYaxis().SetTitleSize(0.12)
         h_axis_ratio[hn].GetYaxis().SetTitleOffset(0.25)
         if doLogy:
-            h_axis_ratio[hn].GetYaxis().SetTitleOffset(0.3)
+            h_axis_ratio[hn].GetYaxis().SetTitleOffset(0.4)
         h_axis_ratio[hn].GetYaxis().SetNdivisions(505)
         h_axis_ratio[hn].GetYaxis().SetLabelSize(0.12)
         h_axis_ratio[hn].GetYaxis().CenterTitle()
         h_axis_ratio[hn].GetYaxis().SetTickLength(0.02)
-        h_axis_ratio[hn].GetXaxis().SetLabelSize(0.0)
-        h_axis_ratio[hn].GetXaxis().SetTitle("")
+        h_axis_ratio[hn].GetXaxis().SetLabelSize(0.12)
+        h_axis_ratio[hn].GetXaxis().SetTitleSize(0.12)
+        h_axis_ratio[hn].GetXaxis().SetTitle(h1d[0][hn].GetXaxis().GetTitle())
         h_axis_ratio[hn].GetXaxis().SetTickSize(0.06)
 
         pads[0].Draw()
@@ -564,13 +699,10 @@ for hn,hnn in enumerate(h1dn):
         pads[1].SetTicky()
         h_axis_ratio[hn].Draw("")
         for fn in range(1,len(infiles)):
-            if (not isMultiDir and "Data" in samples[fn]) or (isMultiDir and "Data" in samples[0]):
-                h1dr[fn][hn].Draw("SAME,P,E")
-            else:
-                h1dr[fn][hn].Draw("SAME,HIST,E")
+            h1dr[fn][hn].Draw("SAME,P,E")
         line[hn].SetLineStyle(2)
         if not isMultiDir:
-            line[hn].SetLineColor(colors[samplecol[0]])
+            line[hn].SetLineColor(h1dr[0][hn].GetLineColor())
         else:
             line[hn].SetLineColor(colorsMultiDir[0])
         line[hn].SetLineWidth(1)
@@ -598,11 +730,17 @@ for hn,hnn in enumerate(h1dn):
     h_axis[hn].SetMinimum(minY[hn])
     h_axis[hn].SetMaximum(maxY[hn])
     h_axis[hn].Draw("")
+    fnd = []
     for fn in range(len(infiles)):
-        if (not isMultiDir and "Data" in samples[fn]) or (isMultiDir and "Data" in samples[0]):
+        if (isMultiDir and "Data" in samples[0]):
             h1d[fn][hn].Draw("SAME,P,E")
+        elif (not isMultiDir and "Data" in samples[fn]):
+            fnd.append(fn)
         else:
             h1d[fn][hn].Draw("SAME,HIST")
+    if (len(fnd) > 0):
+        for fn_ in fnd:
+            h1d[fnd[fn_]][hn].Draw("SAME,P,E")
     leg.Draw("same")
     pads[0].RedrawAxis()
     pads[0].Update()
@@ -637,6 +775,16 @@ for hn,hnn in enumerate(h1dn):
 for hn,hnn in enumerate(h2dn):
     for fn in range(len(infiles)):
         h = h2d[fn][hn].Clone()
+        if "lxycomp" in hnn:
+            if len(args.lxySel)>0:
+                 xmin=float(args.lxySel[0])
+                 ymin=float(args.lxySel[0])
+                 isZoom = True
+                 if len(args.lxySel)>1:
+                     xmax=float(args.lxySel[1])
+                     ymax=float(args.lxySel[1])
+                 h.GetXaxis().SetRangeUser(xmin, xmax)
+                 h.GetYaxis().SetRangeUser(ymin, ymax)
         if "yvsx" in hnn:
             maxc      = 100.0
             maxcPixel = 17.5

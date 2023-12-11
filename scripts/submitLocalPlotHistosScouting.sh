@@ -12,7 +12,7 @@ python3 plotHistosScouting.py --inSamples Data --inDir /ceph/cms/store/user/mmas
 
 python3 plotHistosScouting.py --inSamples Data --inDir /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_dimuonMassDiff0p05AvgMass_onlyFourMuon --shape --logY --outSuffix dimuonMassDiff0p05AvgMass_onlyFourMuon >& /dev/null &
 
-####
+###
 #
 #python3 plotHistosScouting.py --inSamples Data --inMultiDir /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass2p95to3p25_onlyDiMuon/ /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass2p5to2p95-3p25to3p4_onlyDiMuon/ --inMultiLeg "J/#psi" "J/#psi sidebands" --relaxedSVSel --dimuonMassSel 2.5 3.4 --shape --doRatio --logY  --noPreSel --noFourMuon --noFourMuonOSV --outSuffix JPsi >& /dev/null &
 #
@@ -68,7 +68,7 @@ python3 plotHistosScouting.py --inSamples Data --inDir /ceph/cms/store/user/mmas
 #
 ##
 #
-####
+###
 #
 #python3 plotHistosScouting.py --inSamples Data --inMultiDir /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass9p0to11p0_onlyDiMuon/ /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass5p0to9p0-11p0to15p0_onlyDiMuon/ --inMultiLeg "#Upsilon(nS)" "#Upsilon(nS) sidebands" --relaxedSVSel --dimuonMassSel 5.0 15.0 --shape --doRatio --logY  --noPreSel --noFourMuon --noFourMuonOSV --outSuffix Upsilon >& /dev/null &
 #
@@ -124,7 +124,7 @@ python3 plotHistosScouting.py --inSamples Data --inDir /ceph/cms/store/user/mmas
 #
 ##
 #
-####
+###
 #
 #python3 plotHistosScouting.py --inSamples Data --inMultiDir /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass2p95to3p25_onlyDiMuon/ /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass2p5to2p95-3p25to3p4_onlyDiMuon/ /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass9p0to11p0_onlyDiMuon/ /ceph/cms/store/user/mmasciov/Run3ScoutingOutput/outputHistograms_Aug-02-2023_relaxedSVselection_dimuonMass5p0to9p0-11p0to15p0_onlyDiMuon/ --inMultiLeg "J/#psi" "J/#psi sidebands" "#Upsilon(nS)" "#Upsilon(nS) sidebands" --relaxedSVSel --dimuonMassSel 2.5 15.0 --shape --doRatio --logY  --noPreSel --noFourMuon --noFourMuonOSV --outSuffix JPsi-Upsilon >& /dev/null &
 #
@@ -180,4 +180,4 @@ python3 plotHistosScouting.py --inSamples Data --inDir /ceph/cms/store/user/mmas
 #
 ##
 #
-####
+###

@@ -1,0 +1,93 @@
+executable      = $ENV(STARTDIR)/condor/condorHistos_executable.sh
+output          = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId).log
+
+RequestCpus   = 2
+RequestMemory = 8000
+
+getenv = True
+#+JobFlavour = "longlunch"
++JobFlavour = "workday"
++DESIRED_Sites = "T2_US_UCSD"
+transfer_input_files = $ENV(STARTDIR)/package.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy=$ENV(X509_USER_PROXY)
+use_x509userproxy = True
+
+# Comment out any of the following configurations
+queue arguments from (
+###
+###DataB
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023B  --year 2023 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023B  --year 2023 --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+###DataC
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 8 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 9 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 10 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 11 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 12 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 13 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C-triggerV10_  --year 2023 --splitIndex 14 --splitPace 1000000 $ENV(SCOUTINGARGS)
+###DataC
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 8 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 9 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 10 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 11 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 12 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 13 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 14 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 15 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 16 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 17 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 18 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 19 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 20 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 21 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 22 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 23 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 24 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 25 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023C_ --year 2023 --splitIndex 26 --splitPace 1000000 $ENV(SCOUTINGARGS)
+#Data D
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023D  --year 2023 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023D  --year 2023 --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023D  --year 2023 --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample Data2023D  --year 2023 --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+)
+
+#1000000
+#1298212
+
+#1000000
+#25866581
+
+#25767944
+
+#1000000
+#13167789
+
+#1000000
+#3765643
+
+#From event 0 to event 25866581
+#From event 0 to event 13167789
+
+#python3 fillHistosScouting.py --inDir /ceph/cms/store/user/legianni/Run3ScoutingOutput/looperOutput_Sep-21-2023/  --outSuffix test --year 2023 --inSample Data2023B
