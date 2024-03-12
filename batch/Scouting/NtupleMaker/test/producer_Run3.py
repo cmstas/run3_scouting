@@ -11,6 +11,7 @@ opts.register('era',     "2022D",       mytype = vpstring)
 opts.register('output',  "output.root", mytype = vpstring)
 opts.register('inputs',  "",            mytype = vpstring) # comma separated list of input files
 opts.register('nevents', -1,            mytype = vpint)
+opts.register('testL1',    False,       mytype = vpbool)
 opts.parseArguments()
 
 def convert_fname(fname):
@@ -133,6 +134,8 @@ L1Info  = []
 HLTInfo = []
 if '2022' in opts.era or '2023B' in opts.era or '2023C-triggerV10' in opts.era:
     L1Info = ["L1_DoubleMu_12_5","L1_DoubleMu_15_7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_Min7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_7to18","L1_DoubleMu4_SQ_OS_dR_Max1p2","L1_DoubleMu4p5_SQ_OS_dR_Max1p2"]
+    if opts.testL1:
+        L1Info = L1Info + ["L1_DoubleMu0_Upt15_Upt7", "L1_DoubleMu0_Upt6_IP_Min1_Upt4"]
     HLTInfo=[ [ 'Run3_PFScouting', 'DST_Run3_PFScoutingPixelTracking_v*' ] ]
     if opts.monitor:
         HLTInfo = HLTInfo + [

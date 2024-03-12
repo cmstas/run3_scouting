@@ -95,6 +95,35 @@ E.g., to `hadd` histograms within a directory for all data sub-samples:
 source scripts/submitLocalAddHistosScouting.sh
 ```
 
+## Fitting
+
+To run a set of fits just run:
+
+```
+sh cpp/setFittingEnv.sh
+root -b -q -l -n cpp/doAll_fitDimuonMass.C
+```
+
+
+## Limits on condor
+
+If running limits for the first time:
+
+```
+git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+pushd HiggsAnalysis/CombinedLimit
+git fetch origin
+git checkout v9.1.0
+. env_standalone.sh
+make
+```
+
+Then launch with condor with:
+
+```
+sh condor/limits/runLimits_onCondor.sh <datacard directory> <limit output directory>
+``
+
 ## Draft analysis code with uproot and coffea
 
 This is a draft of some potential analysis code, based on uproot and coffea.

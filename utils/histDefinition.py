@@ -30,6 +30,72 @@ def hist2dDefinition(nbinsX, lowX, highX, xtitle2d, nbinsY, lowY, highY, ytitle2
     ztitle2d   ["yvsx"] = "Number of SVs"
     variablesXY["yvsx"] = ["t.SV_x[v]","t.SV_y[v]"]
 
+    nbinsX     ["xerrvslxy"] = 100
+    lowX       ["xerrvslxy"] = 0.0
+    highX      ["xerrvslxy"] = 70.0
+    nbinsY     ["xerrvslxy"] = 100
+    lowY       ["xerrvslxy"] = 0.0
+    highY      ["xerrvslxy"] = 0.05
+    xtitle2d   ["xerrvslxy"] = "SV l_{xy} (from PV) [cm]"
+    ytitle2d   ["xerrvslxy"] = "SV x error [cm]"
+    ztitle2d   ["xerrvslxy"] = "Number of SVs"
+    variablesXY["xerrvslxy"] = ["t.SV_lxy[v]","t.SV_xe[v]"]
+
+    nbinsX     ["yerrvslxy"] = 100
+    lowX       ["yerrvslxy"] = 0.0
+    highX      ["yerrvslxy"] = 70.0
+    nbinsY     ["yerrvslxy"] = 100
+    lowY       ["yerrvslxy"] = 0.0
+    highY      ["yerrvslxy"] = 0.05
+    xtitle2d   ["yerrvslxy"] = "SV l_{xy} (from PV) [cm]"
+    ytitle2d   ["yerrvslxy"] = "SV y error [cm]"
+    ztitle2d   ["yerrvslxy"] = "Number of SVs"
+    variablesXY["yerrvslxy"] = ["t.SV_lxy[v]","t.SV_ye[v]"]
+
+    nbinsX     ["zerrvslxy"] = 100
+    lowX       ["zerrvslxy"] = 0.0
+    highX      ["zerrvslxy"] = 70.0
+    nbinsY     ["zerrvslxy"] = 100
+    lowY       ["zerrvslxy"] = 0.0
+    highY      ["zerrvslxy"] = 0.1
+    xtitle2d   ["zerrvslxy"] = "SV l_{xy} (from PV) [cm]"
+    ytitle2d   ["zerrvslxy"] = "SV z error [cm]"
+    ztitle2d   ["zerrvslxy"] = "Number of SVs"
+    variablesXY["zerrvslxy"] = ["t.SV_lxy[v]","t.SV_ze[v]"]
+
+    nbinsX     ["xerrvsz"] = 100
+    lowX       ["xerrvsz"] = 0.0
+    highX      ["xerrvsz"] = 110.0
+    nbinsY     ["xerrvsz"] = 100
+    lowY       ["xerrvsz"] = 0.0
+    highY      ["xerrvsz"] = 0.05
+    xtitle2d   ["xerrvsz"] = "SV z [cm]"
+    ytitle2d   ["xerrvsz"] = "SV x error [cm]"
+    ztitle2d   ["xerrvsz"] = "Number of SVs"
+    variablesXY["xerrvsz"] = ["t.SV_z[v]","t.SV_xe[v]"]
+
+    nbinsX     ["yerrvsz"] = 100
+    lowX       ["yerrvsz"] = 0.0
+    highX      ["yerrvsz"] = 110.0
+    nbinsY     ["yerrvsz"] = 100
+    lowY       ["yerrvsz"] = 0.0
+    highY      ["yerrvsz"] = 0.05
+    xtitle2d   ["yerrvsz"] = "SV z [cm]"
+    ytitle2d   ["yerrvsz"] = "SV y error [cm]"
+    ztitle2d   ["yerrvsz"] = "Number of SVs"
+    variablesXY["yerrvsz"] = ["t.SV_z[v]","t.SV_ye[v]"]
+
+    nbinsX     ["zerrvsz"] = 100
+    lowX       ["zerrvsz"] = 0.0
+    highX      ["zerrvsz"] = 110.0
+    nbinsY     ["zerrvsz"] = 100
+    lowY       ["zerrvsz"] = 0.0
+    highY      ["zerrvsz"] = 0.1
+    xtitle2d   ["zerrvsz"] = "SV z [cm]"
+    ytitle2d   ["zerrvsz"] = "SV z error [cm]"
+    ztitle2d   ["zerrvsz"] = "Number of SVs"
+    variablesXY["zerrvsz"] = ["t.SV_z[v]","t.SV_ze[v]"]
+
     nbinsX     ["mindvslxy"] = 1000
     lowX       ["mindvslxy"] = 0.0
     highX      ["mindvslxy"] = 40.0
@@ -102,6 +168,20 @@ def hist1dDefinition(nbins, low, high, xtitle, ytitle, labels, variable):
     xtitle  ["llplxy"] = "Decay length l_{xy} (cm)"
     ytitle  ["llplxy"] = "Simulated LLPs"
     variable["llplxy"] = "lxygen"
+
+    nbins   ["deltalxy"] = 100
+    low     ["deltalxy"] = -0.5
+    high    ["deltalxy"] = 0.5
+    xtitle  ["deltalxy"] = "#Delta(reco l_{xy}, gen l_{xy})/gen l_{xy}"
+    ytitle  ["deltalxy"] = "Dimuons"
+    variable["deltalxy"] = "deltalxy"
+
+    nbins   ["genmupt"] = 50
+    low     ["genmupt"] = 0
+    high    ["genmupt"] = 150
+    xtitle  ["genmupt"] = "Generated muon p_{T} [GeV]"
+    ytitle  ["genmupt"] = "Simulated muons"
+    variable["genmupt"] = "t.GenPart_pt[i]"
 
     nbins   ["isgen"] = 2
     low     ["isgen"] = 0
@@ -724,6 +804,48 @@ def hist1dDefinition(nbins, low, high, xtitle, ytitle, labels, variable):
     xtitle  ["mudphisvu"] = "|#Delta#phi(#mu, #vec{SV})| [rad]"
     ytitle  ["mudphisvu"] = "Events / 0.01 rad"
     variable["mudphisvu"] = "svphiu"
+
+    nbins   ["mudphimm"] = 320
+    low     ["mudphimm"] = -3.2/2.0
+    high    ["mudphimm"] = 3.2/2.0
+    xtitle  ["mudphimm"] = "|#Delta#phi(#mu, #vec{#mu#mu})| [rad]"
+    ytitle  ["mudphimm"] = "Events / 0.01 rad"
+    variable["mudphimm"] = "mmuphi"
+
+    nbins   ["mudphimmu"] = 320
+    low     ["mudphimmu"] = -3.2/2.0
+    high    ["mudphimmu"] = 3.2/2.0
+    xtitle  ["mudphimmu"] = "|#Delta#phi(#mu, #vec{#mu#mu})| [rad]"
+    ytitle  ["mudphimmu"] = "Events / 0.01 rad"
+    variable["mudphimmu"] = "mmuphiu"
+
+    nbins   ["mutheta"] = 320
+    low     ["mutheta"] = 0.0
+    high    ["mutheta"] = 3.2
+    xtitle  ["mutheta"] = "|#Delta#phi(IP, #vec{#mu#mu})| [rad]"
+    ytitle  ["mutheta"] = "Events / 0.01 rad"
+    variable["mutheta"] = "mmtheta"
+
+    nbins   ["muthetau"] = 320
+    low     ["muthetau"] = 0.0
+    high    ["muthetau"] = 3.2
+    xtitle  ["muthetau"] = "|#Delta#phi(IP, #vec{#mu#mu})| [rad]"
+    ytitle  ["muthetau"] = "Events / 0.01 rad"
+    variable["muthetau"] = "mmthetau"
+
+    nbins   ["muthetamm"] = 320
+    low     ["muthetamm"] = 0.0
+    high    ["muthetamm"] = 3.2
+    xtitle  ["muthetamm"] = "|#Delta#phi(IP, #vec{#mu#mu})| [rad]"
+    ytitle  ["muthetamm"] = "Events / 0.01 rad"
+    variable["muthetamm"] = "mmtheta_mmsign"
+
+    nbins   ["muthetammu"] = 320
+    low     ["muthetammu"] = 0.0
+    high    ["muthetammu"] = 3.2
+    xtitle  ["muthetammu"] = "|#Delta#phi(IP, #vec{#mu#mu})| [rad]"
+    ytitle  ["muthetammu"] = "Events / 0.01 rad"
+    variable["muthetammu"] = "mmthetau_mmsign"
 
     #Di-muon
 
@@ -1516,6 +1638,11 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
     histname["llp"].append("hllp_lxy")
     histtype[histname["llp"][-1]]="llplxy"
     #
+    histname["genmu"] = []
+    #
+    histname["genmu"].append("hgenmu_pt")
+    histtype[histname["genmu"][-1]]="genmupt"
+    #
     ##
     # Displaced vertices
     histname["nsvsel"] = []
@@ -1609,6 +1736,24 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
         #
         histname2d["svsel"].append("hsvsel_yvsx")
         histtype2d[histname2d["svsel"][-1]]="yvsx"
+        #
+        histname2d["svsel"].append("hsvsel_xerrvslxy")
+        histtype2d[histname2d["svsel"][-1]]="xerrvslxy"
+        #
+        histname2d["svsel"].append("hsvsel_yerrvslxy")
+        histtype2d[histname2d["svsel"][-1]]="yerrvslxy"
+        #
+        histname2d["svsel"].append("hsvsel_zerrvslxy")
+        histtype2d[histname2d["svsel"][-1]]="zerrvslxy"
+        #
+        histname2d["svsel"].append("hsvsel_xerrvsz")
+        histtype2d[histname2d["svsel"][-1]]="xerrvsz"
+        #
+        histname2d["svsel"].append("hsvsel_yerrvsz")
+        histtype2d[histname2d["svsel"][-1]]="yerrvsz"
+        #
+        histname2d["svsel"].append("hsvsel_zerrvsz")
+        histtype2d[histname2d["svsel"][-1]]="zerrvsz"
         #
         histname2d["svsel"].append("hsvsel_mindvslxy")
         histtype2d[histname2d["svsel"][-1]]="mindvslxy"
@@ -1719,6 +1864,24 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
         #
         histname2d["svselass"].append("hsvselass_mindxyvslxy")
         histtype2d[histname2d["svselass"][-1]]="mindxyvslxy"
+        #
+        histname2d["svselass"].append("hsvselass_xerrvslxy")
+        histtype2d[histname2d["svselass"][-1]]="xerrvslxy"
+        #
+        histname2d["svselass"].append("hsvselass_yerrvslxy")
+        histtype2d[histname2d["svselass"][-1]]="yerrvslxy"
+        #
+        histname2d["svselass"].append("hsvselass_zerrvslxy")
+        histtype2d[histname2d["svselass"][-1]]="zerrvslxy"
+        #
+        histname2d["svselass"].append("hsvselass_xerrvsz")
+        histtype2d[histname2d["svselass"][-1]]="xerrvsz"
+        #
+        histname2d["svselass"].append("hsvselass_yerrvsz")
+        histtype2d[histname2d["svselass"][-1]]="yerrvsz"
+        #
+        histname2d["svselass"].append("hsvselass_zerrvsz")
+        histtype2d[histname2d["svselass"][-1]]="zerrvsz"
         #
         ##
         #
@@ -2342,6 +2505,24 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
         histname["selmuon"].append("hselmuon_uphi_dphisv")
         histtype[histname["selmuon"][-1]]="mudphisvu"
         #
+        histname["selmuon"].append("hselmuon_mudphimm")
+        histtype[histname["selmuon"][-1]]="mudphimm"
+        #
+        histname["selmuon"].append("hselmuon_uphi_mudphimm")
+        histtype[histname["selmuon"][-1]]="mudphimmu"
+        #
+        histname["selmuon"].append("hselmuon_mutheta")
+        histtype[histname["selmuon"][-1]]="mutheta"
+        #
+        histname["selmuon"].append("hselmuon_uphi_mutheta")
+        histtype[histname["selmuon"][-1]]="muthetau"
+        #
+        histname["selmuon"].append("hselmuon_muthetamm")
+        histtype[histname["selmuon"][-1]]="muthetamm"
+        #
+        histname["selmuon"].append("hselmuon_uphi_muthetamm")
+        histtype[histname["selmuon"][-1]]="muthetammu"
+        #
         ##
         #
         histname["selmuon_osv"].append("hselmuon_osv_pt")
@@ -2505,6 +2686,24 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
         #
         histname["selmuon_osv"].append("hselmuon_osv_uphi_dphisv")
         histtype[histname["selmuon_osv"][-1]]="mudphisvu"
+        #
+        histname["selmuon_osv"].append("hselmuon_osv_mudphimm")
+        histtype[histname["selmuon_osv"][-1]]="mudphimm"
+        #
+        histname["selmuon_osv"].append("hselmuon_osv_uphi_mudphimm")
+        histtype[histname["selmuon_osv"][-1]]="mudphimmu"
+        #
+        histname["selmuon_osv"].append("hselmuon_osv_mutheta")
+        histtype[histname["selmuon_osv"][-1]]="mutheta"
+        #
+        histname["selmuon_osv"].append("hselmuon_osv_uphi_mutheta")
+        histtype[histname["selmuon_osv"][-1]]="muthetau"
+        #
+        histname["selmuon_osv"].append("hselmuon_osv_muthetamm")
+        histtype[histname["selmuon_osv"][-1]]="muthetamm"
+        #
+        histname["selmuon_osv"].append("hselmuon_osv_uphi_muthetamm")
+        histtype[histname["selmuon_osv"][-1]]="muthetammu"
         #
     ##
     histname["selmuon_fourmu"] = []
@@ -2907,6 +3106,9 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
         #
         histname["dimuon"].append("hdimuon_gen_recolxy")
         histtype[histname["dimuon"][-1]]="lxy"
+        #
+        histname["dimuon"].append("hdimuon_gen_deltalxy")
+        histtype[histname["dimuon"][-1]]="deltalxy"
         #
         histname["dimuon"].append("hdimuon_gen_recomass")
         histtype[histname["dimuon"][-1]]="dimumass"

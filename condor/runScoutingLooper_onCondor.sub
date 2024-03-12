@@ -256,6 +256,11 @@ $ENV(SCOUTINGOUTPUTDIR) 2022 DileptonMinBias 1325 25
 $ENV(SCOUTINGOUTPUTDIR) 2022 DileptonMinBias 1350 25
 $ENV(SCOUTINGOUTPUTDIR) 2022 DileptonMinBias 1375 12
 #
+# Signal (Private ScenB1)
+$ENV(SCOUTINGOUTPUTDIR) 2022 Signal_ScenB1_30_9p9_4p8_ctau_1mm 0 300
+$ENV(SCOUTINGOUTPUTDIR) 2022 Signal_ScenB1_30_9p9_4p8_ctau_10mm 0 300
+$ENV(SCOUTINGOUTPUTDIR) 2022 Signal_ScenB1_30_9p9_4p8_ctau_100mm 0 300
+#
 # Signal (central HTo2ZdTo2mu2x)
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_HTo2ZdTo2mu2x_MZd-44p0_ctau-10mm_2022 0 100
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_HTo2ZdTo2mu2x_MZd-44p0_ctau-10mm_2022postEE 0 100
@@ -401,7 +406,7 @@ $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_HTo2ZdTo2mu2x_MZd-24p0_ctau-1mm_2022 0 100
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_HTo2ZdTo2mu2x_MZd-24p0_ctau-1mm_2022postEE 0 100
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_HTo2ZdTo2mu2x_MZd-8p0_ctau-100mm_2022 0 100
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_HTo2ZdTo2mu2x_MZd-8p0_ctau-100mm_2022postEE 0 100
-# Signal (privately produced published datasets for BToPhi, 1 added at the end to indicate that they should be accessed with Xrootd)
+# Signal BToPhi (privately produced published datasets, 1 added at the end to indicate that they should be accessed with Xrootd)
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_BToPhi_MPhi-2p0_ctau-1mm_2022 0 100 1
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_BToPhi_MPhi-2p0_ctau-1mm_2022postEE 0 100 1
 $ENV(SCOUTINGOUTPUTDIR) 2022 Signal_BToPhi_MPhi-2p0_ctau-10mm_2022 0 100 1

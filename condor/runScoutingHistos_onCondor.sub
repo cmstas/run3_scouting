@@ -321,6 +321,10 @@ $ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG 
 $ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 25 --splitPace 250000 $ENV(SCOUTINGARGS)
 $ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 26 --splitPace 250000 $ENV(SCOUTINGARGS)
 $ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 27 --splitPace 250000 $ENV(SCOUTINGARGS)
+###DarkShower
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenB1_30_9p9_4p8_ctau_100mm --splitIndex 0 --splitPace 300000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenB1_30_9p9_4p8_ctau_10mm --splitIndex 0 --splitPace 300000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenB1_30_9p9_4p8_ctau_1mm --splitIndex 0 --splitPace 300000 $ENV(SCOUTINGARGS)
 ## Central hZdZd
 $ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-44p0_ctau-10mm_2022 --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
 $ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-44p0_ctau-10mm_2022postEE --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)

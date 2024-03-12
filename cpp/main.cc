@@ -202,6 +202,38 @@ int main(int argc, char **argv) {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-7p0_ctau-100mm_2022/", startFile, nFiles, isCondor, fromCrab); 
     process = "Signal_HTo2ZdTo2mu2x_MZd-7p0_ctau-100mm";
   }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-2e-07_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-50_Epsilon-2e-07_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-2e-07_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-6e-08_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-50_Epsilon-6e-08_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-6e-08_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-1e-08_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-50_Epsilon-1e-08_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-1e-08_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-4e-09_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-50_Epsilon-4e-09_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-50_Epsilon-4e-09_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-1e-07_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-60_Epsilon-1e-07_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-1e-07_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-4e-08_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-60_Epsilon-4e-08_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-4e-08_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-7e-09_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-60_Epsilon-7e-09_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-7e-09_testL1";
+  }
+  if ( sampleArg=="Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-2e-09_testL1" && year=="2022") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/HTo2ZdTo2mu2x_MZd-60_Epsilon-2e-09_testL1/", startFile, nFiles, isCondor); 
+    process = "Signal_HTo2ZdTo2mu2x_MZd-60_Epsilon-2e-09_testL1";
+  }
   if ( sampleArg=="Signal_ScenB1_30_9p9_4p8_ctau_1mm" && year=="2022") {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Signal/ScenB1_30_9p9_4p8_ctau_1mm_2022/", startFile, nFiles, isCondor, fromCrab); 
     process = "Signal_ScenB1_30_9p9_4p8_ctau_1mm";
