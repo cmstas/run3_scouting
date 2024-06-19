@@ -7,19 +7,15 @@
   //bool useSignalMC = true;
   bool mergeEras = true;
   bool writeWS = true;
-  TString period = "2023"; // Either 2022 or 2023
+  TString period = "2022"; // Either 2022 or 2023
   TString model = "HTo2ZdTo2mu2x";
   float mF = 350.0;
   float mL = 2000.0;
   
 
   // Dir with the RooDataSets
-  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Mar-26-2024_allCuts";
-  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Apr-19-2024_allCut_v2/";
-  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_May-17-2024_allCuts/";
-  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_May-17-2024_allCuts/"; // Updated 2023
-  TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_May-27-2024_2023_allCuts_w1/"; // Updated 2023
-  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_May-28-2024_2023_allCuts_w10/"; // Updated 2023
+  TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jun-14-2024_SRsOnly_2022"; // last 2022
+  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jun-14-2024_SRsOnly_2023"; // last 2023
 
   // Names of the search regions
   vector<TString> dNames = { };
@@ -95,12 +91,8 @@
   // Signals (To be modified: Needs to be more general but this is provisional)
   //vector<float> sigMass = {0.5, 0.7, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0};
   if ( model=="HTo2ZdTo2mu2x" ) {
-  //vector<float> sigMass = {0.5, 0.7, 1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 12.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0};
- // vector<float> sigMass = {0.5, 0.7, 1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0};
-  vector<float> sigMass = {0.5, 0.7, 2.0, 2.5, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0};
-  //vector<float> sigMass = {0.5, 0.7, 1.5, 2.0, 2.5};
+  vector<float> sigMass = {0.5, 0.7, 1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 12.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0};
   vector<float> sigCtau = {1, 10, 100, 1000};
-  //vector<float> sigCtau = {1};
   for ( unsigned int m=0; m<sigMass.size(); m++ ) {
     TString massString = Form("%.1f",sigMass[m]); 
     massString.ReplaceAll(".", "p");
@@ -220,11 +212,8 @@
    
    if (mergeEras) {
      TString outDir = "fitResults_"+period;
-     RooDataSet mmumu_bkg_merged;
-     for ( int iera=0; iera<eras.size(); iera++ ) {
-       if (iera==0) 
-         mmumu_bkg_merged = mmumu_bkgs[iera];
-       else 
+     RooDataSet mmumu_bkg_merged = mmumu_bkgs[0];
+     for ( int iera=1; iera<eras.size(); iera++ ) {
          mmumu_bkg_merged.append(mmumu_bkgs[iera]);
      }
      mmumu_bkg_merged.SetName(dNames[d]+"_Data_"+period);

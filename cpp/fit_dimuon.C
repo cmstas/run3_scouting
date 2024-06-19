@@ -1,6 +1,6 @@
-#include "../CMSSW_12_6_0/src/HiggsAnalysis/CombinedLimit/interface/RooDoubleCBFast.h"
-#include "../CMSSW_12_6_0/src/HiggsAnalysis/CombinedLimit/interface/RooBernsteinFast.h"
-#include "../CMSSW_12_6_0/src/HiggsAnalysis/CombinedLimit/interface/RooMultiPdf.h"
+#include "../CMSSW_13_3_0/src/HiggsAnalysis/CombinedLimit/interface/RooDoubleCBFast.h"
+#include "../CMSSW_13_3_0/src/HiggsAnalysis/CombinedLimit/interface/RooBernsteinFast.h"
+#include "../CMSSW_13_3_0/src/HiggsAnalysis/CombinedLimit/interface/RooMultiPdf.h"
 #include "RooCategory.h"
 #include "RooWorkspace.h"
 #include "RooFitResult.h"
@@ -51,7 +51,6 @@ using namespace std;
 using namespace RooFit;
 
 bool doBinnedFit = false;
-bool refitSignal = true;
 //bool refitSignal = false;
 bool categorizeSignal = true;
 bool categorizeBackground = true; // true?
@@ -78,6 +77,7 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
   double minmass = 0.4;
   double maxmass = 140.;
   double minMforFit = minmass;
+  bool refitSignal = true;
 
   // Veto of SM resonances: Compare minMforFit with upper edge of vetoed mass band
   // This is provisionally commented because it's giving problems with m = 0.5 GeV
@@ -348,6 +348,9 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
       }
       if (sigRawEntries < 1e-6) {
         sigRawEntries = 1e-6;
+      }
+      if (sigRawEntries < 10) {
+        refitSignal = false;
       }
     }
     else {
@@ -1158,12 +1161,14 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
       //frame->remove(Form("background_bernstein_order%d",to+1));
       if ( (bestBernsteinOrder >= 0 && to > bestBernsteinOrder) || to > maxpolyorder ) {
 	RooAbsPdf *bernstein;
+	bool isUniform = false;
 	vector<int> bernsteinPDFOrders;
 	int minBernsteinOrder = (addBernsteinOrders) ? bestBernsteinOrder-1 : bestBernsteinOrder;
 	int maxBernsteinOrder = (addBernsteinOrders) ? bestBernsteinOrder+1 : bestBernsteinOrder;
 	for ( int tto = minBernsteinOrder; tto <= maxBernsteinOrder; tto++) {
           if (nBG.getVal() < 1 && tto==minBernsteinOrder) {
             bernstein = new RooUniform(Form("background_uniform%s",catExt.Data()),Form("background_uniform%s",catExt.Data()),x);
+	    isUniform = true;
           } else {
             if (nBG.getVal() < 1)
               continue;
@@ -1177,10 +1182,12 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
 	    bernsteinPDFOrders.push_back(tto);
 	    //RooAbsPdf *bernstein;
 	    if (tto == 0) {
-	      if ( (*mmumuFit).sumEntries(Form("%s>=%.3f",varname.Data(),mass+3.0*stddev)) < (*mmumuFit).sumEntries(Form("%s<%.3f",varname.Data(),mass-3.0*stddev)) )
+	      if ( (*mmumuFit).sumEntries(Form("%s>=%.3f",varname.Data(),mass+3.0*stddev)) < (*mmumuFit).sumEntries(Form("%s<%.3f",varname.Data(),mass-3.0*stddev)) ) {
 		bernstein = new RooBernsteinFast<1>(Form("background_bernstein%s",catExt.Data()),Form("background_bernstein%s",catExt.Data()),x,parListBernstein[tto]);
-	      else
+	      } else {
 		bernstein = new RooUniform(Form("background_uniform%s",catExt.Data()),Form("background_uniform%s",catExt.Data()),x);
+		isUniform = true;
+              }
 	    }
 	    else if (tto == 1)
 	      bernstein = new RooBernsteinFast<2>(Form("background_bernstein%s",catExt.Data()),Form("background_bernstein%s",catExt.Data()),x,parListBernstein[tto]);
@@ -1247,7 +1254,8 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
 	    frame->remove(Form("background_bernstein_order%d",tto+1));
             }
 	    }
-	    bgPDFs.add(*bernstein);
+	    if (!isUniform || bgPDFs.getSize()<1)
+	      bgPDFs.add(*bernstein);
 	    if ( useOnlyBernstein )
 	      wfit.import(*bernstein);
 	}
