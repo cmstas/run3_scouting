@@ -927,6 +927,26 @@ def hist1dDefinition(nbins, low, high, xtitle, ytitle, labels, variable):
     variable["dimu3danglesv"] = "a3dsv"
 
     #
+    nbins   ["dimuumass"] = 15000
+    low     ["dimuumass"] = 0
+    high    ["dimuumass"] = 150
+    xtitle  ["dimuumass"] = "Uncorrected m_{#mu#mu} [GeV]"
+    ytitle  ["dimuumass"] = "Events / 0.01"
+    variable["dimuumass"] = "umass"
+
+    nbins   ["seagullumass"] = 15000
+    low     ["seagullumass"] = 0
+    high    ["seagullumass"] = 150
+    xtitle  ["seagullumass"] = "Uncorrected m_{#mu#mu} [GeV]"
+    ytitle  ["seagullumass"] = "Events / 0.01"
+    variable["seagullumass"] = "seagullumass"
+
+    nbins   ["cowboyumass"] = 15000
+    low     ["cowboyumass"] = 0
+    high    ["cowboyumass"] = 150
+    xtitle  ["cowboyumass"] = "Uncorrected m_{#mu#mu} [GeV]"
+    ytitle  ["cowboyumass"] = "Events / 0.01"
+    variable["cowboyumass"] = "cowboyumass"
 
     nbins   ["dimuupdr"] = 100
     low     ["dimuupdr"] = 0
@@ -3128,6 +3148,14 @@ def histBooking(presel=True, dimuon=True, fourmuon=True, fourmuonosv=True):
         histname2d["dimuon"].append("hdimuon_genjpsi_lxycomp")
         histtype2d[histname2d["dimuon"][-1]]="lxyvslxygen"
         #
+        histname["dimuon"].append("hdimuon_umass")
+        histtype[histname["dimuon"][-1]]="dimuumass"
+        #
+        histname["dimuon"].append("hdimuon_cowboy")
+        histtype[histname["dimuon"][-1]]="cowboyumass"
+        #
+        histname["dimuon"].append("hdimuon_seagull")
+        histtype[histname["dimuon"][-1]]="seagullumass"
         ##
         # Di-muon from overlapping SV
         #
