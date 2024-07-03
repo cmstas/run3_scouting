@@ -6,7 +6,7 @@ import numpy as np
 import copy
 import math
 sys.path.append('utils')
-import plotUtils
+#import plotUtils
 from IPython.display import Image
 import argparse
 import os
@@ -66,19 +66,19 @@ for subdir in os.listdir(directory):
 		summed_histogram_mass = None
 		summed_histogram_umass = None
 		summed_histogram_cowboy = None
-		summed_histogram_eagle = None
+		summed_histogram_seagull = None
 
-		#for filename in files:
-			#if 'Data' in filename:
-				#data_files.append(filename)
-
-		#for filename in data_files:
 		for filename in files:
+			if 'Data' in filename:
+				data_files.append(filename)
+
+		for filename in data_files:
+		#for filename in files:
 			file = ROOT.TFile.Open(full_subdir_path + filename)
 			hdimuon_mass = file.Get("hdimuon_mass")
 			hdimuon_umass = file.Get("hdimuon_umass")
 			hdimuon_cowboy = file.Get("hdimuon_cowboy")
-			hdimuon_eagle = file.Get("hdimuon_eagle")
+			hdimuon_seagull = file.Get("hdimuon_seagull")
 			if summed_histogram_mass is None:
 				summed_histogram_mass = hdimuon_mass.Clone("summed_histogram_mass")
 				summed_histogram_mass.SetDirectory(0)
@@ -94,11 +94,11 @@ for subdir in os.listdir(directory):
 				summed_histogram_cowboy.SetDirectory(0)
 			else:
 				summed_histogram_cowboy.Add(hdimuon_cowboy)
-			if summed_histogram_eagle is None:
-				summed_histogram_eagle = hdimuon_eagle.Clone("summed_histogram_eagle")
-				summed_histogram_eagle.SetDirectory(0)
+			if summed_histogram_seagull is None:
+				summed_histogram_seagull = hdimuon_seagull.Clone("summed_histogram_seagull")
+				summed_histogram_seagull.SetDirectory(0)
 			else:
-				summed_histogram_umass.Add(hdimuon_eagle)
+				summed_histogram_seagull.Add(hdimuon_seagull)
 
 		if '0p0to0p2' in subdir:
 			ymax = 220000
@@ -149,12 +149,10 @@ for subdir in os.listdir(directory):
 
 		if not os.path.exists('JPsiPlots/'):
 			os.mkdir('JPsiPlots/')
-		ymax = 220000
-		xCMS = 0.2
-		name = '16p0to70p0'
+
 		c1 = ROOT.TCanvas('c1', '', 600, 500)
 		c1.cd()
-		summed_histogram_mass.GetXaxis().SetRangeUser(1.6,2.6)
+		summed_histogram_mass.GetXaxis().SetRangeUser(2.6,3.6)
 		summed_histogram_mass.GetYaxis().SetRangeUser(0, ymax)
 		summed_histogram_mass.SetLineColor(ROOT.kBlack)
 		#summed_histogram_mass.SetTitle(title)
@@ -162,8 +160,8 @@ for subdir in os.listdir(directory):
 		summed_histogram_mass.Draw('HIST')
 		summed_histogram_umass.SetLineColor(ROOT.kRed)
 		summed_histogram_umass.Draw('HIST SAME')
-		summed_histogram_eagle.SetLineColor(ROOT.kCyan)
-		summed_histogram_eagle.Draw('HIST SAME')
+		summed_histogram_seagull.SetLineColor(ROOT.kCyan)
+		summed_histogram_seagull.Draw('HIST SAME')
 		summed_histogram_cowboy.SetLineColor(ROOT.kOrange)
 		summed_histogram_cowboy.Draw('HIST SAME')
 		#ROOT.gStyle.SetOptTitle(0)
@@ -187,7 +185,7 @@ for subdir in os.listdir(directory):
 		legend.SetBorderSize(0) 
 		legend.AddEntry(summed_histogram_mass, "Corrected mass", "l")
 		legend.AddEntry(summed_histogram_umass, "Uncorrected mass", "l")
-		legend.AddEntry(summed_histogram_eagle, "Eagle", "l")
+		legend.AddEntry(summed_histogram_seagull, "Seagull", "l")
 		legend.AddEntry(summed_histogram_cowboy, "Cowboy", "l")
 		legend.Draw()
 		latexCMS.DrawLatex(xCMS,0.91,"CMS");
