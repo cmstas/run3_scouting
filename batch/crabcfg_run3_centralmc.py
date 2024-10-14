@@ -7,7 +7,7 @@ from CRABAPI.RawCommand import crabCommand
 import sys
 
 era = sys.argv[1] # [2022, 2022postEE, 2023 or 2023BPix]
-signal = sys.argv[2] # [HTo2ZdTo2mu2x, BToPhi]
+signal = sys.argv[2] # [HTo2ZdTo2mu2x, BToPhi, ScenarioB1]
 
 year=0
 if ("2022") in era:
@@ -156,6 +156,34 @@ if (len(sys.argv)>2):
             mass_points.append(['BToPhi_MPhi-2p0_ctau-1mm', '/BToPhi_MPhi-2p0_ctau-1mm-pythia8/Run3Scouting-private-Run3Summer22EE-AODSIM-59a22edf0600a784f6c900595d24e883/USER'])
             mass_points.append(['BToPhi_MPhi-2p0_ctau-10mm', '/BToPhi_MPhi-2p0_ctau-10mm-pythia8/Run3Scouting-private-Run3Summer22EE-AODSIM-59a22edf0600a784f6c900595d24e883/USER'])
             mass_points.append(['BToPhi_MPhi-2p0_ctau-100mm', '/BToPhi_MPhi-2p0_ctau-100mm-pythia8/Run3Scouting-private-Run3Summer22EE-AODSIM-59a22edf0600a784f6c900595d24e883/USER'])
+        for [signal_name,dataset_name] in mass_points:
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False",]
+            config_list[-1].Data.inputDataset = dataset_name
+            config_list[-1].General.requestName = 'centralSkim_{}_{}_{}'.format(signal_name, era, ntuple_version)
+            print(config_list[-1])
+            crabCommand('submit', config = config_list[-1], dryrun = False) ## dryrun = True for local test
+            #print(config)
+            #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+    elif "ScenarioB1" in sys.argv[2]:
+        # This setup is provisional as it is tested with private signal crab produced samples
+        #   -> Will be replaced by central datasets when done
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioB1_v'+ntuple_version # DB no
+        config.Data.inputDBS = 'phys03'
+        config.Data.splitting = 'FileBased'
+        config.Data.publication = True
+        config.Data.unitsPerJob = int(100) # Increased to match 10 jobs per file aprox
+        config.Data.outputDatasetTag = "private-Skim_{era}-v1".format(era=era)
+        if era=="2022":
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_0p1', '/scenarioB1_mpi_4_mA_1p33_ctau_0p1/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_1p0', '/scenarioB1_mpi_4_mA_1p33_ctau_1p0/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_10', '/scenarioB1_mpi_4_mA_1p33_ctau_10/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_100', '/scenarioB1_mpi_4_mA_1p33_ctau_100/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+        elif era=="2022postEE":
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_0p1', '/scenarioB1_mpi_4_mA_1p33_ctau_0p1/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_1p0', '/scenarioB1_mpi_4_mA_1p33_ctau_1p0/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_10', '/scenarioB1_mpi_4_mA_1p33_ctau_10/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
+            mass_points.append(['ScenarioB1_mpi_4_mA_1p33_ctau_100', '/scenarioB1_mpi_4_mA_1p33_ctau_100/jleonhol-AODSIM_2022-bd8711905ed05b0226f084d42f06d7ac/USER'])
         for [signal_name,dataset_name] in mass_points:
             config_list.append(config)
             config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False",]

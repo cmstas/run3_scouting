@@ -50,7 +50,7 @@ do
     do
         if [ ${model} != "nomodel" ]
         then
-            if [ ${model} == "HTo2ZdTo2mu2x" ] && [ ${t} -gt 10 ] && [ ${m} -lt 1.0]
+            if [ ${model} == "HTo2ZdTo2mu2x" ] && [ ${t} -gt 10 ] && [ ${m} -lt 1.0 ]
             then
                 continue
             fi

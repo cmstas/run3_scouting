@@ -85,7 +85,6 @@ luminosity2022E = 5.866801170
 luminosity2022F = 18.006671456
 luminosity2022G = 3.108858306
 luminosity2023 = 27.208114203999997
-#luminosity2023 = 17.0604 # Excluding B and D
 luminosity2023B = 0.622430830
 luminosity2023C = 5.557004785
 luminosity2023C_triggerV10 = 11.503479528
@@ -126,27 +125,19 @@ elif samples[0]=="Data" and args.year=="2023":
     luminosity = luminosity2023
 else:
     luminosity = 1.0
-luminosity      = 0.1*luminosity
-luminosity2022  = 0.1*luminosity2022
-luminosity2022B = 0.1*luminosity2022B
-luminosity2022C = 0.1*luminosity2022C
-luminosity2022D = 0.1*luminosity2022D
-luminosity2022E = 0.1*luminosity2022E
-luminosity2022F = 0.1*luminosity2022F
-luminosity2022G = 0.1*luminosity2022G
-luminosity2023  = 0.1*luminosity2023
-luminosity2023B = 0.1*luminosity2023B
-luminosity2023C = 0.1*luminosity2023C
-luminosity2023C_triggerV10 = 0.1*luminosity2023C_triggerV10
-luminosity2023D = 0.1*luminosity2023D
 if skimEvents and skimFraction>0.0:
-    luminosity      = skimFraction*luminosity
+    luminosity2022  = skimFraction*luminosity2022
     luminosity2022B = skimFraction*luminosity2022B
     luminosity2022C = skimFraction*luminosity2022C
     luminosity2022D = skimFraction*luminosity2022D
     luminosity2022E = skimFraction*luminosity2022E
     luminosity2022F = skimFraction*luminosity2022F
     luminosity2022G = skimFraction*luminosity2022G
+    luminosity2023  = skimFraction*luminosity2023
+    luminosity2023B = skimFraction*luminosity2023B
+    luminosity2023C = skimFraction*luminosity2023C
+    luminosity2023C_triggerV10 = skimFraction*luminosity2023C_triggerV10
+    luminosity2023D = skimFraction*luminosity2023D
 
 
 
@@ -237,8 +228,12 @@ if args.generator:
     hname = "histograms_GEN"
 if not isMultiDir:
     for i,s in enumerate(samples):
-        if not os.path.isfile("%s/%s_%s_%s_all.root"%(indir,hname,s,inyears[i])):
-            os.system('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_'+inyears[i]+'*.root")')
+        if inyears[i]=='allYears':
+            if not os.path.isfile("%s/%s_%s_%s_all.root"%(indir,hname,s,inyears[i])):
+                os.system('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_*_*.root")')
+        else:
+            if not os.path.isfile("%s/%s_%s_%s_all.root"%(indir,hname,s,inyears[i])):
+                os.system('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_'+inyears[i]+'*.root")')
         infiles.append(indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root')
 else:
     for i,d in enumerate(inmultidirs):
@@ -266,29 +261,11 @@ colors["DataD"] = ROOT.kRed+1
 colors["DataE"] = ROOT.kPink+1
 colors["DataF"] = ROOT.kMagenta+1
 colors["DataG"] = ROOT.kViolet+1
-colors["signal"] = [ROOT.kAzure+2, ROOT.kOrange+7, ROOT.kGreen+2, ROOT.kRed+1, ROOT.kMagenta-2]
+colors["signal"] = [ROOT.TColor.GetColor('#3f90da'), ROOT.TColor.GetColor('#ffa90e'), ROOT.TColor.GetColor('#bd1f01'), ROOT.TColor.GetColor('#94a4a2'), ROOT.TColor.GetColor('#832db6'), ROOT.TColor.GetColor('#a96b59'), ROOT.TColor.GetColor('#e76300'), ROOT.TColor.GetColor('#b9ac70'), ROOT.TColor.GetColor('#717581'), ROOT.TColor.GetColor('#92dadd')]
 colors["mc"] = [ROOT.kRed-3]
 
-"""
-colorsMultiDir = [ROOT.kBlack,
-                  ROOT.TColor.GetColor('#017B93'),
-                  ROOT.TColor.GetColor('#10D9DC'),
-                  ROOT.TColor.GetColor('#F1B950'),
-                  ROOT.TColor.GetColor('#CA6702'),
-                  ROOT.TColor.GetColor('#AE2012')]
-"""
 
 if isMultiDir > 0:
-    """
-    if len(inmultidirs) < 8:    
-        colorsMultiDir = [ROOT.kBlack,
-                          ROOT.TColor.GetColor('#448aff'),
-                          ROOT.TColor.GetColor('#009688'),
-                          ROOT.TColor.GetColor('#8bc34a'),
-                          ROOT.TColor.GetColor('#ffc107'),
-                          ROOT.TColor.GetColor('#f44336'),
-                          ROOT.TColor.GetColor('#f15bb5')]
-    """
     if len(inmultidirs) < 7:    
         colorsMultiDir = [ROOT.kBlack,
                           ROOT.TColor.GetColor('#448aff'),
@@ -334,9 +311,9 @@ inf = []
 # Legend
 ncl = 1
 xol = 0.30
-if len(samples)>5:
-    ncl=2
-    xol=0.5
+#if len(samples)>5:
+#    ncl=2
+#    xol=0.5
 if len(inmultidirs)>5:
     longLabel = False
     for label in inmultilegs:
@@ -648,6 +625,8 @@ for hn,hnn in enumerate(h1dn):
                         ytitle = ytitle.replace("0.01","{:.2f}".format(rebinWindow*0.01))
                         h1d[fn][hn].GetYaxis().SetTitle(ytitle)
             if "reld" in hnn:
+                h1d[fn][hn].Rebin(5)
+            if "dxyscaled" in hnn:
                 h1d[fn][hn].Rebin(5)
 
         if scaleSignal:

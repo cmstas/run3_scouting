@@ -305,3 +305,15 @@ Signal_BToPhi_MPhi-2p0_ctau-10mm_2022,/BToPhi_MPhi-2p0_ctau-10mm-pythia8/Run3Sco
 Signal_BToPhi_MPhi-2p0_ctau-10mm_2022postEE,/BToPhi_MPhi-2p0_ctau-10mm-pythia8/Run3Scouting-private-Skim_2022postEE-v1-1b32a25b09c50ceaafd1ea7c5555c401/USER
 Signal_BToPhi_MPhi-2p0_ctau-100mm_2022,/BToPhi_MPhi-2p0_ctau-100mm-pythia8/Run3Scouting-private-Skim_2022-v1-c90c1d4759d316765c85d416fdcd844e/USER
 Signal_BToPhi_MPhi-2p0_ctau-100mm_2022postEE,/BToPhi_MPhi-2p0_ctau-100mm-pythia8/Run3Scouting-private-Skim_2022postEE-v1-1b32a25b09c50ceaafd1ea7c5555c401/USER
+####################################
+####################################
+#### ScenarioB1 private datasets
+####################################
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-0p1mm_2022,/scenarioB1_mpi_4_mA_1p33_ctau_0p1/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-0p1mm_2022postEE,/scenarioB1_mpi_4_mA_1p33_ctau_0p1/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-1mm_2022,/scenarioB1_mpi_4_mA_1p33_ctau_1p0/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-1mm_2022postEE,/scenarioB1_mpi_4_mA_1p33_ctau_1p0/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-10mm_2022,/scenarioB1_mpi_4_mA_1p33_ctau_10/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-10mm_2022postEE,/scenarioB1_mpi_4_mA_1p33_ctau_10/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-100mm_2022,/scenarioB1_mpi_4_mA_1p33_ctau_100/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER
+Signal_ScenarioB1_mpi-4_mA-1p33_ctau-100mm_2022postEE,/scenarioB1_mpi_4_mA_1p33_ctau_100/Run3Scouting-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER

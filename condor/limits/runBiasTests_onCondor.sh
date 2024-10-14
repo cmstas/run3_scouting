@@ -19,11 +19,19 @@ if [ -z $1 ]; then usage; fi
 export SCOUTINGSNTINPUTDIRLIM=$1
 export SCOUTINGSNTOUTPUTDIRLIM=$2
 export PERIOD=$3
+export EXPECTEDLIM=$4
+export SCOUTINGEXPECTEDLIM=$(basename "$EXPECTEDLIM")
 export HOMEDIR=$PWD
 
-mkdir -p condor/limits/limits_logs
+echo "Creating dirs..."
+
+mkdir -p condor/limits/bias_logs
 mkdir -p /ceph/cms/store/user/$USER/Run3ScoutingOutput/$SCOUTINGSNTOUTPUTDIRLIM
 
-sh condor/limits/create_package.sh $SCOUTINGSNTINPUTDIRLIM fitResults_${PERIOD}
+cp $EXPECTEDLIM .
 
-condor_submit condor/limits/runLimits_onCondor.sub
+echo "Creating the package..."
+sh condor/limits/create_package.sh $SCOUTINGSNTINPUTDIRLIM $SCOUTINGEXPECTEDLIM fitResults_${PERIOD}
+
+echo "Submission started"
+condor_submit condor/limits/runBiasTests_onCondor.sub

@@ -4,24 +4,25 @@ export X509_USER_PROXY=$(voms-proxy-info -path)
 
 DIR=$1
 OUT=$2
-SIG=$3 # HTo2ZdTo2mu2x
-LIM=$4 # asymptotic, toysObs, toysExp, toysEm2, toysEm1, toysEp1, toysEp2, sigExp, sigObs
-PERIOD=$5 # Year
+LIM=$3
+SIG=$4 # HTo2ZdTo2mu2x
+RINJ=$5 # injected bias
+PERIOD=$6 # Year
 
-MASS=2.0
+MASS=5.0
 CTAU=1
 
-if [ $# -lt 6 ]
+if [ $# -lt 7 ]
 then
     MASS=2.0
     CTAU=1
 elif [ $# -lt 7 ]
 then
-    MASS=$6
+    MASS=$7
     CTAU=1
 else
-    MASS=$6
-    CTAU=$7
+    MASS=$7
+    CTAU=$8
 fi
 
 function stageout {
@@ -68,15 +69,15 @@ scramv1 b clean; scramv1 b
 cmsenv
 cd ../../
 
-#cd HiggsAnalysis/CombinedLimit
-#. env_standalone.sh
-#cd ../../
-
-ls -la
+ls
+mv fitResults_${PERIOD} ${DIR}
 
 rm -rf ${OUT}
 mkdir -p ${OUT}
-bash combineScripts/submitLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU}
+ls
+echo "Preparing to run checks..."
+python3 combineScripts/submitBiasTests.py ${DIR} ${OUT} ${LIM} ${SIG} ${RINJ} ${MASS} ${CTAU}
+echo "Checks finished"
 
 for FILE in $(ls ${OUT})
 do

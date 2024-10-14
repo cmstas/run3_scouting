@@ -5,7 +5,7 @@ export X509_USER_PROXY=$(voms-proxy-info -path)
 DIR=$1
 OUT=$2
 SIG=$3 # HTo2ZdTo2mu2x
-LIM=$4 # asymptotic, toysObs, toysExp, toysEm2, toysEm1, toysEp1, toysEp2, sigExp, sigObs
+LIM=$4 # gof
 PERIOD=$5 # Year
 
 MASS=2.0
@@ -68,15 +68,13 @@ scramv1 b clean; scramv1 b
 cmsenv
 cd ../../
 
-#cd HiggsAnalysis/CombinedLimit
-#. env_standalone.sh
-#cd ../../
-
 ls -la
 
 rm -rf ${OUT}
 mkdir -p ${OUT}
-bash combineScripts/submitLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU}
+echo "Preparing to run checks..."
+bash combineScripts/submitChecks.sh ${DIR} ${OUT} ${SIG} ${PERIOD} ${MASS} ${CTAU}
+echo "Checks finished"
 
 for FILE in $(ls ${OUT})
 do

@@ -31,7 +31,7 @@ for card1 in os.listdir(inDir1):
             card_name2 += (portion + '_')
         if card_name1==card_name2:
             print("COMBINING ", card_name1)
-            print("combineCards.py -S %s/%s %s/%s > %s/%s_allEras.txt "%(inDir1, card1, inDir2, card2, outDir, card_name1))
-            os.system("combineCards.py -S %s/%s %s/%s > %s/%s_allEras.txt "%(inDir1, card1, inDir2, card2, outDir, card_name1))
-            os.system("text2workspace.py %s/%s_allEras.txt"%(outDir, card_name1))
+            print("combineCards.py -S %s/%s %s/%s > %s/%sallEras.txt "%(inDir1, card1, inDir2, card2, outDir, card_name1))
+            os.system("combineCards.py -S %s/%s %s/%s > %s/%sallEras.txt "%(inDir1, card1, inDir2, card2, outDir, card_name1))
+            os.system("text2workspace.py %s/%sallEras.txt"%(outDir, card_name1))
             break
