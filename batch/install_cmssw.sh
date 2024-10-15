@@ -1,5 +1,5 @@
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-export SCRAM_ARCH=slc7_amd64_gcc10
+#export SCRAM_ARCH=slc7_amd64_gcc10
 thisdir=$(pwd)
 release=CMSSW_12_6_0_patch1
 if [ $# -gt 0 ]

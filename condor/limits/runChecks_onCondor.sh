@@ -21,9 +21,9 @@ export SCOUTINGSNTOUTPUTDIRLIM=$2
 export PERIOD=$3
 export HOMEDIR=$PWD
 
-mkdir -p condor/limits/limits_logs
+mkdir -p condor/limits/plotting_logs
 mkdir -p /ceph/cms/store/user/$USER/Run3ScoutingOutput/$SCOUTINGSNTOUTPUTDIRLIM
 
 sh condor/limits/create_package.sh $SCOUTINGSNTINPUTDIRLIM fitResults_${PERIOD}
 
-condor_submit condor/limits/runLimits_onCondor.sub
+condor_submit condor/limits/runChecks_onCondor.sub

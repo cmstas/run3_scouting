@@ -8,4 +8,5 @@ rootDict.cc
 *plots_*
 *tmp_*
 *plotting_logs*
+*_logs*
 *.swp
