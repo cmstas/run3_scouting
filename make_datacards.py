@@ -92,7 +92,6 @@ if len(sys.argv)>1:
         noModel=True
         dirExt = dirExt+"_nomodel"
 
-
 useSinglePDF = False
 if useOnlyExponential or useOnlyPowerLaw or useOnlyBernstein:
     useSinglePDF = True
@@ -184,9 +183,7 @@ os.system('cp -r %s %s/'%(_inDir, outDir))
 inDir  = "%s/%s/"%(thisDir, _inDir)
 
 # Signals
-sigModel = "ScenarioB1"
-sigModel = "HTo2ZdTo2mu2x"
-
+sigModel = "HTo2ZdTo2mu2x" # HTo2ZdTo2mu2x : ScenarioB1 : BToPhi
 
 sigTags = []
 if sigModel=="HTo2ZdTo2mu2x":
@@ -210,6 +207,17 @@ if sigModel=="HTo2ZdTo2mu2x":
                 if ((m < 1.0 and t > 10) or (m < 30.0 and t > 100)):
                     continue
                 sigTags.append("Signal_HTo2ZdTo2mu2x_MZd-%.3f_ctau-%.1fmm"%(m, t))
+elif sigModel=="BToPhi":
+    #sigMasses = [0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.25, 1.5, 2.0, 2.85, 3.35, 4.0, 5.0]
+    sigMasses = [0.9, 1.25, 1.5, 2.0, 5.0] #Other masses are either too small or too close to SM resonance
+    for m in sigMasses:
+        sigCTaus = [0.0, 0.1, 1, 10, 100]
+        #sigCTaus = [0.1, 1, 10, 100]
+        for t in sigCTaus:
+            if t < 1:
+                sigTags.append("Signal_BToPhi-%s_ctau-%smm"%(str(m).replace('.','p'), str(t).replace('.','p')))
+            else:
+                sigTags.append("Signal_BToPhi-%s_ctau-%smm"%(str(m).replace('.','p'), str(t)))              
 elif sigModel=="ScenarioB1":
     sigMasses = [1.33]
     sigCTaus = [0.1, 1, 10, 100]

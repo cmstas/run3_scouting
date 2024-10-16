@@ -102,6 +102,9 @@ if useSignalMC:
     elif (model=="ScenarioB1"):
         sigMasses = [1.33]
         sigCtau = ["0p1", "1", "10", "100"]
+    elif model == "BToPhi":
+        sigMasses = [0.9, 1.25, 1.5, 1.5, 2.0, 5.0]
+        sigCtau = ["0p0", "0p1", "1", "10", "100"]
 else:
     if (model=="HTo2ZdTo2mu2x"):
         sigCtau = [1, 10, 100]
@@ -203,6 +206,9 @@ for y in years:
                         sample = "Signal_HTo2ZdTo2mu2x_MZd-%s_ctau-%imm"%(m.replace(".", "p"),t)
                     else:
                         sample = "Signal_HTo2ZdTo2mu2x_MZd-%.2f_ctau-%imm"%(mf,t)
+                elif (model=="BToPhi"):
+                    sample = ("Signal_BToPhi-%s_ctau-%smm"%(m.replace('.','p'), t))
+                    finame = "%s/%s_%s_%s_workspace.root"%(inDir,d,sample,y)
                 else:
                     sample = "Signal_ScenarioB1_mpi-4_mA-%s_ctau-%imm"%(m.replace(".", "p"),t)
                 finame = "%s/%s_%s_%s_workspace.root"%(inDir,d,sample,y)
