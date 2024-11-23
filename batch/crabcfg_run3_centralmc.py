@@ -21,7 +21,7 @@ else:
 data=False
 
 # ntuple version defined now
-ntuple_version = "5p0"
+ntuple_version = "6p0"
 
 # Setup working environment
 import os
@@ -229,6 +229,111 @@ if (len(sys.argv)>2):
             config_list[-1].General.requestName = 'centralSkim__{}_{}_m-{}_ctau-{}mm_{}'.format(signal, era, m, t, ntuple_version)
             print(config)
             #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+    elif "ScenarioA" in sys.argv[2]:
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
+        config.Data.inputDBS = 'phys03'
+        config.Data.splitting = 'FileBased'
+        config.Data.publication = True
+        config.Data.unitsPerJob = int(100) # Increased to match 10 jobs per file aprox
+        config.Data.outputDatasetTag = "private-Skim_{era}-v1".format(era=era)
+        mass_points.append(['1', '0p25', '0p1'])
+        mass_points.append(['1', '0p25', '1p0'])
+        mass_points.append(['1', '0p25', '10'])
+        mass_points.append(['1', '0p25', '100'])
+        mass_points.append(['1', '0p33', '0p1'])
+        mass_points.append(['1', '0p33', '1p0'])
+        mass_points.append(['1', '0p33', '10'])
+        mass_points.append(['1', '0p33', '100'])
+        mass_points.append(['1', '0p45', '0p1'])
+        mass_points.append(['1', '0p45', '1p0'])
+        mass_points.append(['1', '0p45', '10'])
+        mass_points.append(['1', '0p45', '100'])
+        mass_points.append(['2', '0p25', '0p1'])
+        mass_points.append(['2', '0p25', '1p0'])
+        mass_points.append(['2', '0p25', '10'])
+        mass_points.append(['2', '0p25', '100'])
+        mass_points.append(['2', '0p40', '0p1'])
+        mass_points.append(['2', '0p40', '1p0'])
+        mass_points.append(['2', '0p40', '10'])
+        mass_points.append(['2', '0p40', '100'])
+        mass_points.append(['2', '0p50', '0p1'])
+        mass_points.append(['2', '0p50', '1p0'])
+        mass_points.append(['2', '0p50', '10'])
+        mass_points.append(['2', '0p50', '100'])
+        mass_points.append(['2', '0p67', '0p1'])
+        mass_points.append(['2', '0p67', '1p0'])
+        mass_points.append(['2', '0p67', '10'])
+        mass_points.append(['2', '0p67', '100'])
+        mass_points.append(['2', '0p90', '0p1'])
+        mass_points.append(['2', '0p90', '1p0'])
+        mass_points.append(['2', '0p90', '10'])
+        mass_points.append(['2', '0p90', '100'])
+        mass_points.append(['4', '0p25', '0p1'])
+        mass_points.append(['4', '0p25', '1p0'])
+        mass_points.append(['4', '0p25', '10'])
+        mass_points.append(['4', '0p25', '100'])
+        mass_points.append(['4', '0p40', '0p1'])
+        mass_points.append(['4', '0p40', '1p0'])
+        mass_points.append(['4', '0p40', '10'])
+        mass_points.append(['4', '0p40', '100'])
+        mass_points.append(['4', '0p80', '0p1'])
+        mass_points.append(['4', '0p80', '1p0'])
+        mass_points.append(['4', '0p80', '10'])
+        mass_points.append(['4', '0p80', '100'])
+        mass_points.append(['4', '1p30', '0p1'])
+        mass_points.append(['4', '1p30', '1p0'])
+        mass_points.append(['4', '1p30', '10'])
+        mass_points.append(['4', '1p30', '100'])
+        mass_points.append(['4', '1p90', '0p1'])
+        mass_points.append(['4', '1p90', '1p0'])
+        mass_points.append(['4', '1p90', '10'])
+        mass_points.append(['4', '1p90', '100'])
+        mass_points.append(['5', '0p50', '0p1'])
+        mass_points.append(['5', '0p50', '1p0'])
+        mass_points.append(['5', '0p50', '10'])
+        mass_points.append(['5', '0p50', '100'])
+        mass_points.append(['5', '1p00', '0p1'])
+        mass_points.append(['5', '1p00', '1p0'])
+        mass_points.append(['5', '1p00', '10'])
+        mass_points.append(['5', '1p00', '100'])
+        mass_points.append(['5', '1p67', '0p1'])
+        mass_points.append(['5', '1p67', '1p0'])
+        mass_points.append(['5', '1p67', '10'])
+        mass_points.append(['5', '1p67', '100'])
+        mass_points.append(['5', '2p40', '0p1'])
+        mass_points.append(['5', '2p40', '1p0'])
+        mass_points.append(['5', '2p40', '10'])
+        mass_points.append(['5', '2p40', '100'])
+        mass_points.append(['10', '1p00', '0p1'])
+        mass_points.append(['10', '1p00', '1p0'])
+        mass_points.append(['10', '1p00', '10'])
+        mass_points.append(['10', '1p00', '100'])
+        mass_points.append(['10', '2p00', '0p1'])
+        mass_points.append(['10', '2p00', '1p0'])
+        mass_points.append(['10', '2p00', '10'])
+        mass_points.append(['10', '2p00', '100'])
+        mass_points.append(['10', '3p33', '0p1'])
+        mass_points.append(['10', '3p33', '1p0'])
+        mass_points.append(['10', '3p33', '10'])
+        mass_points.append(['10', '3p33', '100'])
+        mass_points.append(['10', '4p90', '0p1'])
+        mass_points.append(['10', '4p90', '1p0'])
+        mass_points.append(['10', '4p90', '10'])
+        mass_points.append(['10', '4p90', '100'])
+        for [mpi,mA,t] in mass_points:
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False",]
+            if era=="2022":
+                dataset_name = '/scenarioA_mpi_{}_mA_{}_ctau_{}/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER'.format(mpi, mA, t)
+                config_list[-1].Data.inputDataset = dataset_name
+            elif era=="2022postEE":
+                dataset_name = '/scenarioA_mpi_{}_mA_{}_ctau_{}/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER'.format(mpi, mA, t)
+                config_list[-1].Data.inputDataset = dataset_name
+            # No 2023 eras for the moment, when adding them, you have to run . install_cmssw.sh 2023central first
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(signal, era, mpi, mA, t, ntuple_version)
+            print(config)
+            crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+
     elif "ScenarioB1" in sys.argv[2]:
         # This setup is provisional as it is tested with private signal crab produced samples
         #   -> Will be replaced by central datasets when done
