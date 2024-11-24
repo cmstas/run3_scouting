@@ -21,7 +21,7 @@ else:
 data=False
 
 # ntuple version defined now
-ntuple_version = "6p0"
+ntuple_version = "6p1"
 
 # Setup working environment
 import os
@@ -229,13 +229,30 @@ if (len(sys.argv)>2):
             config_list[-1].General.requestName = 'centralSkim__{}_{}_m-{}_ctau-{}mm_{}'.format(signal, era, m, t, ntuple_version)
             print(config)
             #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+    elif "DQCD" in sys.argv[2]:
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
+        config.Data.inputDBS = 'phys03'
+        config.Data.splitting = 'FileBased'
+        config.Data.publication = True
+        config.Data.unitsPerJob = int(10) # Increased to match 10 jobs per file aprox
+        config.Data.outputDatasetTag = "private-Skim_{era}-v2".format(era=era)
+        if era=="2022":
+            inputfile = 'data/datasets_dqcd_2022.txt'
+        if era=="2022postEE":
+            inputfile = 'data/datasets_dqcd_2022postEE.txt'
+        with open(inputfile,'r') as f:
+            dataset_list = f.readlines()
+        for dataset_name in dataset_list:
+            config_list[-1].Data.inputDataset = dataset_name[:-1]
+                    config_list[-1].General.requestName = 'centralSkim__{}_{}_m-{}_ctau-{}mm_{}'.format(signal, era, m, t, ntuple_version)
+            print(config)
     elif "ScenarioA" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
         config.Data.splitting = 'FileBased'
         config.Data.publication = True
-        config.Data.unitsPerJob = int(100) # Increased to match 10 jobs per file aprox
-        config.Data.outputDatasetTag = "private-Skim_{era}-v1".format(era=era)
+        config.Data.unitsPerJob = int(10) # Increased to match 10 jobs per file aprox
+        config.Data.outputDatasetTag = "private-Skim_{era}-v2".format(era=era)
         mass_points.append(['1', '0p25', '0p1'])
         mass_points.append(['1', '0p25', '1p0'])
         mass_points.append(['1', '0p25', '10'])
@@ -338,8 +355,8 @@ if (len(sys.argv)>2):
         config.Data.inputDBS = 'phys03'
         config.Data.splitting = 'FileBased'
         config.Data.publication = True
-        config.Data.unitsPerJob = int(20) # Increased to match 10 jobs per file aprox
-        config.Data.outputDatasetTag = "private-Skim_{era}-v1".format(era=era)
+        config.Data.unitsPerJob = int(10) # Increased to match 10 jobs per file aprox
+        config.Data.outputDatasetTag = "private-Skim_{era}-v2".format(era=era)
         mass_points.append(['1', '0p40', '0p1'])
         mass_points.append(['1', '0p40', '1p0'])
         mass_points.append(['1', '0p40', '10'])
