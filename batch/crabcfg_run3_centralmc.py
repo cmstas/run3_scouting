@@ -333,8 +333,70 @@ if (len(sys.argv)>2):
             config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(signal, era, mpi, mA, t, ntuple_version)
             print(config)
             crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
-
     elif "ScenarioB1" in sys.argv[2]:
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
+        config.Data.inputDBS = 'phys03'
+        config.Data.splitting = 'FileBased'
+        config.Data.publication = True
+        config.Data.unitsPerJob = int(20) # Increased to match 10 jobs per file aprox
+        config.Data.outputDatasetTag = "private-Skim_{era}-v1".format(era=era)
+        mass_points.append(['1', '0p40', '0p1'])
+        mass_points.append(['1', '0p40', '1p0'])
+        mass_points.append(['1', '0p40', '10'])
+        mass_points.append(['1', '0p40', '100'])
+        mass_points.append(['2', '0p33', '0p1'])
+        mass_points.append(['2', '0p33', '1p0'])
+        mass_points.append(['2', '0p33', '10'])
+        mass_points.append(['2', '0p33', '100'])
+        mass_points.append(['2', '0p90', '0p1'])
+        mass_points.append(['2', '0p90', '1p0'])
+        mass_points.append(['2', '0p90', '10'])
+        mass_points.append(['2', '0p90', '100'])
+        mass_points.append(['4', '0p67', '0p1'])
+        mass_points.append(['4', '0p67', '1p0'])
+        mass_points.append(['4', '0p67', '10'])
+        mass_points.append(['4', '0p67', '100'])
+        mass_points.append(['4', '1p90', '0p1'])
+        mass_points.append(['4', '1p90', '1p0'])
+        mass_points.append(['4', '1p90', '10'])
+        mass_points.append(['4', '1p90', '100'])
+        mass_points.append(['5', '0p83', '0p1'])
+        mass_points.append(['5', '0p83', '1p0'])
+        mass_points.append(['5', '0p83', '10'])
+        mass_points.append(['5', '0p83', '100'])
+        mass_points.append(['5', '1p00', '0p1'])
+        mass_points.append(['5', '1p00', '1p0'])
+        mass_points.append(['5', '1p00', '10'])
+        mass_points.append(['5', '1p00', '100'])
+        mass_points.append(['5', '1p67', '0p1'])
+        mass_points.append(['5', '1p67', '1p0'])
+        mass_points.append(['5', '1p67', '10'])
+        mass_points.append(['5', '1p67', '100'])
+        mass_points.append(['5', '2p40', '0p1'])
+        mass_points.append(['5', '2p40', '1p0'])
+        mass_points.append(['5', '2p40', '10'])
+        mass_points.append(['5', '2p40', '100'])
+        for [mpi,mA,t] in mass_points:
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False",]
+            if era=="2022":
+                os.system("""dasgoclient -query="/scenarioB1_mpi_{}_mA_{}_ctau_{}/jleonhol-AODSIM_2022_ext*bd8711905ed05b0226f084d42f06d7ac/USER instance=prod/phys03" > temp.txt""".format(mpi, mA, t))
+                with open('temp.txt', 'r') as file:
+                    dataset_name = file.readlines()[-1]
+                #dataset_name = '/scenarioB1_mpi_{}_mA_{}_ctau_{}/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER'.format(mpi, mA, t)
+                config_list[-1].Data.inputDataset = dataset_name
+            elif era=="2022postEE":
+                os.system("""dasgoclient -query="/scenarioB1_mpi_{}_mA_{}_ctau_{}/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER instance=prod/phys03" > temp.txt""".format(mpi, mA, t))
+                with open('temp.txt', 'r') as file:
+                    dataset_name = file.readlines()[-1]
+                #dataset_name = '/scenarioB1_mpi_{}_mA_{}_ctau_{}/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER'.format(mpi, mA, t)
+                config_list[-1].Data.inputDataset = dataset_name
+            # No 2023 eras for the moment, when adding them, you have to run . install_cmssw.sh 2023central first
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(signal, era, mpi, mA, t, ntuple_version)
+            print(config)
+            #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+
+    elif "ScenarioB1priv" in sys.argv[2]:
         # This setup is provisional as it is tested with private signal crab produced samples
         #   -> Will be replaced by central datasets when done
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioB1_v'+ntuple_version # DB no
