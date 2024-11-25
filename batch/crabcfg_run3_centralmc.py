@@ -230,7 +230,7 @@ if (len(sys.argv)>2):
             print(config)
             #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
     elif "DQCD" in sys.argv[2]:
-        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privQCD_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
         config.Data.splitting = 'FileBased'
         config.Data.publication = True
@@ -243,9 +243,20 @@ if (len(sys.argv)>2):
         with open(inputfile,'r') as f:
             dataset_list = f.readlines()
         for dataset_name in dataset_list:
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False",]
+            print(dataset_name)
             config_list[-1].Data.inputDataset = dataset_name[:-1]
-                    config_list[-1].General.requestName = 'centralSkim__{}_{}_m-{}_ctau-{}mm_{}'.format(signal, era, m, t, ntuple_version)
+            model_name = 'S'+dataset_name.split('_')[0][2:]
+            mpi = dataset_name.split('mpi_')[1].split('_')[0]
+            mA = dataset_name.split('mA_')[1].split('_')[0]
+            t = dataset_name.split('ctau_')[1].split('/')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(model_name, era, mpi, mA, t, ntuple_version)
             print(config)
+            try:
+                crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+            except:
+                print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
     elif "ScenarioA" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
