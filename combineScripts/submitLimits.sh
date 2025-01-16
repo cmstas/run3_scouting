@@ -43,7 +43,7 @@ fi
 
 
 #options="--cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_freezeDisassociatedParams --X-rtd MINIMIZER_multiMin_hideConstants --X-rtd MINIMIZER_multiMin_maskConstraints --X-rtd MINIMIZER_multiMin_maskChannels=1"
-options="--cminDefaultMinimizerStrategy 0 -v 0"
+options="--cminDefaultMinimizerStrategy 0 -v 0 --rMax 10"
 for m in ${allmasses[@]}
 do
     for t in ${allCTaus[@]}

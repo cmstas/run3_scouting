@@ -3,7 +3,7 @@ import ROOT
 
 ROOT.gROOT.ProcessLine(".L cpp/helper.C+")
 
-useSignalMC = True
+useSignalMC = False
 
 if len(sys.argv)<3:
     print("Please, specify model and limit directory.")
@@ -23,13 +23,14 @@ fout = open("%s/limits_%s_%s.txt"%(outdir,model,year),"w")
 
 if useSignalMC:
     #masses =  [0.5, 0.7, 1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 12.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0] # Full set of masses
-    masses =  [1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
+    #masses =  [1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
+    masses =  [5.0, 8.0]
     ctaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.00]
 else:
     masses = []
     ctaus = [1, 10, 100] # Lifetimes for the grid
     with open('data/HZdZd_limitgrid.txt', 'r') as f:
-        lmasses = f.readlines()[0].split(',')[:-1]
+        lmasses = f.readlines()
         for mass in lmasses:
             m = float(mass)
             masses.append(m)
