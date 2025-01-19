@@ -398,7 +398,6 @@ else:
     fin.close()
     os.system('rm -f filein.txt')
 print("Found {} files matching criteria".format(len(files)))
-print(files)
 
 index = int(args.splitIndex)
 pace  = int(args.splitPace)
@@ -1439,6 +1438,8 @@ for e in range(firste,laste):
         if not applyLzSelection(lz):
             continue
         mass = v.M()
+        uv = dmu_muvecdp[-1] + dmu_muvecdp[-2]
+        umass = uv.M()
         pt   = v.Pt()
         nhitsbeforesvtotal = t.Muon_nhitsbeforesv[dmuidxs[int(vn*2)]] + t.Muon_nhitsbeforesv[dmuidxs[int(vn*2)+1]]
         subpt = t.Muon_pt[dmuidxs[int(vn*2)]] if t.Muon_pt[dmuidxs[int(vn*2)]] < t.Muon_pt[dmuidxs[int(vn*2)+1]] else t.Muon_pt[dmuidxs[int(vn*2)+1]]
@@ -1520,6 +1521,15 @@ for e in range(firste,laste):
         dphisv2u = abs(dmu_muvecdp[int(vn*2)+1].Vect().DeltaPhi(svvec[vn]))
         detasvu = abs(vu.Vect().Eta()-svvec[vn].Eta())
         detadphisvu = 1e6
+        delta_phi = dphisv - dphisvu
+        if delta_phi>0:
+            addition_seagull = dmu_muvecdp[-1] + dmu_muvecdp[-2]
+            seagullumass = addition_seagull.M()
+            cowboyumass = 0 
+        elif delta_phi<0:
+            addition_cowboy = dmu_muvecdp[-1] + dmu_muvecdp[-2]
+            cowboyumass = addition_cowboy.M()
+            seagullumass = 0
         if dphisvu>0.0:
             detadphisvu = detasvu/dphisvu
         a3dsvu  = abs(vu.Vect().Angle(svvec[vn]))
