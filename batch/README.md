@@ -67,11 +67,23 @@ and then run:
 python3 crabcfg_run3_centralmc.py [era] [signal]
 ```
 
-**Note 1: Right now only setup for central HAHM and private BtoPhi samples will need to adapt once others are produced**
+**Note 1: Right now setup for central HAHM, central BtoPhi and part of private DQCD samples are available**
 
-**Note 2: Since BtoPhi samples, output could be published in DAS so it can be accessed out UAF through xrd**
+**Note 2: Since BtoPhi samples, output could be published in DAS so it can be accessed out UAF through xrd, this is used for DQCD samples produced outside**
 
-**Note 3: If running out of UAF and/or out of SnT Scouting group, crab details should be modify to re-direct the output to a site with writting permission**
+**Note 3: If running out of UAF and/or out of SnT Scouting group, crab details should be modifed to re-direct the output to a site with writting permission**
+
+To prepare the files that are used to run in condor the looper and the filler you just need to run :
+```
+python3 setupCentralSignals_remote.py
+```
+and the following files will be created:
+```
+centralDatasets.txt                           # input for looper
+runScoutingLooper_onCondor_CentralSignal.sub  # input for looper
+runScoutingHistos_onCondor_CentralSignal.sub  # input for filler
+```
+
 
 ## Run2 Info
 
