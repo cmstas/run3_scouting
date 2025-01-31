@@ -21,7 +21,7 @@ else:
 data=False
 
 # ntuple version defined now
-ntuple_version = "6p1"
+ntuple_version = "6p2"
 
 # Setup working environment
 import os
@@ -225,10 +225,15 @@ if (len(sys.argv)>2):
             elif era=="2022postEE":
                 dataset_name = '/BToPhi_MPhi-{}_ctau-{}mm_TuneCP5_13p6TeV_pythia8/Run3Summer22EEDRPremix-124X_mcRun3_2022_realistic_postEE_v1-v2/AODSIM'.format(m, t)
                 config_list[-1].Data.inputDataset = dataset_name
-            # No 2023 eras for the moment, when adding them, you have to run . install_cmssw.sh 2023central first
+            elif era=="2023":
+                dataset_name = '/BToPhi_MPhi-{}_ctau-{}mm_TuneCP5_13p6TeV_pythia8/Run3Summer23DRPremix-130X_mcRun3_2023_realistic_v15-v2/AODSIM'.format(m, t)
+                config_list[-1].Data.inputDataset = dataset_name
+            elif era=="2023BPix":
+                dataset_name = '/BToPhi_MPhi-{}_ctau-{}mm_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v6-v2/AODSIM'.format(m, t)
+                config_list[-1].Data.inputDataset = dataset_name
             config_list[-1].General.requestName = 'centralSkim__{}_{}_m-{}_ctau-{}mm_{}'.format(signal, era, m, t, ntuple_version)
             print(config)
-            #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+            crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
     elif "DQCD" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privQCD_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'

@@ -1,7 +1,7 @@
 import os
 
 ## This script put the crab output in the corresponding ceph area and creates the files to run the looper and plotter
-model='ScenarioA'
+model='ScenarioB1'
 
 # To be modified by user:
 model_template = ''
@@ -10,13 +10,15 @@ if model=='HTo2ZdTo2mu2x':
     model_template = "/HTo2ZdTo2mu2x_MZd-{MASS}_ctau-{CTAU}mm_TuneCP5_13p6TeV_madgraph-pythia8/Run3Scouting-crab_centralSkim__HTo2ZdTo2mu2x_2023BPix_m-{MASS}_ctau-{CTAU}mm_5p0-1f253bfad14a992d8887e2452ef8b1e3/USER"
     signal_template = "Signal_HTo2ZdTo2mu2x_MZd-{MASS}_ctau-{CTAU}mm"
 elif model=='ScenarioA':
-    model_template = "/scenarioA_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/Run3Scouting-private-Skim_2022postEE-v2-7302dba74ed76f00031d7a657aa159c3/USER"
+    #model_template = "/scenarioA_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/Run3Scouting-private-Skim_2022postEE-v2-7302dba74ed76f00031d7a657aa159c3/USER"
+    model_template = "/scenarioA_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/jleonhol-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER"
     signal_template = "Signal_ScenarioA_Mpi-{MASS4}_MA-{MASS}_ctau-{CTAU}mm"
 elif model=='ScenarioB1':
-    model_template = "/scenarioB1_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/Run3Scouting-private-Skim_2022postEE-v2-7302dba74ed76f00031d7a657aa159c3/USER"
+    #model_template = "/scenarioB1_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/Run3Scouting-private-Skim_2022postEE-v2-7302dba74ed76f00031d7a657aa159c3/USER"
+    model_template = "/scenarioB1_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/jleonhol-private-Skim_2022-v1-9b9153b31e58b326ec6234f65b60747a/USER"
     signal_template = "Signal_ScenarioB1_Mpi-{MASS4}_MA-{MASS}_ctau-{CTAU}mm"
 elif model=='ScenarioB2':
-    model_template = "/scenarioB2_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/Run3Scouting-private-Skim_2022postEE-v2-7302dba74ed76f00031d7a657aa159c3/USER"
+    #model_template = "/scenarioB2_mpi_{MASS4}_mA_{MASS}_ctau_{CTAU}/Run3Scouting-private-Skim_2022postEE-v2-7302dba74ed76f00031d7a657aa159c3/USER"
     signal_template = "Signal_ScenarioB2_Mpi-{MASS4}_MA-{MASS}_ctau-{CTAU}mm"
     
 mass_points = []

@@ -1,4 +1,5 @@
 ## Run3 Info
+*(Last updated: 31 Jan 2025)*
 
 The RAW data are skimmed and/or slimmed first, as in Run 2. The skim requires at least 2 Scouting Muons and at least 1 Scouting Vertex for data.
 
@@ -73,11 +74,13 @@ python3 crabcfg_run3_centralmc.py [era] [signal]
 
 **Note 3: If running out of UAF and/or out of SnT Scouting group, crab details should be modifed to re-direct the output to a site with writting permission**
 
-To prepare the files that are used to run in condor the looper and the filler you just need to run :
+To prepare the files that are used to run in condor the looper and the filler you just need to run:
 ```
 python3 setupCentralSignals_remote.py
 ```
-and the following files will be created:
+**Note:** You will have to select inside the model you want to run on.
+
+Then, the following files will be created:
 ```
 centralDatasets.txt                           # input for looper
 runScoutingLooper_onCondor_CentralSignal.sub  # input for looper
