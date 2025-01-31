@@ -1,10 +1,8 @@
 import os
 import ROOT
 
-ROOT.gROOT.ProcessLine(".L cpp/helper.C+")
-
 # Select the model
-sigModel = "HTo2ZdTo2mu2x"
+sigModel = "BToPhi" # HTo2ZdTo2mu2x : BToPhi
 
 # Create the file
 subfile = open("runLimits_%s_onCondor.sub"%(sigModel),"w")
@@ -29,27 +27,24 @@ subfile.write("##\n")
 
 # Add the points
 if sigModel=="HTo2ZdTo2mu2x":
-    #sigCTaus = [1]
-    #lastmass = 0.5
-    #while (lastmass < 45.0):
-    #    lastmass = 1.04*lastmass
-    #    if not ROOT.passMassVeto(lastmass):
-    #        continue
-    #    m = lastmass
-    #    for t in sigCTaus:
-    #        if ((m < 1.0 and t > 10) or (m < 30.0 and t > 100)):
-    #            continue
-    #        line = "$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) HTo2ZdTo2mu2x asymptotic $ENV(PERIOD) %.3f %i\n"%(m, t)
-    #        subfile.write(line)
     with open('data/HZdZd_limitgrid.txt', 'r') as f:
-        masses = f.readlines()[0].split(',')[:-1]
+        masses = f.readlines()
         sigCTaus = [1, 10, 100]
         for mass in masses:
             m = float(mass)
             for t in sigCTaus:
                 if ((m < 1.0 and t > 10) or (m < 30.0 and t > 100)):
                     continue
-                line = "$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) HTo2ZdTo2mu2x asymptotic $ENV(PERIOD) %.3f %i\n"%(m, t)
+                line = "$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) HTo2ZdTo2mu2x asymptotic $ENV(PERIOD) %.3f %.2f\n"%(m, t)
+                subfile.write(line)
+elif sigModel=="BToPhi":
+    with open('data/BToPhi_limitgrid.txt', 'r') as f:
+        masses = f.readlines()
+        sigCTaus = [0.1, 1, 10, 100]
+        for mass in masses:
+            m = float(mass)
+            for t in sigCTaus:
+                line = "$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) %.3f %.2f\n"%(m, t)
                 subfile.write(line)
 
 subfile.write("##\n")
