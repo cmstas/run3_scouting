@@ -253,12 +253,12 @@ python3 combineScripts/readAsymptoticLimits.py HTo2ZdTo2mu2x /ceph/cms/store/use
 
 And finally for plotting (may be needed to change options in the script):
 ```
-python3 combineScripts/plot1DLimits.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2022 1 2022
-python3 combineScripts/plot1DLimits.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2022 10 2022
-python3 combineScripts/plot1DLimits.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2022 100 2022
-python3 combineScripts/plot1DLimits.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2023 1 2023
-python3 combineScripts/plot1DLimits.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2023 10 2023
-python3 combineScripts/plot1DLimits.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2023 100 2023
+python3 combineScripts/plot1DLimits_vsMass.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2022 1 2022
+python3 combineScripts/plot1DLimits_vsMass.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2022 10 2022
+python3 combineScripts/plot1DLimits_vsMass.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2022 100 2022
+python3 combineScripts/plot1DLimits_vsMass.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2023 1 2023
+python3 combineScripts/plot1DLimits_vsMass.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2023 10 2023
+python3 combineScripts/plot1DLimits_vsMass.py HTo2ZdTo2mu2x /ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Jun-14-2024_2023 100 2023
 ```
 
 ## Draft analysis code with uproot and coffea
