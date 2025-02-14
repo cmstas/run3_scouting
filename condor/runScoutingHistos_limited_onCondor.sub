@@ -1,0 +1,140 @@
+executable      = $ENV(STARTDIR)/condor/condorHistos_executable.sh
+output          = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId).log
+
+RequestCpus   = 2
+RequestMemory = 8000
+
+getenv = True
++JobFlavour = 'workday'
++DESIRED_Sites = 'T2_US_UCSD'
+transfer_input_files = $ENV(STARTDIR)/package.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy=$ENV(X509_USER_PROXY)
+use_x509userproxy = True
+
+queue arguments from (
+###DataC
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 8 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 9 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 10 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 11 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 12 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataC --splitIndex 13 --splitPace 1000000 $ENV(SCOUTINGARGS)
+###DataD
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataD --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+###DataE
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 8 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 9 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 10 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 11 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 12 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 13 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 14 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 15 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataE --splitIndex 16 --splitPace 1000000 $ENV(SCOUTINGARGS)
+###DataF
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 8 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 9 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 10 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 11 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 12 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 13 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 14 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 15 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 16 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 17 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 18 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 19 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 20 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 21 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 22 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 23 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 24 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 25 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 26 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 27 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 28 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 29 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 30 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 31 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 32 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 33 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 34 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 35 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 36 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 37 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 38 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataF --splitIndex 39 --splitPace 1000000 $ENV(SCOUTINGARGS)
+###DataG
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 1 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 2 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 3 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 4 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 5 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 6 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --data --inSample DataG --splitIndex 7 --splitPace 1000000 $ENV(SCOUTINGARGS)
+####### BToLLPhi model
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_BToPhi-0p5_ctau-1mm_2022 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_BToPhi-2p0_ctau-10mm_2022 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_BToPhi-4p0_ctau-100mm_2022 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_BToPhi-0p5_ctau-1mm_2022postEE --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_BToPhi-2p0_ctau-10mm_2022postEE --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_BToPhi-4p0_ctau-100mm_2022postEE --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+#
+### Scenario A
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenarioA_Mpi-5_MA-2p40_ctau-1p0mm_2022 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenarioA_Mpi-5_MA-2p40_ctau-1p0mm_2022postEE --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+#
+### Scenario B1
+#
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenarioB1_Mpi-4_MA-1p33_ctau-1p0mm_2022 --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_ScenarioB1_Mpi-4_MA-1p33_ctau-1p0mm_2022postEE --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)
+## Central hZdZd
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-2p0_ctau-100mm_2022postEE --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-2p0_ctau-100mm_2022 --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-8p0_ctau-10mm_2022postEE --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-8p0_ctau-10mm_2022 --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-14p0_ctau-1mm_2022 --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
+$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample Signal_HTo2ZdTo2mu2x_MZd-14p0_ctau-1mm_2022postEE --splitIndex 0 --splitPace 2000000 $ENV(SCOUTINGARGS)
+)
