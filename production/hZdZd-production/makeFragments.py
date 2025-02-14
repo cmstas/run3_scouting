@@ -7,7 +7,7 @@ from utils import *
 ### Init 
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument("--dir", default="/ceph/cms/store/user/fernance/Run3ScoutingProduction/hZdZd/Gridpacks/", help="Path to gridpacks")
+parser.add_argument("--dir", default="/ceph/cms/store/user/fernance/Run3ScoutingProduction/hZdZd/Gridpacks_v2/", help="Path to gridpacks")
 parser.add_argument("--br", default="mass_corr_brs.txt", help="Table with the branching ratios")
 parser.add_argument("--model", default="mass_epsilon_gamma_ctau.txt", help="Table with the model")
 parser.add_argument("--mode", default="lifetime", help="Can also be 'epsilon'")
@@ -18,11 +18,12 @@ args = parser.parse_args()
 # Branchin ratios (todo)
 brs = parse_table(args.br)
 
-fragmentTEMPLATE = 'fragment-templates/HTo2ZdTo2mu2x_MZd-ZDMASS_Epsilon-EPSILON_TuneCP5_13p6TeV_pythia8_cff.py' # should be common for both
+#fragmentTEMPLATE = 'fragment-templates/HTo2ZdTo2mu2x_MZd-ZDMASS_Epsilon-EPSILON_TuneCP5_13p6TeV_pythia8_cff.py' # should be common for both
+fragmentTEMPLATE = 'fragment-templates/HTo2ZdTo2mu2x_MZd-ZDMASS_Epsilon-EPSILON_TuneCP5_13p6TeV_pythia8_cff_noExtLHEP.py' # should be common for both
 if args.mode=="epsilon":
     fragmentNAME = 'HTo2ZdTo2mu2x_MZd-{ZDMASS}_Epsilon-{EPSILON}_TuneCP5_13p6TeV_pythia8_cff.py'
 elif args.mode=="lifetime":
-    fragmentNAME = 'HTo2ZdTo2mu2x_MZd-{ZDMASS}_ctau-{CTAU}_TuneCP5_13p6TeV_pythia8_cff.py'
+    fragmentNAME = 'HTo2ZdTo2mu2x_MZd-{ZDMASS}_ctau-{CTAU}mm_TuneCP5_13p6TeV_pythia8_cff.py'
 
 with open(fragmentTEMPLATE, 'r') as file_:
     fragmentTEXT = file_.read()

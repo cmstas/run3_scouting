@@ -81,15 +81,23 @@ generator = cms.EDFilter("Pythia8ConcurrentHadronizerFilter",
 )
 
 # -- Require at least one muon in the final state. Muon from taus and HF decays are not considered.
+MuMuFilter = cms.EDFilter("MCParticlePairFilter",
+                          Status = cms.untracked.vint32(1, 1),
+                          MinPt = cms.untracked.vdouble(2.5, 2.5),
+                          MaxEta = cms.untracked.vdouble(2.5, 2.5),
+                          MinEta = cms.untracked.vdouble(-2.5, -2.5),
+                          ParticleID1 = cms.untracked.vint32(13,-13),
+                          )
+
 MuFilter = cms.EDFilter("PythiaFilter",
     Status = cms.untracked.int32(0),
     MotherID = cms.untracked.int32(1023),
-    MinPt = cms.untracked.double(0.),
+    MinPt = cms.untracked.double(2.5),
     ParticleID = cms.untracked.int32(13),
-    MaxEta = cms.untracked.double(10),
-    MinEta = cms.untracked.double(-10)
+    MaxEta = cms.untracked.double(2.5),
+    MinEta = cms.untracked.double(-2.5)
 )
-ProductionFilterSequence = cms.Sequence(generator*MuFilter)
+ProductionFilterSequence = cms.Sequence(generator*MuMuFilter*MuFilter)
 
 
 # Link to generator fragment:

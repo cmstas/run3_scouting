@@ -91,14 +91,14 @@ if mode=="lifetime":
 
     # Mass-lifetime prop
     mass_proposal = [] # in GeV
-    mass_proposal += [0.36, 0.5, 0.7, 1.0]
+    mass_proposal += [0.5, 0.7]
     mass_proposal += [1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0]
-    mass_proposal += [12.0, 14.0, 16.0, 18.0, 20.0]
-    mass_proposal += [22.0, 24.0, 26.0, 28.0, 30.0]
+    mass_proposal += [12.0, 14.0, 16.0, 20.0]
+    mass_proposal += [22.0, 24.0]
     mass_proposal += [32.0, 34.0, 38.0]
     mass_proposal += [42.0, 46.0, 50.0]
 
-    ctau_proposal = [1, 10, 100] # in mm (only integers or change string formatting below to not loose precision)
+    ctau_proposal = [1, 10, 100, 1000] # in mm (only integers or change string formatting below to not loose precision)
 
     ctau_grid = []
 
