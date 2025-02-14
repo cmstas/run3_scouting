@@ -4,8 +4,10 @@ import os
 
 # To be modified by user:
 sourceDir = "/ceph/cms/store/group/Run3Scouting/RAWScouting_5c"
-finalDir = "/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/CentralSignal"
+finalDir = "/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Feb-03-2024/CentralSignal"
+sourceDir = "/ceph/cms/store/group/Run3Scouting/RAWScouting_BToPhi_2023_v7p0"
 modeto = False # Set to True if moving files it is necessary
+selected_era = '2023BPix'
 
 ### File with central datasets fr looper input
 fout_ = open("centralDatasets.txt", "w")
@@ -64,12 +66,21 @@ for sample in os.listdir(sourceDir):
         elif "2022" in isource:
             era = "2022"
             year = "2022"
-        destination = finalDir + '/Signal_' + tag + '_' + era + '/'
-        if not os.path.exists(destination):
-            os.mkdir(destination)
+        elif "2023BPix" in isource:
+            era = "2023BPix"
+            year = "2023"
+        elif "2023" in isource:
+            era = "2023"
+            year = "2023"
+        if era!=selected_era:
+            continue
+        #destination = finalDir + '/Signal_' + tag + '_' + era + '/'
+        #if not os.path.exists(destination):
+        #    os.mkdir(destination)
         #os.system("mv {}*.root {}".format(isource, destination))
-        print("mv {}*.root {}".format(isource, destination))
-        line = "{},{}\n".format('Signal_' + tag + '_' + era, destination)
+        #print("mv {}*.root {}".format(isource, destination))
+        #line = "{},{}\n".format('Signal_' + tag + '_' + era, destination)
+        line = "{},{}\n".format('Signal_' + tag + '_' + era, isource)
         fout_.write(line)
         f2out_.write("$ENV(SCOUTINGOUTPUTDIR) {} {} 0 100\n".format(year, 'Signal_' + tag + '_' + era))
         f3out_.write("$ENV(SCOUTINGINPUTDIR) $ENV(SCOUTINGOUTPUTDIR) --condor --signal --inSample {} --splitIndex 0 --splitPace 1000000 $ENV(SCOUTINGARGS)\n".format('Signal_' + tag + '_' + era))
