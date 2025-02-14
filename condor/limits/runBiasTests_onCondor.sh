@@ -32,7 +32,8 @@ mkdir -p /ceph/cms/store/user/$USER/Run3ScoutingOutput/$SCOUTINGSNTOUTPUTDIRLIM
 cp $EXPECTEDLIM .
 
 echo "Creating the package..."
-sh condor/limits/create_package.sh $SCOUTINGSNTINPUTDIRLIM $SCOUTINGEXPECTEDLIM fitResults_${PERIOD}
+#sh condor/limits/create_package.sh $SCOUTINGSNTINPUTDIRLIM $SCOUTINGEXPECTEDLIM fitResults_${PERIOD}
+sh condor/limits/create_package.sh $SCOUTINGSNTINPUTDIRLIM $SCOUTINGEXPECTEDLIM
 
 echo "Submission started"
 condor_submit condor/limits/runBiasTests_onCondor.sub

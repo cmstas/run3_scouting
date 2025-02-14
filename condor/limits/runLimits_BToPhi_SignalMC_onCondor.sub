@@ -1,0 +1,31 @@
+executable      = $ENV(HOMEDIR)/condor/limits/condor_executable.sh
+output          = $ENV(HOMEDIR)/condor/limits/limits_logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(HOMEDIR)/condor/limits/limits_logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(HOMEDIR)/condor/limits/limits_logs/job.$(ClusterId).$(ProcId).log
+
+getenv = True
++JobFlavour = "workday"
++DESIRED_Sites = "T2_US_UCSD"
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64"
+transfer_input_files = $ENV(HOMEDIR)/package.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy=$ENV(X509_USER_PROXY)
+use_x509userproxy = True
+
+queue arguments from (
+##
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 0.900 0.10
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 0.900 1.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 0.900 10.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 0.900 100.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.250 0.10
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.250 1.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.250 10.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.250 100.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.500 0.10
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.500 1.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.500 10.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) BToPhi asymptotic $ENV(PERIOD) 1.500 100.00
+##
+)
