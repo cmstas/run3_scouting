@@ -192,12 +192,19 @@ def getIPSign(mphi, dmphi):
 # Get Signal normalization weight
 def getweight(era, ngen, frac=1.0, xsec=1000):
     if era=="2022":
+        print(f"Getting {era}: Normalize to {frac*8.077046947}")
         return frac*8.077046947*xsec/ngen
     if era=="2022postEE":
+        print(f"Getting {era}: Normalize to {frac*26.982330931}")
         return frac*26.982330931*xsec/ngen
+    if era=="2023postEE":
+        print(f"Getting {era}: Normalize to {frac*5.557004785}")
+        return frac*5.557004785*xsec/ngen # Total C: 17.060484313
     if era=="2023":
-        return frac*17.060484313*xsec/ngen
+        print(f"Getting {era}: Normalize to {frac*11.503479528}")
+        return frac*11.503479528*xsec/ngen # Total C: 17.060484313
     if era=="2023BPix":
+        print(f"Getting {era}: Normalize to {frac*9.525199061}")
         return frac*9.525199061*xsec/ngen
 
 # Get closest from list
@@ -446,20 +453,9 @@ if not isData and args.weightMC and 'DileptonMinBias' not in args.inSample:
         with open('data/BToPhi-request.csv') as mcinfo:
             reader = csv.reader(mcinfo, delimiter=',')
             for row in reader:
-                if sampleTag in row[0]:
+                if sampleTag.replace('_MPhi','') in row[0]:
                     efilter = float(row[-1])
                     break
-    if "ScenB2" in sampleTag:
-        for _,f in enumerate(files):
-            if not args.condor:
-                f_ = ROOT.TFile.Open(f.replace('davs://redirector.t2.ucsd.edu:1095//', '/ceph/cms/'))
-            else:
-                f_ = ROOT.TFile.Open(f)
-            h_ = f_.Get("counts").Clone("Clone_{}".format(_))
-            counts.Add(h_)
-            f_.Close()
-        ncounts = counts.GetBinContent(1)
-        efilter = 1.0
     if "ScenarioB1" in sampleTag:
         for _,f in enumerate(files):
             if not args.condor:
@@ -470,15 +466,38 @@ if not isData and args.weightMC and 'DileptonMinBias' not in args.inSample:
             counts.Add(h_)
             f_.Close()
         ncounts = counts.GetBinContent(1)
-        efilter = 1.0
-    if "2022postEE" in f:
+        with open('data/ScenarioB1-request.csv') as mcinfo:
+            reader = csv.reader(mcinfo, delimiter=',')
+            for row in reader:
+                if sampleTag in row[0]:
+                    efilter = float(row[-1])
+                    break
+    if "ScenarioA" in sampleTag:
+        for _,f in enumerate(files):
+            if not args.condor:
+                f_ = ROOT.TFile.Open(f.replace('davs://redirector.t2.ucsd.edu:1095//', '/ceph/cms/'))
+            else:
+                f_ = ROOT.TFile.Open(f)
+            h_ = f_.Get("counts").Clone("Clone_{}".format(_))
+            counts.Add(h_)
+            f_.Close()
+        ncounts = counts.GetBinContent(1)
+        with open('data/ScenarioA-request.csv') as mcinfo:
+            reader = csv.reader(mcinfo, delimiter=',')
+            for row in reader:
+                if sampleTag in row[0]:
+                    efilter = float(row[-1])
+                    break
+    if "2022postEE" in files[0] and args.year=="2022":
         lumiweight = getweight("2022postEE", ncounts/efilter, unblind_frac)
-    elif "2022" in f:
+    elif "2022" in files[0] and args.year=="2022":
         lumiweight = getweight("2022", ncounts/efilter, unblind_frac)
-    elif "2023" in f:
-        lumiweight = getweight("2023", ncounts/efilter, unblind_frac)
-    elif "2023BPix" in f:
+    if "2022postEE" in files[0] and args.year=="2023":
+        lumiweight = getweight("2023postEE", ncounts/efilter, unblind_frac)
+    elif "2023BPix" in files[0] and args.year=="2023":
         lumiweight = getweight("2023BPix", ncounts/efilter, unblind_frac)
+    elif "2023" in files[0] and args.year=="2023":
+        lumiweight = getweight("2023", ncounts/efilter, unblind_frac)
     if "ScenB1" in sampleTag:
         ncounts = 300000.0
         efilter = 1.0
@@ -591,7 +610,7 @@ for dbin in dbins:
         roods_sel_up[dbin] = ROOT.RooDataSet(dname + "_sel_up",dname,ROOT.RooArgSet(mfit,roow_sel_up),"roow_sel_up")
         roods_sel_down[dbin] = ROOT.RooDataSet(dname + "_sel_down",dname,ROOT.RooArgSet(mfit,roow_sel_down),"roow_sel_down")
     else:
-        catmass[dbin] = ROOT.TH1F(dname + "_rawmass","; m_{4#mu} [GeV]; Events / 0.01 GeV",15000, 0., 150.)
+        catmass[dbin] = ROOT.TH1F(dname + "_rawmass","; m_{4#mu} [GeV]; Events / 0.01 GeV",20000, 0., 200.)
         roods[dbin] = ROOT.RooDataSet(dname,dname,ROOT.RooArgSet(m4fit,roow4),"roow")
         roods_trg_up[dbin] = ROOT.RooDataSet(dname + "_trg_up",dname,ROOT.RooArgSet(m4fit,roow4_trg_up),"roow_trg_up")
         roods_trg_down[dbin] = ROOT.RooDataSet(dname + "_trg_down",dname,ROOT.RooArgSet(m4fit,roow4_trg_down),"roow_trg_down")
@@ -1972,11 +1991,24 @@ if args.inSample!="*":
 if index>=0:
     foname = foname+("_%d"%index)
 
-if reweightFrom > 0 and reweightTo > 0:
-    foname = foname.replace("ctau-%imm"%reweightFrom, "ctau-%.2fmm"%(reweightTo))
-else:
-    ctau_string = foname.split('ctau-')[1].split('mm')[0]
-    foname = foname.replace(ctau_string+'mm', "%.2fmm"%(float(ctau_string)))
+if not isData:
+    ## Convention for ctau (uniform for every sample)
+    if reweightFrom > 0 and reweightTo > 0:
+        foname = foname.replace("ctau-%imm"%reweightFrom, "ctau-%.2fmm"%(reweightTo))
+    else:
+        ctau_string = foname.split('ctau-')[1].split('mm')[0]
+        if 'p' in ctau_string:
+            ctau_string_ = ctau_string.replace('p','.')
+        else:
+            ctau_string_ = ctau_string
+        foname = foname.replace(ctau_string+'mm', "%.2fmm"%(float(ctau_string_)))
+    ## Convention for uniform mass for BToPhi
+    if 'BToPhi' in foname:
+        mass_string = foname.split('MPhi-')[1].split('_ctau')[0]
+        mass_value = float(mass_string.replace('p','.'))
+        new_mass_string = ('%.2f'%(mass_value)).replace('.','p')
+        foname = foname.replace(mass_string, new_mass_string)
+        
 fout = ROOT.TFile(foname+".root","RECREATE")
 fout.cd()
 for cat in h1d.keys():
