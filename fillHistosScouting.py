@@ -53,6 +53,8 @@ parser.add_argument("--noMaterialVeto", default=False, action="store_true", help
 parser.add_argument("--noMuonIPSel", default=False, action="store_true", help="Do not apply selection on muon IP (Not applied at four-muon level)")
 parser.add_argument("--noMuonHitSel", default=False, action="store_true", help="Do not apply selection on muon hits (Not applied at four-muon level)")
 parser.add_argument("--noDiMuonAngularSel", default=False, action="store_true", help="Do not apply selection on dimuon angular variables")
+parser.add_argument("--noDiMuonResonanceMasking", default=False, action="store_true", help="Do not apply dimuon resonance masking in dimuon events")
+parser.add_argument("--noFourMuonResonanceMasking", default=False, action="store_true", help="Do not apply dimuon resonance masking in dimuon events")
 parser.add_argument("--noFourMuonAngularSel", default=False, action="store_true", help="Do not apply selection on fourmuon angular variables")
 parser.add_argument("--noFourMuonMassDiffSel", default=False, action="store_true", help="Do not apply selection on fourmuon invariant mass difference")
 parser.add_argument("--noPreSel", default=False, action="store_true", help="Do not fill pre-selection/association histograms")
@@ -348,6 +350,8 @@ applyMaterialVeto = not args.noMaterialVeto
 applyMuonIPSel = not args.noMuonIPSel
 applyDiMuonAngularSel = not args.noDiMuonAngularSel
 applyMuonHitSel = not args.noMuonHitSel
+applyDiMuonResonanceMasking = not args.noDiMuonResonanceMasking
+applyFourMuonResonanceMasking = not args.noFourMuonResonanceMasking
 applyFourMuonAngularSel = not args.noFourMuonAngularSel
 applyFourMuonMassDiffSel = not args.noFourMuonMassDiffSel
 
@@ -1191,6 +1195,28 @@ for e in range(firste,laste):
             if reldmass > 0.05:
                 continue
         #
+        if applyFourMuonResonanceMasking:
+            if (minmass > 0.41 and minmass < 0.50) or (maxmass > 0.41 and maxmass < 0.50):
+                continue
+            if (minmass > 0.51 and minmass < 0.59) or (maxmass > 0.51 and maxmass < 0.59):
+                continue
+            if (minmass > 0.73 and minmass < 0.83) or (maxmass > 0.73 and maxmass < 0.83):
+                continue
+            if (minmass > 0.96 and minmass < 1.08) or (maxmass > 0.96 and maxmass < 1.08):
+                continue
+            if (minmass > 2.91 and minmass < 3.27) or (maxmass > 2.91 and maxmass < 3.27):
+                continue
+            if (minmass > 3.47 and minmass < 3.89) or (maxmass > 3.47 and maxmass < 3.89):
+                continue
+            if (minmass > 8.99 and minmass < 9.91) or (maxmass > 8.99 and maxmass < 9.91):
+                continue
+            if (minmass > 9.64 and minmass < 10.56) or (maxmass > 9.64 and maxmass < 10.56):
+                continue
+            if (minmass > 9.90 and minmass < 10.78) or (maxmass > 9.90 and maxmass < 10.78):
+                continue
+            if (minmass > 81 and minmass < 101) or (maxmass > 81 and maxmass < 101):
+                continue
+        #
         for h in h1d["fourmuon"]:
             tn = h.GetName()
             h.Fill(eval(variable1d[h.GetName()]), lumiweight)
@@ -1224,10 +1250,6 @@ for e in range(firste,laste):
             roods_sel_up["FourMu_sep"].add(ROOT.RooArgSet(m4fit,roow4_sel_up),roow4_sel_up.getVal());
             roods_sel_down["FourMu_sep"].add(ROOT.RooArgSet(m4fit,roow4_sel_down),roow4_sel_down.getVal());
             catmass["FourMu_sep"].Fill(mass, lumiweight*rooweight*sf_trg*sf_sel*tweight);
-            #mfit.setVal(avgmass)
-            #roow.setVal(lumiweight);
-            #roods["FourMu_sep"].add(ROOT.RooArgSet(mfit,roow),roow.getVal());
-            #catmass["FourMu_sep"].Fill(avgmass, lumiweight);
             filledcat4musep = True
         else:
             filledcat4musep = False
@@ -1391,6 +1413,29 @@ for e in range(firste,laste):
             if dphisvu>ROOT.TMath.PiOver2():
                 continue
         #
+        # -> This is left commented as this cuts are not applied in overlapping vertices
+        #if applyFourMuonResonanceMasking:
+        #    if (minmass > 0.41 and minmass < 0.50) or (maxmass > 0.41 and maxmass < 0.50):
+        #        continue
+        #    if (minmass > 0.51 and minmass < 0.59) or (maxmass > 0.51 and maxmass < 0.59):
+        #        continue
+        #    if (minmass > 0.73 and minmass < 0.83) or (maxmass > 0.73 and maxmass < 0.83):
+        #        continue
+        #    if (minmass > 0.96 and minmass < 1.08) or (maxmass > 0.96 and maxmass < 1.08):
+        #        continue
+        #    if (minmass > 2.91 and minmass < 3.27) or (maxmass > 2.91 and maxmass < 3.27):
+        #        continue
+        #    if (minmass > 3.47 and minmass < 3.89) or (maxmass > 3.47 and maxmass < 3.89):
+        #        continue
+        #    if (minmass > 8.99 and minmass < 9.91) or (maxmass > 8.99 and maxmass < 9.91):
+        #        continue
+        #    if (minmass > 9.64 and minmass < 10.56) or (maxmass > 9.64 and maxmass < 10.56):
+        #        continue
+        #    if (minmass > 9.90 and minmass < 10.78) or (maxmass > 9.90 and maxmass < 10.78):
+        #        continue
+        #    if (minmass > 81 and minmass < 101) or (maxmass > 81 and maxmass < 101):
+        #        continue
+        #
         for h in h1d["fourmuon_osv"]:
             tn = h.GetName()
             h.Fill(eval(variable1d[h.GetName()]), lumiweight)
@@ -1495,6 +1540,29 @@ for e in range(firste,laste):
             elif lxy > 16.0:
                 if ( nhitsbeforesvtotal > 2):
                     continue
+        if applyDiMuonResonanceMasking:
+            if (mass > 0.41 and mass < 0.50):
+                continue
+            if (mass > 0.51 and mass < 0.59):
+                continue
+            if (mass > 0.73 and mass < 0.83):
+                continue
+            if (mass > 0.96 and mass < 1.08):
+                continue
+            if (mass > 2.91 and mass < 3.27):
+                continue
+            if (mass > 3.47 and mass < 3.89):
+                continue
+            if (mass > 8.99 and mass < 9.91):
+                continue
+            if (mass > 9.64 and mass < 10.56):
+                continue
+            if (mass > 9.90 and mass < 10.78):
+                continue
+            if (mass > 81 and mass < 101):
+                continue
+        #
+
         drmm = t.Muon_vec[dmuidxs[int(vn*2)]].DeltaR(t.Muon_vec[dmuidxs[int(vn*2)+1]])
         dpmm = abs(t.Muon_vec[dmuidxs[int(vn*2)]].DeltaPhi(t.Muon_vec[dmuidxs[int(vn*2)+1]]))
         demm = abs(t.Muon_vec[dmuidxs[int(vn*2)]].Eta()-t.Muon_vec[dmuidxs[int(vn*2)+1]].Eta())
@@ -1690,6 +1758,28 @@ for e in range(firste,laste):
             elif lxy > 16.0:
                 if ( nhitsbeforesvtotal > 2):
                     continue
+        if applyDiMuonResonanceMasking:
+            if (mass > 0.41 and mass < 0.50):
+                continue
+            if (mass > 0.51 and mass < 0.59):
+                continue
+            if (mass > 0.73 and mass < 0.83):
+                continue
+            if (mass > 0.96 and mass < 1.08):
+                continue
+            if (mass > 2.91 and mass < 3.27):
+                continue
+            if (mass > 3.47 and mass < 3.89):
+                continue
+            if (mass > 8.99 and mass < 9.91):
+                continue
+            if (mass > 9.64 and mass < 10.56):
+                continue
+            if (mass > 9.90 and mass < 10.78):
+                continue
+            if (mass > 81 and mass < 101):
+                continue
+        #
         drmm = t.Muon_vec[dmuidxs_osv[int(vn*2)]].DeltaR(t.Muon_vec[dmuidxs_osv[int(vn*2)+1]])
         dpmm = abs(t.Muon_vec[dmuidxs_osv[int(vn*2)]].DeltaPhi(t.Muon_vec[dmuidxs_osv[int(vn*2)+1]]))
         demm = abs(t.Muon_vec[dmuidxs_osv[int(vn*2)]].Eta()-t.Muon_vec[dmuidxs_osv[int(vn*2)+1]].Eta())
