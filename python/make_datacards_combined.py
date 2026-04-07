@@ -2,6 +2,7 @@ import os,sys
 import ROOT
 from datetime import date
 import csv
+import numpy as np
 
 ROOT.gROOT.ProcessLine(".L cpp/helper.C+")
 
@@ -27,10 +28,9 @@ useSignalMC = True
 
 # Constant to control the yields of the signal in the datacard (to be used consistently when limits are made)
 useNorm = True
-NORMCONST = 0.01
 
-doHybridFit = False
-doBinnedFit = True # If doHybridFit is set to True this is basically not used
+doHybridFit = True
+doBinnedFit = False # If doHybridFit is set to True this is basically not used
 doPartiaUnblinding = False
 ext = "data"
 if not useData:
@@ -50,6 +50,8 @@ doRootCard = True
 doSmartScaling = True
 useOnlyZeroBackground = False
 mergeEmptyBins = True
+combineMeans = False
+combineSigmas = False
 
 ## doc: Smart scaling allows to have the limit around 0.5, or alternatively with the 2.5% quantile above 0.25
 
@@ -66,14 +68,31 @@ if len(sys.argv)>1:
     if len(sys.argv)>5:
         NORMCONST = float(sys.argv[5])
     else:
-        NORMCONST = 0.01
+        NORMCONST = 0.001
     
 if doSmartScaling and not len(sys.argv)>5:
+    print("---------------------------Accessing file")
     if sigModel=="HTo2ZdTo2mu2x":
         if not useSignalMC:
             scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Apr-15-2025_HTo2ZdTo2mu2x_Norm0p01_asymptotic_vsMass_allEras/limits_HTo2ZdTo2mu2x_allEras.txt'
         else:
-            scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_HTo2ZdTo2mu2x_NormSmart_Apr-28-2025_vsCTau_asymptotic_allEras/limits_HTo2ZdTo2mu2x_allEras.txt'
+            scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_HTo2ZdTo2mu2x_NormSmart_Apr-28-2025_vsCTau_asymptotic_allEras/limits_HTo2ZdTo2mu2x_asymptotic_allEras.txt'
+    if sigModel=="BToPhi":
+        if not useSignalMC:
+            #scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Apr-15-2025_HTo2ZdTo2mu2x_Norm0p01_asymptotic_vsMass_allEras/limits_HTo2ZdTo2mu2x_allEras.txt'
+            #scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_1mm.txt'
+            #scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_10-100mm.txt'
+            scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_vsCTau.txt'
+        else:
+            scalingFile = 'results_BToPhi_asymptotic/limits_BToPhi_asymptotic_allEras.txt'
+            scalingFile = 'results_BToPhi_MC/limits_BToPhi_asymptotic_allEras.txt'
+    if sigModel=="ScenarioA":
+        scalingFile = 'combineScripts/SmartLimitNorm/limits_ScenarioA_asymptotic_allEras_vsCTau.txt'
+        #scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_ScenarioA_Norm1p0-0p6_Jun-10-2025_vsCTau_asymptotic_allEras/limits_ScenarioA_asymptotic_allEras.txt'
+    if sigModel=="ScenarioB1":
+        #scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_ScenarioB1_Norm1p0-0p6_Jun-10-2025_vsCTau_asymptotic_allEras/limits_ScenarioB1_asymptotic_allEras.txt'
+        #scalingFile = 'results_ScenarioB1_asymptotic/limits_ScenarioB1_asymptotic_allEras.txt'
+        scalingFile = 'combineScripts/SmartLimitNorm/limits_ScenarioB1_asymptotic_allEras_vsCTau.txt'
 else:
     scalingFile = ''
 
@@ -129,8 +148,11 @@ if useOnlyExponential or useOnlyPowerLaw or useOnlyBernstein:
 #### Caution, here the names AND order should be consistent to the ones set in cpp/doAll_fitDimuonMass.C 
 # Example of workspace: d_Dimuon_lxy0p0to2p7_iso0_pthigh_Signal_HTo2ZdTo2mu2x_MZd-7p0_ctau-1mm_2022_workspace.root
 dNames = []
-dNames.append("d_FourMu_sep")
-dNames.append("d_FourMu_osv")
+if 'BToPhi' not in sigModel:
+    if 'ScenarioB1' not in sigModel:
+        dNames.append("d_FourMu_sep")
+    if 'ScenarioA' not in sigModel:
+        dNames.append("d_FourMu_osv")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_ptlow")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_pthigh")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso1_ptlow")
@@ -163,14 +185,15 @@ dNames.append("d_Dimuon_lxy16p0to70p0_iso0_ptlow")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso0_pthigh")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso1_ptlow")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso1_pthigh")
-dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
-dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
-dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
-dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
-dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
-dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
-dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
-dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
+if 'ScenarioA' not in sigModel:
+    dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
+    dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
+    dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
+    dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
+    dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
+    dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
+    dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
+    dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
 if doIso0HighPt:
     dNames = [s for s in dNames if "iso0_pthigh" in s]
 elif doIso1HighPt:
@@ -209,6 +232,7 @@ for y_,y in enumerate(years):
     #
     inDir = "%s/%s"%(thisDir, inDirs[y_])
     os.system('cp -r %s %s/'%(inDir, outDir))
+    os.system('chmod u+w %s/%s/*.root'%(outDir, inDirs[y_]))
 
 
 sigTags = []
@@ -217,13 +241,14 @@ if sigModel=="HTo2ZdTo2mu2x":
         if not validation:
             sigMasses = [1.5, 2.0, 2.5, 5.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 50.0]
             sigMasses = [1.5, 2.0, 2.5, 5.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 40.0, 50.0]
-            sigMasses = [20.0, 30.0, 40.0, 50.0]
+            sigMasses = [30.0, 40.0, 50.0]
             #sigMasses = [20.0]
-            #sigMasses = [50.0]
+            sigMasses = [2.0]
             for  m in sigMasses:
                 sigCTaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.00, 160.00, 250.00, 400.00, 630.00, 1000.00]
                 #sigCTaus = [160.00, 250.00, 400.00, 630.00, 1000.00]
-                #sigCTaus = [1.00]
+                sigCTaus = [ 0.63, 1.00, 1.60, 2.50]
+                #sigCTaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00]
                 for t in sigCTaus:
                     if ((m < 1.0 and t > 10) or (m < 2.0 and t > 100)):
                         continue
@@ -260,42 +285,66 @@ if sigModel=="HTo2ZdTo2mu2x":
 elif sigModel=="BToPhi":
     if useSignalMC:
         #sigMasses = [0.25, 0.30, 0.40, 0.50, 0.60, 0.70, 0.90, 1.25, 1.50, 2.0, 2.85, 3.35, 4.00, 5.00]
-        sigMasses = [4.00] #Other masses are either too small or too close to SM resonance
+        #sigMasses = [0.30, 1.25, 1.50, 2.00] #Other masses are either too small or too close to SM resonance
+        sigMasses = [1.25, 1.50, 2.00] #Other masses are either too small or too close to SM resonance
         for m in sigMasses:
-            sigCTaus = [0.0, 0.1, 1, 10, 100]
+            #sigCTaus = [0.1, 1, 10, 100]
+            sigCTaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.00]
             for t in sigCTaus:
                 sigTags.append("Signal_BToPhi_MPhi-%s_ctau-%.2fmm"%(('%.2f'%m).replace('.','p'), t))
     elif usePredefinedGrid:
         with open('data/BToPhi_limitgrid.txt', 'r') as f:
             masses = f.readlines()
-            sigCTaus = [1, 10, 100]
+            sigCTaus = [100]
             for mass in masses:
                 m = float(mass)
                 for t in sigCTaus:
                     sigTags.append("Signal_BToPhi_MPhi-%.3f_ctau-%.2fmm"%(m, t))
 elif sigModel=="ScenarioB1":
     sigMasses = []
+    #sigMasses.append([1,0.33])
+    #sigMasses.append([2,0.67])
     #sigMasses.append([4,1.33])
-    sigMasses.append([5,2.40])
-    sigCTaus = [0.1, 1, 10, 100]
+    sigMasses.append([5,1.67])
+    #sigMasses.append([3.33,0.33])
+    #sigMasses.append([6.,2.])
+    #sigMasses.append([7.5,2.5])
+    #sigMasses.append([12.,1.20])
+    #sigCTaus = [0.10, 0.25, 0.60, 1.00, 2.50, 6.00, 10.00, 25.00, 60.00, 100.00]
+    #sigCTaus = [0.10, 1.00, 10.00]
+    #sigCTaus = [1000.00]
+    sigCTaus = [0.10, 0.25]
     for m in sigMasses:
         for t in sigCTaus:
-            sigTags.append("Signal_ScenarioB1_Mpi-%i_MA-%s_ctau-%.2fmm" % (m[0], ('%.2f'%m[1]).replace('.','p'), float(t)))
+            if m==[6.,2.]:
+                sigTags.append("Signal_ScenarioB1_Mpi-6_MA-2_ctau-%.2fmm" % (float(t)))
+            elif m==[7.5,2.5]:
+                sigTags.append("Signal_ScenarioB1_Mpi-7p50_MA-2p50_ctau-%.2fmm" % (float(t)))
+            else:
+                sigTags.append("Signal_ScenarioB1_Mpi-%i_MA-%s_ctau-%.2fmm" % (m[0], ('%.2f'%m[1]).replace('.','p'), float(t)))
+
 elif sigModel=="ScenarioA":
     sigMasses = []
-    sigMasses.append([1,0.33])
-    #sigMasses.append([1,0.25])
+    #sigMasses.append([1,0.33])
     #sigMasses.append([2,0.67])
-    #sigMasses.append([5,2.40])
-    sigMasses.append([4,1.33])
-    #sigMasses.append([5,2.40])
-    #sigMasses.append([10,2.00])
-    #sigMasses.append([10,3.33])
-    #sigMasses.append([10,4.90])
-    sigCTaus = [0.1, 1, 10, 100]
+    #sigMasses.append([4,1.33])
+    sigMasses.append([5,1.67])
+    #sigMasses.append([3.33,0.33])
+    #sigMasses.append([6.,2.])
+    #sigMasses.append([7.5,2.5])
+    #sigMasses.append([12.,1.20])
+    #sigCTaus = [0.1, 1, 10, 100]
+    #sigCTaus = [0.10, 0.25, 0.60, 1.00, 2.50, 6.00, 10.00, 25.00, 60.00, 100.00, 1000.0]
+    #sigCTaus = [1000.00]
+    sigCTaus = [0.10]
     for m in sigMasses:
         for t in sigCTaus:
-            sigTags.append("Signal_ScenarioA_Mpi-%i_MA-%s_ctau-%.2fmm" % (m[0], ('%.2f'%m[1]).replace('.','p'), float(t)))
+            if m==[6.,2.]:
+                sigTags.append("Signal_ScenarioA_Mpi-6_MA-2_ctau-%.2fmm" % (float(t)))
+            elif m==[7.5,2.5]:
+                sigTags.append("Signal_ScenarioA_Mpi-7p50_MA-2p50_ctau-%.2fmm" % (float(t)))
+            else:
+                sigTags.append("Signal_ScenarioA_Mpi-%i_MA-%s_ctau-%.2fmm" % (m[0], ('%.2f'%m[1]).replace('.','p'), float(t)))
 
 f2l = [0.0]
 nSigTot = 1.0
@@ -346,6 +395,43 @@ for m in sigTags:
                         print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
                         break
                     lsprev = ls
+                if sigModel=="BToPhi":
+                    if (float(ls[1])== float(M)) and (float(ls[2])== float(T)):
+                        obs = float(ls[3])
+                        exp = float(ls[4])
+                        e2m = float(ls[5])
+                        e1m = float(ls[6])
+                        e1p = float(ls[7])
+                        e2p = float(ls[8])
+                        NORMCONST = 1.00 * ( e2m / 0.6 )
+                        print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
+                        break
+                    if (float(ls[1]) > float(M)) and (float(ls[2])== float(T)):
+                        obs = float(lsprev[3])
+                        exp = float(lsprev[4])
+                        e2m = float(lsprev[5])
+                        e1m = float(lsprev[6])
+                        e1p = float(lsprev[7])
+                        e2p = float(lsprev[8])
+                        NORMCONST = 1.00 * ( e2m / 0.6 )
+                        print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
+                        break
+                    lsprev = ls
+                if "Scenario" in sigModel:
+                    print("Openes normalizations for Scenario's")
+                    #print(float(ls[1]), float(ls[2]), float(ls[3]))
+                    #print(float(M), float(M2), float(T))
+                    if (float(ls[1])== float(M2)) and (float(ls[2])== float(M)) and (float(ls[3])== float(T)):
+                        obs = float(ls[4])
+                        exp = float(ls[5])
+                        e2m = float(ls[6])
+                        e1m = float(ls[7])
+                        e1p = float(ls[8])
+                        e2p = float(ls[9])
+                        NORMCONST = 10.0 * ( e2m / 0.6 ) # This one was used with 1.0 before but in this last test 10.
+                        print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
+                        break
+
     #
     #
     #
@@ -362,6 +448,10 @@ for m in sigTags:
     nuis_mcstat         = []
     nuis_mean           = []
     nuis_width          = []
+    nuis_width          = []
+    nuis_sigmas_2mu     = []
+    nuis_sigmas_s4mu    = []
+    nuis_sigmas_o4mu    = []
     nuis_pdf_index      = []
     #
     #
@@ -458,6 +548,7 @@ for m in sigTags:
         ## Loop over years
         #
         factor_dataEvents = 1
+        sum_dataEvents    = 0
         y_shapes_background   = []
         y_shapes_data         = []
         y_shapes_signal       = []
@@ -474,7 +565,7 @@ for m in sigTags:
         #
         for y_,y in enumerate(years):
             #
-            inDir = "%s/%s"%(thisDir, inDirs[y_])
+            inDir = "%s/%s"%(outDir, inDirs[y_])
             print("%s/%s_%s_%s_workspace.root"%(inDir,d,m,y))
             finame = "%s/%s_%s_%s_workspace.root"%(inDir,d,m,y)
             _finame = "%s/%s_%s_%s_workspace.root"%(inDirs[y_],d,m,y)
@@ -491,7 +582,8 @@ for m in sigTags:
             if useCategorizedBackground:
                 catExtB = "_ch%d_%s"%(binidx, y)
             # Open input file with workspace
-            f = ROOT.TFile(finame)
+            print('Modifying finame!!!!')
+            f = ROOT.TFile(finame, "UPDATE")
             # Retrieve workspace from file
             w = f.Get(wsname)
             # Retrieve signal normalization
@@ -503,22 +595,50 @@ for m in sigTags:
             if useNorm:
                 print("Using a normalization constant of %.5f"%(NORMCONST))
                 nSig = NORMCONST*nSig
-            if (binidx > 22 and binidx < 35) or (binidx > 39):
-                nSig = nSig * 0.82
+            if ((binidx > 22 and binidx < 35) or (binidx > 39)):
+                print("Manually applying the scale factor on the most displaced regions")
+                nSig = nSig * 0.82 # Manually applying the scale factor on the most displaced regions
             print(f"Measured signal: {nSig}")
             # Retrieve signal mean and std. deviation
             mean = w.var("mean%s"%catExtS).getValV()
             sigma = w.var("sigma%s"%catExtS).getValV()
-            sigmavar = 0.06*sigma # 0.5*sigma
+            #sigmavar = 0.06*sigma # 0.5*sigma
+            sigmavar = 0.5*sigma # 0.5*sigma
+            #
+            if combineMeans:
+                mean_variable = w.var("mean%s"%catExtS)
+                if 'Dimuon' in d:
+                    mean_variable.SetName('mean_signal_2mu')
+                    mean_variable.SetTitle('mean_signal_2mu')
+                elif 'FourMu_sep' in d:
+                    mean_variable.SetName('mean_signal_s4mu')
+                    mean_variable.SetTitle('mean_signal_s4mu')
+                else:
+                    mean_variable.SetName('mean_signal_o4mu')
+                    mean_variable.SetTitle('mean_signal_o4mu')
+                w.Write("", ROOT.TFile.kOverwrite)
+            if combineSigmas:
+                sigma_variable = w.var("sigma%s"%catExtS)
+                if 'Dimuon' in d:
+                    sigma_variable.SetName('sigma_signal_2mu')
+                    sigma_variable.SetTitle('sigma_signal_2mu')
+                elif 'FourMu_sep' in d:
+                    sigma_variable.SetName('sigma_signal_s4mu')
+                    sigma_variable.SetTitle('sigma_signal_s4mu')
+                else:
+                    sigma_variable.SetName('sigma_signal_o4mu')
+                    sigma_variable.SetTitle('sigma_signal_o4mu')
+                w.Write("", ROOT.TFile.kOverwrite)
             # Retrieve MC stat. uncertainty from RooDataSet
             if useSignalMC:
                 if w.var("signalRawNorm%s"%catExtS).getValV()>0.0:
                     mcstatunc = 1.0/ROOT.TMath.Sqrt(w.var("signalRawNorm%s"%catExtS).getValV())
+                    print(f'>> Numero raw de eventos:  {w.var("signalRawNorm%s"%catExtS).getValV()}')
                 else:
                     mcstatunc = 1.0
             else:
-                luminosity = 35 if year=="2022" else 27
-                ngenfilter = 300000 if year=="2022" else 340000 # averaged between files
+                luminosity = 35 if y=="2022" else 27
+                ngenfilter = 300000 if y=="2022" else 340000 # averaged between files
                 efilter = -99
                 if sigModel=="HTo2ZdTo2mu2x":
                     mass = float(m.split('MZd-')[1].split('_')[0])
@@ -539,6 +659,8 @@ for m in sigTags:
                                     break
                     if efilter < 0:
                         efilter = 0.3
+                if sigModel=="BToPhi":
+                    efilter=1.0
                 if efilter < 0:
                     raise Exception("The mcstat uncertainty can't be computed for %s"%(m))
                 mcstatunc = 1.0/ROOT.TMath.Sqrt(nSig/NORMCONST*ngenfilter/efilter/(1000*luminosity))
@@ -575,22 +697,42 @@ for m in sigTags:
             #
             #
             # Selection systematic:
-            try:
-                w_sel_up = f.Get(wsname + '_sel_up')
-                w_sel_down = f.Get(wsname + '_sel_down')
-                nSig_selUp = w_sel_up.var("signalNorm%s"%catExtS).getValV()
-                nSig_selDown = w_sel_down.var("signalNorm%s"%catExtS).getValV()
-                if useNorm:
-                    nSig_selUp = NORMCONST*nSig_selUp
-                    nSig_selDown = NORMCONST*nSig_selDown
-                selsyst = max([(nSig_selUp/nSig - 1.0), (1.0 - nSig_selDown/nSig)])
-            except AttributeError: # No up and down variations in this tree, probably interpolated point
-                filesyst = ROOT.TFile.Open("data/systematicSplines_2022.root", "READ")
-                #spline_trg = filesyst.Get("spline_selsys_HTo2ZdTo2mu2x_%s_%.1f_%s"%(d, T, y))
-                spline_trg = filesyst.Get("spline_selsys_HTo2ZdTo2mu2x_%s_%.1f_%s"%(d, T, 2022)) # Use always 2022 as systematics are the same (RE-CHECK for better implementation)
-                selsyst = spline_trg.Eval(M)
-                filesyst.Close()
+            # This is how it was before:
+            #try:
+            #    w_sel_up = f.Get(wsname + '_sel_up')
+            #    w_sel_down = f.Get(wsname + '_sel_down')
+            #    nSig_selUp = w_sel_up.var("signalNorm%s"%catExtS).getValV()
+            #    nSig_selDown = w_sel_down.var("signalNorm%s"%catExtS).getValV()
+            #    if useNorm:
+            #        nSig_selUp = NORMCONST*nSig_selUp
+            #        nSig_selDown = NORMCONST*nSig_selDown
+            #    selsyst = max([(nSig_selUp/nSig - 1.0), (1.0 - nSig_selDown/nSig)])
+            #except AttributeError: # No up and down variations in this tree, probably interpolated point
+            #    filesyst = ROOT.TFile.Open("data/systematicSplines_2022.root", "READ")
+            #    #spline_trg = filesyst.Get("spline_selsys_HTo2ZdTo2mu2x_%s_%.1f_%s"%(d, T, y))
+            #    spline_trg = filesyst.Get("spline_selsys_HTo2ZdTo2mu2x_%s_%.1f_%s"%(d, T, 2022)) # Use always 2022 as systematics are the same (RE-CHECK for better implementation)
+            #    selsyst = spline_trg.Eval(M)
+            #    filesyst.Close()
             #
+            # This is the correct way to do it:
+            if 'FourMu' in d:
+                selsyst = 0.1
+            if 'lxy0p0to0p2' in d:
+                selsyst = 0.01
+            elif 'lxy0p2to1p0' in d:
+                selsyst = 0.02
+            elif 'lxy1p0to2p4' in d:
+                selsyst = 0.03
+            elif 'lxy2p4to3p1' in d:
+                selsyst = 0.06
+            elif 'lxy3p1to7p0' in d:
+                selsyst = 0.1
+            elif 'lxy7p0to11p0' in d:
+                selsyst = 0.3
+            elif 'lxy11p0to16p0' in d:
+                selsyst = 0.3
+            elif 'lxy16p0to70p0' in d:
+                selsyst = 0.3
             ## Close input file with workspace
             f.Close()
 
@@ -605,7 +747,8 @@ for m in sigTags:
                 SOverSqrtB = 0
                 raise Exception("Signal and background points are not the same, probably you shouldn't be doing datacards from these workspaces")
 
-            if nSig/NORMCONST <= 1e-6:
+            if nSig/NORMCONST <= 1e-6 or w.var("signalRawNorm%s"%catExtS).getValV() < 10:
+                print('REJECTED')
                 continue
 
             #
@@ -625,6 +768,7 @@ for m in sigTags:
             y_shapes_signal.append("%s %s:signal%s\n"%(_finame,wsname,catExtS))
             #
             factor_dataEvents = factor_dataEvents * nBG
+            sum_dataEvents = sum_dataEvents + nBG            
             y_process_nBG.append(nBG)
             y_process_nSig.append(nSig)
             ## Other systematics
@@ -636,10 +780,16 @@ for m in sigTags:
             y_nuis_width.append("sigma%s param %.5f %.5f"%(catExtS,sigma,sigmavar))
             y_nuis_pdf_index.append("pdf_index_ch%d_%s discrete"%(binidx, y))
             y_nuis_mcstat.append(mcstatunc)
-
+            if 'Dimuon' in d:
+                nuis_sigmas_2mu.append(sigma)
+            elif 'FourMu_sep' in d:
+                nuis_sigmas_s4mu.append(sigma)
+            else:
+                nuis_sigmas_o4mu.append(sigma)
             #
             #
-        if factor_dataEvents < 0.99 and mergeEmptyBins:
+        #if factor_dataEvents < 0.99 and mergeEmptyBins:
+        if sum_dataEvents < 1.00 and mergeEmptyBins and len(y_bins_names) > 0:
             print("Years merged")
             print(y_nuis_mcstat)
             bins_names.append('chFF_%i'%(binidx))
@@ -700,7 +850,21 @@ for m in sigTags:
     card = open("%s"%cardn,"w")
     card.write("imax %i number of bins\n"%(nRegions))
     card.write("jmax 1 number of processes minus 1\n")
-    card.write("kmax %i number of nuisance parameters\n"%(3 + 3*nRegions))
+    if not combineMeans and not combineSigmas:
+        card.write("kmax %i number of nuisance parameters\n"%(3 + 3*nRegions))
+    elif (combineMeans and not combineSigmas) or (combineSigmas and not combineMeans):
+        if 'Scenario' in sigModel:
+            if len(nuis_sigmas_s4mu) > 0:
+                card.write("kmax %i number of nuisance parameters\n"%(3 + 2*nRegions + 2))
+            else:
+                card.write("kmax %i number of nuisance parameters\n"%(3 + 2*nRegions + 1))
+        else:
+            card.write("kmax %i number of nuisance parameters\n"%(3 + 2*nRegions + 3))
+    else:
+        if 'Scenario' in sigModel:
+            card.write("kmax %i number of nuisance parameters\n"%(3 + nRegions + 4))
+        else:
+            card.write("kmax %i number of nuisance parameters\n"%(3 + nRegions + 6))
     card.write("----------------------------------------------------------------------------------------------------------------------------------\n")
     #
     #
@@ -747,14 +911,36 @@ for m in sigTags:
                 line_mcstat_r += "-            -            "
         card.write(line_mcstat_r + '\n') # MC stat. uncertainty (uncorrelated)
     #
-    for r in range(nRegions):
-        card.write(nuis_mean[r] + '\n') # Shape systematic on dimuon mass mean value
-        card.write(nuis_width[r] + '\n') # Shape systematic on dimuon sigma value
+    print('>> All sigmas')
+    print(nuis_sigmas_2mu)
+    print(nuis_sigmas_s4mu)
+    print(nuis_sigmas_o4mu)
+    if not combineMeans:
+        for r in range(nRegions):
+            card.write(nuis_mean[r] + '\n') # Shape systematic on dimuon mass mean value
+    else:
+        card.write("mean_signal_2mu param %.3f -%.3f/+%.3f\n"%(M,0.5*np.mean(nuis_sigmas_2mu),0.5*np.mean(nuis_sigmas_2mu)))
+        if 'ScenarioB1' not in sigModel and 'BToPhi' not in sigModel and len(nuis_sigmas_s4mu) > 0:
+            card.write("mean_signal_s4mu param %.3f -%.3f/+%.3f\n"%(M2,0.5*np.mean(nuis_sigmas_s4mu),0.5*np.mean(nuis_sigmas_s4mu)))
+        if 'ScenarioA' not in sigModel and 'BToPhi' not in sigModel:
+            card.write("mean_signal_o4mu param %.3f -%.3f/+%.3f\n"%(M2,0.5*np.mean(nuis_sigmas_o4mu),0.5*np.mean(nuis_sigmas_o4mu)))
+    if not combineSigmas:
+        for r in range(nRegions):
+            card.write(nuis_width[r] + '\n') # Shape systematic on dimuon sigma value
+    else:
+        card.write("sigma_signal_2mu param %.3f -%.3f/+%.3f\n"%(np.mean(nuis_sigmas_2mu),0.06*np.mean(nuis_sigmas_2mu),0.06*np.mean(nuis_sigmas_2mu)))
+        if 'ScenarioB1' not in sigModel and 'BToPhi' not in sigModel and len(nuis_sigmas_s4mu) > 0:
+            card.write("sigma_signal_s4mu param %.3f -%.3f/+%.3f\n"%(np.mean(nuis_sigmas_s4mu),0.06*np.mean(nuis_sigmas_s4mu),0.06*np.mean(nuis_sigmas_s4mu)))
+        if 'ScenarioA' not in sigModel and 'BToPhi' not in sigModel and len(nuis_sigmas_o4mu) > 0:
+            card.write("sigma_signal_o4mu param %.3f -%.3f/+%.3f\n"%(np.mean(nuis_sigmas_o4mu),0.06*np.mean(nuis_sigmas_o4mu),0.06*np.mean(nuis_sigmas_o4mu)))
     for r in range(nRegions):
         card.write(nuis_pdf_index[r] + '\n') # For discrete profiling
     card.close()
     print("> %s ready and closed!"%(cardn))
-                      
+
+    if combineMeans:
+        print('> Correlating the means...')
+
 
     ## text2workspace for individual cards:
     if doRootCard:

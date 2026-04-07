@@ -10,6 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import FixedLocator, FixedFormatter
 import plotly.graph_objects as go
+import pickle
 #import plotUtils
 
 def getValues(histo):
@@ -31,7 +32,32 @@ legData["d_Dimuon_lxy3p1to7p0_inclusive"] = r'$3.1 < l_{xy} < 7 $ cm'
 legData["d_Dimuon_lxy7p0to11p0_inclusive"] = r'$7.0 < l_{xy} < 11.0 $ cm'
 legData["d_Dimuon_lxy11p0to16p0_inclusive"] = r'$11.0 < l_{xy} < 16.0 $ cm'
 legData["d_Dimuon_lxy16p0to70p0_inclusive"] = r'$16.0 < l_{xy} < 70.0 $ cm'
+legData["d_Dimuon_lxy0p0to0p2_iso1_pthigh"] = r'$0.0 < l_{xy} < 0.2 $ cm (isohigh)'
+legData["d_Dimuon_lxy0p2to1p0_iso1_pthigh"] = r'$0.2 < l_{xy} < 1.0 $ cm (isohigh)'
+legData["d_Dimuon_lxy1p0to2p4_iso1_pthigh"] = r'$1.0 < l_{xy} < 2.4 $ cm (isohigh)'
+legData["d_Dimuon_lxy2p4to3p1_iso1_pthigh"] = r'$2.4 < l_{xy} < 3.1 $ cm (isohigh)'
+legData["d_Dimuon_lxy3p1to7p0_iso1_pthigh"] = r'$3.1 < l_{xy} < 7 $ cm (isohigh)'
+legData["d_Dimuon_lxy7p0to11p0_iso1_pthigh"] = r'$7.0 < l_{xy} < 11.0 $ cm (isohigh)'
+legData["d_Dimuon_lxy11p0to16p0_iso1_pthigh"] = r'$11.0 < l_{xy} < 16.0 $ cm (isohigh)'
+legData["d_Dimuon_lxy16p0to70p0_iso1_pthigh"] = r'$16.0 < l_{xy} < 70.0 $ cm (isohigh)'
+legData["d_Dimuon_lxy0p0to0p2_iso0_pthigh"] = r'$0.0 < l_{xy} < 0.2 $ cm (noisohigh)'
+legData["d_Dimuon_lxy0p2to1p0_iso0_pthigh"] = r'$0.2 < l_{xy} < 1.0 $ cm (noisohigh)'
+legData["d_Dimuon_lxy1p0to2p4_iso0_pthigh"] = r'$1.0 < l_{xy} < 2.4 $ cm (noisohigh)'
+legData["d_Dimuon_lxy2p4to3p1_iso0_pthigh"] = r'$2.4 < l_{xy} < 3.1 $ cm (noisohigh)'
+legData["d_Dimuon_lxy3p1to7p0_iso0_pthigh"] = r'$3.1 < l_{xy} < 7 $ cm (noisohigh)'
+legData["d_Dimuon_lxy7p0to11p0_iso0_pthigh"] = r'$7.0 < l_{xy} < 11.0 $ cm (noisohigh)'
+legData["d_Dimuon_lxy11p0to16p0_iso0_pthigh"] = r'$11.0 < l_{xy} < 16.0 $ cm (noisohigh)'
+legData["d_Dimuon_lxy16p0to70p0_iso0_pthigh"] = r'$16.0 < l_{xy} < 70.0 $ cm (noisohigh)'
+legData["d_Dimuon_lxy0p0to0p2_non-pointing"] = r'$0.0 < l_{xy} < 0.2 $ cm (np)'
+legData["d_Dimuon_lxy0p2to1p0_non-pointing"] = r'$0.2 < l_{xy} < 1.0 $ cm (np)'
+legData["d_Dimuon_lxy1p0to2p4_non-pointing"] = r'$1.0 < l_{xy} < 2.4 $ cm (np)'
+legData["d_Dimuon_lxy2p4to3p1_non-pointing"] = r'$2.4 < l_{xy} < 3.1 $ cm (np)'
+legData["d_Dimuon_lxy3p1to7p0_non-pointing"] = r'$3.1 < l_{xy} < 7 $ cm (np)'
+legData["d_Dimuon_lxy7p0to11p0_non-pointing"] = r'$7.0 < l_{xy} < 11.0 $ cm (np)'
+legData["d_Dimuon_lxy11p0to16p0_non-pointing"] = r'$11.0 < l_{xy} < 16.0 $ cm (np)'
+legData["d_Dimuon_lxy16p0to70p0_non-pointing"] = r'$16.0 < l_{xy} < 70.0 $ cm (np)'
 legData["d_FourMu_sep"] = r'Four-muon multivertex'
+legData["d_FourMu_osv"] = r'Four-muon overlapping'
 
 #########################
 
@@ -53,6 +79,7 @@ useSignalMC = True
 doSystVariations = False
 sigModel = "HTo2ZdTo2mu2x" # HTo2ZdTo2mu2x : BToPhi
 correctByFilter = False
+hepdata_input = True
 
 # Output definition
 outDir = ("%s/plotsAcceptance_"%(thisDir))+today
@@ -60,17 +87,15 @@ if not os.path.exists(outDir):
     os.makedirs(outDir)
 os.system('cp '+os.environ.get("PWD")+'/utils/index.php '+outDir)
 #
-y = 2023
+y = 2022
 #
-outFileName = ("%s/plotsAcceptance_"%(thisDir))+today + "/acceptanceSplines_%s_%i.root"%(sigModel,y) # Year is hardcoded
-outFile = ROOT.TFile(outFileName, "RECREATE")
-outFile.Close()
 
 # Signal Regions
 dNames = []
 if doPaperPlot:
     #dNames.append("d_Dimuon_full_inclusive")
-    dNames.append("d_FourMu_sep")
+    #dNames.append("d_FourMu_sep")
+    #dNames.append("d_FourMu_osv")
     dNames.append("d_Dimuon_lxy0p0to0p2_inclusive")
     dNames.append("d_Dimuon_lxy0p2to1p0_inclusive")
     dNames.append("d_Dimuon_lxy1p0to2p4_inclusive")
@@ -79,6 +104,24 @@ if doPaperPlot:
     dNames.append("d_Dimuon_lxy7p0to11p0_inclusive")
     dNames.append("d_Dimuon_lxy11p0to16p0_inclusive")
     dNames.append("d_Dimuon_lxy16p0to70p0_inclusive")
+    #
+    #dNames.append("d_Dimuon_lxy0p0to0p2_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy0p2to1p0_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy1p0to2p4_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy2p4to3p1_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy3p1to7p0_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy7p0to11p0_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy11p0to16p0_iso1_pthigh")
+    #dNames.append("d_Dimuon_lxy16p0to70p0_iso1_pthigh")
+    #
+    #dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
+    #dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
+    #dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
+    #dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
+    #dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
+    #dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
+    #dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
+    #dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
     correctByFilter = True
 else:
     dNames.append("d_FourMu_sep")
@@ -133,6 +176,7 @@ years.append(2023)
 eras = {}
 eras[2022] = ['2022', '2022postEE']
 eras[2023] = ['2023', '2022postEE', '2023BPix']
+#eras[2023] = ['2023', '2023BPix']
 
 # Style settings
 ROOT.gStyle.SetOptStat(0)
@@ -151,7 +195,8 @@ sigCTaus = []
 if sigModel=="HTo2ZdTo2mu2x":
     if doPaperPlot:
         sigMasses = [2.0, 5.0, 7.0, 14.0, 20.0, 30.0, 40.0, 50.0]
-        #sigMasses = [30.0, 40.0, 50.0]
+        sigMasses = [0.5, 0.7, 1.5, 2.0, 5.0, 7.0, 8.0]
+        sigMasses = [2.0, 5.0, 12.0, 20.0]
         sigCTaus = [0.1, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.00]
         sigCTaus += [160.00, 250.00, 400.00, 630.00, 1000.0]
     else:
@@ -160,14 +205,17 @@ if sigModel=="HTo2ZdTo2mu2x":
         sigCTaus = [1, 10, 100, 1000]
 
 if sigModel=="BToPhi":
-    sigMasses = [0.25, 0.3, 0.4, 0.6, 0.7, 0.9, 1.25, 1.5, 2.85, 3.35]
-    sigCTaus = [0.1, 1, 10, 100]
+    sigMasses = [0.3, 0.5, 0.6, 0.7, 0.9, 1.25, 1.5, 2.0, 2.85, 3.35, 4.6]
+    sigCTaus = [1000]
 
 #
 #
 ## Loop to make the plots
 nSignal_perYear = {}
 for y in years:
+    outFileName = ("%s/plotsAcceptance_"%(thisDir))+today + "/acceptanceSplines_%s_%i.root"%(sigModel,y) # Year is hardcoded
+    outFile = ROOT.TFile(outFileName, "RECREATE")
+    outFile.Close()
     sy = str(y)
     nSignal_perYear[sy] = {}
     splines = []
@@ -180,13 +228,15 @@ for y in years:
         #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Dec-03-2024_2022_complete"
         #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-20-2025_2022"
         if y==2022:
-            inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-23-2025_2022_HToZdZd_lifetimeReweighting"
-            inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Mar-20-2025_2022_noSF"
-            #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Mar-09-2025_2022_finalSignal"
+            #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-23-2025_2022_HToZdZd_lifetimeReweighting"
+            inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-25-2025_allYears"
+            #inDir = "/ceph/cms/store/user/fernance/EXO-24-016/BToPhi/Splines/outputHistograms_Sep-22-2025_2022_BToPhi_wB_wPU_RooOnly"
+            #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jan-28-2026_allCuts_BToPhi_2022/"
         else:
-            inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-23-2025_2023_HToZdZd_lifetimeReweighting"
-            inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Mar-20-2025_2023_noSF"
-            #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Mar-08-2025_2023_finalSignal"
+            #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-23-2025_2023_HToZdZd_lifetimeReweighting"
+            inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Feb-25-2025_allYears"
+            #inDir = "/ceph/cms/store/user/fernance/EXO-24-016/BToPhi/Splines/outputHistograms_Sep-22-2025_2023_BToPhi_wB_wPU_RooOnly"
+            #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jan-28-2026_allCuts_BToPhi_2023/"
         #
         # Identify bin index
         binidx=-1
@@ -284,7 +334,10 @@ for y in years:
         ax.set_ylabel(r'Acceptance $\times$ Efficiency (%)', fontsize=24)
         ax.set_xlabel(r'LLP mass (GeV)', fontsize=24)
         ax.set_xscale('log')
-        hep.cms.label("Preliminary", data=True, lumi=35, year=y, com='13.6')
+        if y==2022:
+            hep.cms.label("Preliminary", data=True, lumi=34.6, year=y, com='13.6')
+        else:
+            hep.cms.label("Preliminary", data=True, lumi=27.8, year=y, com='13.6')
         title = ''
         if "FourMu_sep" in d:
             fig.text(0.15, 0.7, 'Multivertex four-muon region', color='black', fontsize = 16)
@@ -364,12 +417,30 @@ for y in years:
                     print(d)
                     if 'FourMu' not in d:
                         nSig = dataset.sumEntries("%f < mfit && mfit < %f"%(m-0.018*5.0*m, m+0.018*5.0*m))
+                        print(dataset.sumEntries("%f < mfit && mfit < %f"%(m-0.018*5.0*m, m+0.018*5.0*m)))
+                        #print(dataset.numEntries("%f < mfit && mfit < %f"%(m-0.018*5.0*m, m+0.018*5.0*m)))
                     else:
                         nSig = dataset.sumEntries("%f < m4fit && m4fit < %f"%(125-0.018*5.0*125., 125+0.018*5.0*125.)) # Corrected 
+                    ## Manual application of SF:
+                    if ('lxy7p0to11p0' in d) or ('lxy11p0to16p0' in d) or ('lxy16p0to70p0' in d):
+                        print("Manually applying the scale factor on the most displaced regions")
+                        nSig = nSig * 0.82 # Manually applying the scale factor on the most displaced regions
+                    ##
+                    #efilter = 1.0
+                    #if correctByFilter:
+                    #    with open('data/hahm-request.csv') as mcinfo:
+                    #        reader = csv.reader(mcinfo, delimiter=',')
+                    #        for row in reader:
+                    #            if "MZd-%s_ctau-%imm"%(str(m).replace('.','p'), t) in row[0]:
+                    #            #if "MZd-%s"%(str(m).replace('.','p')) in row[0]:
+                    #                efilter = float(row[-1])
+                    #                print("EFILTER FOUND")
+                    #                break
+                    ##
                     if y==2022:
-                        acceptance.append(nSig/(1000*35)) # Nexp / (sigma*L) = A * eff
+                        acceptance.append(nSig/(1000*35.)) # Nexp / (sigma*L) = A * eff (before L = 35. but correct is 34.627501094)
                     else:
-                        acceptance.append(nSig/(1000*27)) # Nexp / (sigma*L) = A * eff
+                        acceptance.append(nSig/(1000*26.59)) # Nexp / (sigma*L) = A * eff (before L = 27. but correct is 27.754413924999998)
                     nSignal_perYear[sy][d][_m][_t] = nSig
                     masses.append(m)
                 # Graph and acceptance for spline
@@ -393,7 +464,7 @@ for y in years:
                         else:
                             m_interp = np.linspace(30.00, masses[-1], 300)
                     elif sigModel=="BToPhi":
-                        m_interp = np.linspace(0.25, 4.0, 200)
+                        m_interp = np.linspace(0.25, 4.6, 200)
                     a_interp = [spline_100.Eval(x) for x in m_interp]
                     # Plot in the canvas
                     if len(sigCTaus) > 5:
@@ -460,8 +531,10 @@ for y in years:
                             with open('data/hahm-request.csv') as mcinfo:
                                 reader = csv.reader(mcinfo, delimiter=',')
                                 for row in reader:
-                                    if "MZd-%s"%(str(m).replace('.','p')) in row[0]:
+                                    if "MZd-%s_ctau-%imm"%(str(m).replace('.','p'), t) in row[0]:
+                                    #if "MZd-%s"%(str(m).replace('.','p')) in row[0]:
                                         efilter = float(row[-1])
+                                        print("EFILTER FOUND")
                                         break
                         ctau_data[t].append(nSig/(1000*35*efilter)) # Nexp / (sigma*L) = A * eff
                         ctau_mass[t].append(m) # Nexp / (sigma*L) = A * eff
@@ -576,7 +649,8 @@ for y in years:
 # Plot signal efficiency vs lifetime (paper)
 if doPaperPlot:
     #
-    colors = ["k","#3f90da", "#ffa90e", "#bd1f01", "#94a4a2", "#832db6", "#a96b59", "#e76300", "#b9ac70", "#717581", "#92dadd"] 
+    #colors = ["k","#3f90da", "#ffa90e", "#bd1f01", "#94a4a2", "#832db6", "#a96b59", "#e76300", "#b9ac70", "#717581", "#92dadd"] 
+    colors = ["#3f90da", "#ffa90e", "#bd1f01", "#94a4a2", "#832db6", "#a96b59", "#e76300", "#b9ac70", "#717581", "#92dadd"] 
     #
     nSignal_perYear['total'] = {}
     for d_,d in enumerate(dNames):
@@ -595,18 +669,21 @@ if doPaperPlot:
     for _m,m in enumerate(sigMasses):
         plt.style.use(hep.style.CMS)
         fig, ax = plt.subplots(figsize=(10.5, 8))
-        hep.cms.label("Preliminary", data=True, com='13.6')
-        ax.set_ylabel(r'Signal efficiency', fontsize=24)
+        #hep.cms.label("Preliminary", data=False, com='13.6')
+        hep.cms.text("Simulation", loc=0, ax=ax, fontsize=30)
+        hep.cms.lumitext("2022 + 2023 (13.6 TeV)", ax=ax, fontsize=30, fontname=None)
+        ax.set_ylabel(r'Acceptance x selection efficiency', fontsize=30)
         if sigModel=="HTo2ZdTo2mu2x":
-            ax.set_xlabel(r'Dark photon $c\tau$ (cm)', fontsize=24)
-            ax.text(0.04, 0.95, r'$H\rightarrow Z_DZ_D \rightarrow 2\mu + X$', transform=ax.transAxes, fontsize=17, verticalalignment='top',horizontalalignment='left')
-            ax.text(0.04, 0.9, r'$m_H = 125$ GeV', transform=ax.transAxes, fontsize=17, verticalalignment='top',horizontalalignment='left')
-            ax.text(0.04, 0.85, r'$m_{Z_D} =$ %.0f GeV'%m, transform=ax.transAxes, fontsize=17, verticalalignment='top',horizontalalignment='left')
+            ax.set_xlabel(r'Dark photon $c\tau_{0}$ [cm]', fontsize=30)
+            #ax.text(0.04, 0.95, r'$H\rightarrow Z_DZ_D \rightarrow 2\mu + X$', transform=ax.transAxes, fontsize=17, verticalalignment='top',horizontalalignment='left')
+            #ax.text(0.04, 0.9, r'$m_H = 125$ GeV', transform=ax.transAxes, fontsize=17, verticalalignment='top',horizontalalignment='left')
+            #ax.text(0.04, 0.85, r'$m_{Z_D} =$ %.0f GeV'%m, transform=ax.transAxes, fontsize=17, verticalalignment='top',horizontalalignment='left')
+            ax.text(0.04, 0.6, r'$H\rightarrow Z_DZ_D \rightarrow 2\mu + X$, $m_H = 125$ GeV $m_{Z_D} =$ %.0f GeV'%m, transform=ax.transAxes, fontsize=20, verticalalignment='top',horizontalalignment='left')
         ax.set_xscale('log')
         ax.set_yscale('log')
-        ax.set_ylim(1e-3, 10)
-        ax.set_yscale('linear')
-        ax.set_ylim(0.0, 0.5)
+        ax.set_ylim(5e-3, 10)
+        #ax.set_yscale('linear')
+        #ax.set_ylim(0.0, 0.5)
         ax.set_xlim(sigCTaus_cm[0], sigCTaus_cm[-1])
         #ax.set_yticks([0.001, 0.01, 0.1, 1.0])
         #ax.set_yticklabels([r"$10^{-3}$", r"$10^{-2}$", r"$10^{-1}$", "1"])
@@ -617,19 +694,58 @@ if doPaperPlot:
             ax.set_xticks([0.01, 0.1, 1.0, 10.00])
             ax.set_xticklabels([r"$10^{-2}$", r"$10^{-1}$", "1", r"$10$"])
         #
-        efilter = 1.0
+        #ax.set_xlim(sigCTaus_cm[0], 1.0)
+        efilter_vector = np.zeros(len(sigCTaus_cm))
         if correctByFilter and sigModel=="HTo2ZdTo2mu2x":
-            with open('data/hahm-request.csv') as mcinfo:
-                reader = csv.reader(mcinfo, delimiter=',')
-                for row in reader:
-                    if "MZd-%s"%(str(m).replace('.','p')) in row[0]:
-                        efilter = float(row[-1])
-                        break
-        #
-        ax.plot(sigCTaus_cm, nSignal_perYear['total']['inclusive'][_m]/(1000*62)/efilter, label='Inclusive', color='k', linestyle='-', lw=2)
-        ax.plot(sigCTaus_cm, nSignal_perYear['total']['run2'][_m]/(1000*62)/efilter, label=r'$0.0 < l_{xy} < 11.0 $ cm', color='k', linestyle=':', lw=2)
+            for n in range(len(sigCTaus_cm)):
+                if sigCTaus_cm[n]*10. <= 1.0001:
+                    timestamp = 1
+                elif sigCTaus_cm[n]*10. <= 10.0001:
+                    timestamp = 10
+                elif sigCTaus_cm[n]*10. <= 100.0001:
+                    timestamp = 100
+                else:
+                    timestamp = 1000
+                efilter = 1.0
+                with open('data/hahm-request.csv') as mcinfo:
+                    reader = csv.reader(mcinfo, delimiter=',')
+                    for row in reader:
+                        if "MZd-%s_ctau-%imm"%(str(m).replace('.','p'), timestamp) in row[0]:
+                            #efilter = float(row[-1])
+                            efilter_vector[n] = float(row[-1])
+                            break
+                nSignal_perYear['total']['inclusive'][_m][n] = nSignal_perYear['total']['inclusive'][_m][n] / efilter_vector[n]
+                nSignal_perYear['total']['run2'][_m][n] = nSignal_perYear['total']['run2'][_m][n] / efilter_vector[n]
+                for d_,d in enumerate(dNames):
+                    nSignal_perYear['total'][d][_m][n] = nSignal_perYear['total'][d][_m][n] / efilter_vector[n]
+        ax.plot(sigCTaus_cm, nSignal_perYear['total']['inclusive'][_m]/(1000*62), label='Inclusive', color='k', linestyle='-', lw=2)
+        ax.plot(sigCTaus_cm, nSignal_perYear['total']['run2'][_m]/(1000*62), label=r'$0.0 < l_{xy} < 11.0 $ cm', color='k', linestyle=':', lw=2)
         for d_,d in enumerate(dNames):
-            ax.plot(sigCTaus_cm, nSignal_perYear['total'][d][_m]/(1000*62)/efilter, label=legData[d], color=colors[d_], linestyle='--', lw=2)
-        ax.legend(loc='upper right', fontsize = 16, frameon = True, ncol=2)
+            ax.plot(sigCTaus_cm, nSignal_perYear['total'][d][_m]/(1000*62), label=legData[d], color=colors[d_], linestyle='--', lw=2)
+        ax.legend(loc='upper left', fontsize = 20, frameon = False, ncol=2)
         fig.savefig('%s/signalEfficiency_%s_M%s_paper.png'%(outDir, sigModel, str(m).replace('.', 'p')), dpi=400)
+        fig.savefig('%s/signalEfficiency_%s_M%s_paper.pdf'%(outDir, sigModel, str(m).replace('.', 'p')), dpi=400)
+
+        if hepdata_input:
+            if sigModel=="HTo2ZdTo2mu2x" and m in [2.0, 5.0, 12.0, 20.0]:
+                if m==2.0:
+                    name = "Figure_004-a"
+                if m==5.0:
+                    name = "Figure_004-b"
+                if m==12.0:
+                    name = "Figure_004-c"
+                if m==20.0:
+                    name = "Figure_004-d"
+                fig.savefig(f"paperPlots/{name}.png", dpi=140)
+                fig.savefig(f"paperPlots/{name}.pdf", dpi=140)
+                #data_hep = {}
+                #data_hep['ctau_values'] = ctauv
+                #data_hep['expected_values'] = expv
+                #data_hep['observed_values'] = obsv
+                #data_hep['p2sigma_values'] = p2sv
+                #data_hep['p1sigma_values'] = p1sv
+                #data_hep['m1sigma_values'] = m1sv
+                #data_hep['m2sigma_values'] = m2sv, 
+                #with open(f'paperPlots/hepdata_{name}.pkl', 'wb') as f:
+                #    pickle.dump(data_hep, f)
     

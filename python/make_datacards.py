@@ -47,7 +47,7 @@ noModel = False
 usePredefinedGrid = True # only applied if not using MC
 dirExt = "standard"
 doIndividualRootCard = False
-doSmartScaling = True
+doSmartScaling = False
 useOnlyZeroBackground = False
 
 ## doc: Smart scaling allows to have the limit around 0.5, or alternatively with the 2.5% quantile above 0.25
@@ -73,6 +73,21 @@ if doSmartScaling and not len(sys.argv)>5:
             scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Apr-15-2025_HTo2ZdTo2mu2x_Norm0p01_asymptotic_vsMass_allEras/limits_HTo2ZdTo2mu2x_allEras.txt'
         else:
             scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_HTo2ZdTo2mu2x_NormSmart_Apr-28-2025_vsCTau_asymptotic_allEras/limits_HTo2ZdTo2mu2x_allEras.txt'
+    if sigModel=="BToPhi":
+        if not useSignalMC:
+            #scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_Apr-15-2025_HTo2ZdTo2mu2x_Norm0p01_asymptotic_vsMass_allEras/limits_HTo2ZdTo2mu2x_allEras.txt'
+            #scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_1mm.txt'
+            #scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_10-100mm.txt'
+            scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_vsCTau.txt'
+        else:
+            scalingFile = 'results_BToPhi_asymptotic/limits_BToPhi_asymptotic_allEras.txt'
+    if sigModel=="ScenarioA":
+        scalingFile = 'combineScripts/SmartLimitNorm/limits_ScenarioA_asymptotic_allEras_vsCTau.txt'
+        #scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_ScenarioA_Norm1p0-0p6_Jun-10-2025_vsCTau_asymptotic_allEras/limits_ScenarioA_asymptotic_allEras.txt'
+    if sigModel=="ScenarioB1":
+        #scalingFile = '/ceph/cms/store/user/fernance/Run3ScoutingOutput/limits_ScenarioB1_Norm1p0-0p6_Jun-10-2025_vsCTau_asymptotic_allEras/limits_ScenarioB1_asymptotic_allEras.txt'
+        #scalingFile = 'results_ScenarioB1_asymptotic/limits_ScenarioB1_asymptotic_allEras.txt'
+        scalingFile = 'combineScripts/SmartLimitNorm/limits_ScenarioB1_asymptotic_allEras_vsCTau.txt'
 else:
     scalingFile = ''
 
@@ -128,8 +143,11 @@ if useOnlyExponential or useOnlyPowerLaw or useOnlyBernstein:
 #### Caution, here the names AND order should be consistent to the ones set in cpp/doAll_fitDimuonMass.C 
 # Example of workspace: d_Dimuon_lxy0p0to2p7_iso0_pthigh_Signal_HTo2ZdTo2mu2x_MZd-7p0_ctau-1mm_2022_workspace.root
 dNames = []
-dNames.append("d_FourMu_sep")
-dNames.append("d_FourMu_osv")
+if 'BToPhi' not in sigModel:
+    if 'ScenarioB1' not in sigModel:
+        dNames.append("d_FourMu_sep")
+    if 'ScenarioA' not in sigModel and 'HTo2ZdTo2mu2x' not in sigModel:
+        dNames.append("d_FourMu_osv")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_ptlow")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_pthigh")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso1_ptlow")
@@ -162,14 +180,14 @@ dNames.append("d_Dimuon_lxy16p0to70p0_iso0_ptlow")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso0_pthigh")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso1_ptlow")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso1_pthigh")
-dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
-dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
-dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
-dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
-dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
-dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
-dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
-dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
+#dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
+#dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
+#dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
+#dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
+#dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
+#dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
+#dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
+#dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
 if doIso0HighPt:
     dNames = [s for s in dNames if "iso0_pthigh" in s]
 elif doIso1HighPt:
@@ -216,11 +234,13 @@ if sigModel=="HTo2ZdTo2mu2x":
             sigMasses = [1.5, 2.0, 2.5, 5.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 50.0]
             sigMasses = [1.5, 2.0, 2.5, 5.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 40.0, 50.0]
             sigMasses = [20.0, 30.0, 40.0, 50.0]
-            #sigMasses = [50.0]
+            sigMasses = [5.0]
+            #sigMasses = [20.0]
             for  m in sigMasses:
                 sigCTaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.00, 160.00, 250.00, 400.00, 630.00, 1000.00]
                 #sigCTaus = [160.00, 250.00, 400.00, 630.00, 1000.00]
                 #sigCTaus = [100.00]
+                sigCTaus = [10.00]
                 for t in sigCTaus:
                     if ((m < 1.0 and t > 10) or (m < 2.0 and t > 100)):
                         continue
@@ -257,9 +277,10 @@ if sigModel=="HTo2ZdTo2mu2x":
 elif sigModel=="BToPhi":
     if useSignalMC:
         #sigMasses = [0.25, 0.30, 0.40, 0.50, 0.60, 0.70, 0.90, 1.25, 1.50, 2.0, 2.85, 3.35, 4.00, 5.00]
-        sigMasses = [4.00] #Other masses are either too small or too close to SM resonance
+        sigMasses = [1.25] #Other masses are either too small or too close to SM resonance
         for m in sigMasses:
             sigCTaus = [0.0, 0.1, 1, 10, 100]
+            sigCTaus = [0.1]
             for t in sigCTaus:
                 sigTags.append("Signal_BToPhi_MPhi-%s_ctau-%.2fmm"%(('%.2f'%m).replace('.','p'), t))
     elif usePredefinedGrid:
@@ -272,24 +293,26 @@ elif sigModel=="BToPhi":
                     sigTags.append("Signal_BToPhi_MPhi-%.3f_ctau-%.2fmm"%(m, t))
 elif sigModel=="ScenarioB1":
     sigMasses = []
-    #sigMasses.append([4,1.33])
-    sigMasses.append([5,2.40])
-    sigCTaus = [0.1, 1, 10, 100]
+    sigMasses.append([4,1.33])
+    #sigMasses.append([5,2.40])
+    #sigCTaus = [0.1, 1, 10, 100]
+    sigCTaus = [0.25]
     for m in sigMasses:
         for t in sigCTaus:
             sigTags.append("Signal_ScenarioB1_Mpi-%i_MA-%s_ctau-%.2fmm" % (m[0], ('%.2f'%m[1]).replace('.','p'), float(t)))
 elif sigModel=="ScenarioA":
     sigMasses = []
-    sigMasses.append([1,0.33])
+    #sigMasses.append([1,0.33])
     #sigMasses.append([1,0.25])
     #sigMasses.append([2,0.67])
     #sigMasses.append([5,2.40])
-    sigMasses.append([4,1.33])
-    #sigMasses.append([5,2.40])
+    #sigMasses.append([4,1.33])
+    sigMasses.append([5,1.67])
     #sigMasses.append([10,2.00])
     #sigMasses.append([10,3.33])
     #sigMasses.append([10,4.90])
-    sigCTaus = [0.1, 1, 10, 100]
+    #sigCTaus = [0.1, 1, 10, 100]
+    sigCTaus = [0.1]
     for m in sigMasses:
         for t in sigCTaus:
             sigTags.append("Signal_ScenarioA_Mpi-%i_MA-%s_ctau-%.2fmm" % (m[0], ('%.2f'%m[1]).replace('.','p'), float(t)))
@@ -347,6 +370,22 @@ for y in years:
                             print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
                             break
                         lsprev = ls
+                    if "Scenario" in sigModel:
+                        print("Openes normalizations for Scenario's")
+                        print(ls)
+                        #print(float(ls[1]), float(ls[2]), float(ls[3]))
+                        #print(float(M), float(M2), float(T))
+                        if (float(ls[1])== float(M2)) and (float(ls[2])== float(M)) and (float(ls[3])== float(T)):
+                            obs = float(ls[4])
+                            exp = float(ls[5])
+                            e2m = float(ls[6])
+                            e1m = float(ls[7])
+                            e1p = float(ls[8])
+                            e2p = float(ls[9])
+                            NORMCONST = 10.0 * ( e2m / 0.6 ) # This one was used with 1.0 before but in this last test 10.
+                            print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
+                            break
+
         #
         for d_,d in enumerate(dNames):
             print("Analyzing %s, in region %s"%(m, d))
@@ -774,7 +813,8 @@ for y in years:
                     else:
                         print('Skipping card: ', icard)
                 else:
-                    if (nSigs[binidx]/NORMCONST > 1e-6) and (SOverSqrtB[binidx] > 1e-4*max(SOverSqrtB.values()) or SOverSqrtB[binidx] < 0):
+                    #if (nSigs[binidx]/NORMCONST > 1e-6) and (SOverSqrtB[binidx] > 1e-4*max(SOverSqrtB.values()) or SOverSqrtB[binidx] < 0):
+                    if (nSigs[binidx]/NORMCONST > 1e-6):
                         combinedCards += icard
                     else:
                         print('Skipping card: ', icard)
