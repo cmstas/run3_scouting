@@ -15,7 +15,8 @@
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jun-14-2024_SRsOnly_2022";
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jul-10-2024_2022_allCuts_full";
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Sep-25-2024_RooDatasets_unblind";
-  TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Dec-03-2024_2022_complete";
+  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Dec-03-2024_2022_complete";
+  TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Oct-01-2025_allEras_BToPhiAnalysis_RooOnly";
 
   // Names of the search regions we want to parametrize
   vector<TString> dNames = { };
@@ -59,7 +60,7 @@
     }
   } else if ( model=="BToPhi" ) {
     //sigMass = {0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.25, 1.5, 2.0, 2.85, 3.35, 4.0, 5.0};
-    sigMass = {0.25, 0.3, 0.4, 0.6, 0.7, 0.9, 1.25, 1.5, 2.85, 3.35};
+    sigMass = {0.25, 0.3, 0.4, 0.6, 0.7, 0.9, 1.25, 1.5, 2.85, 3.35, 4.00, 5.00};
     sigCtau = {0.0, 0.1, 1, 10, 100};
     sigTemplate = "Signal_BToPhi_MPhi-%s_ctau-%smm";
     for (unsigned int t=0; t<sigCtau.size(); t++) {

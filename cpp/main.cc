@@ -135,8 +135,8 @@ int main(int argc, char **argv) {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Data/2022G/", startFile, nFiles, isCondor, fromCrab);
     process = "DataG";
   }
-  if ( sampleArg=="DataB" && year=="2023") { // Not used for analysis
-    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Nov-13-2023/Data/2023B/", startFile, nFiles, isCondor, fromCrab);
+  if ( sampleArg=="DataB" && year=="2023") { 
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/May-24-2024/Data/2023B/", startFile, nFiles, isCondor, fromCrab);
     process = "DataB";
   }
   if ( sampleArg=="DataC-triggerV10" && year=="2023") {

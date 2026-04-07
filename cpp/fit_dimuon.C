@@ -56,7 +56,7 @@ bool doBinnedFit = true;
 //bool refitSignal = false;
 bool categorizeSignal = true;
 bool categorizeBackground = true; 
-bool useFixedSigma = false;
+bool useFixedSigma = true;
 bool addBernsteinOrders = false;
 //bool saveFitResult = true;
 bool saveFitResult = false;
@@ -166,9 +166,10 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
     maxstddev = 1.25*stddev;      
   }
   double binsize = 0.1*stddev_window; // 100 bins
-  double binsizePlot = 0.02*stddev_window;
+  double binsizePlot = 0.1*stddev_window;
 
-  if ( datasetname.Contains("d_FourMu_osv") && sigmodel.Contains("Scenario")) {
+  if ( (datasetname.Contains("d_FourMu_osv") || datasetname.Contains("d_FourMu_sep")) && sigmodel.Contains("Scenario")) {
+    //stddev = 0.018*mass
     minstddev = 0.001*mass;
   }
 
@@ -481,9 +482,9 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
         facc->Close();
         int sigRawAll = 1e6; // Random for now... But will have to include it for the systematics...
         if (period.Contains("2022"))
-          sigNormalization = tacceff*1000*35;
+          sigNormalization = tacceff*1000*34.6;
         else
-          sigNormalization = tacceff*1000*27;
+          sigNormalization = tacceff*1000*27.8;
         sigRawEntries = (int) (sigNormalization/(tacceff*1000*35)*sigRawAll);
         std::cout << ">>> SIGNAL NORMALIZATION: " << sigNormalization << std::endl;
     }
@@ -884,6 +885,7 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
     //////Exponential PDF
     //RooRealVar expo_slope(Form("expo_slope%s",catExt.Data()),Form("expo_slope%s",catExt.Data()),-0.02,-0.1,-0.0001); // decreasing slope
     RooRealVar expo_slope(Form("expo_slope%s",catExt.Data()),Form("expo_slope%s",catExt.Data()),-0.02,-20.0,20.0);
+    //RooRealVar expo_slope(Form("expo_slope%s",catExt.Data()),Form("expo_slope%s",catExt.Data()),-0.02,-20.0,-0.0001);
     RooExponential exponential(Form("background_exponential%s",catExt.Data()),Form("background_exponential%s",catExt.Data()),x,expo_slope);
     //////Fit
     std::cout << "Exponential fit................." << std::endl;
@@ -893,7 +895,7 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
       r = exponential.fitTo((*mmumuFit), Range("fitRange"), Save(), Minimizer("Minuit2","Migrad"),/*SumW2Error(kTRUE), */PrintLevel(-1), PrintEvalErrors(-1));
       ++nFits;
       if ( r->status()==0 )
-	break;
+	      break;
     }
     exponential.plotOn(frame,Name("background_exponential"),Range("fitRange"),RooFit::NormRange("fitRange"));
 
@@ -924,6 +926,7 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
     //////Access fit result information
     //r->Print();
     //////Access basic information
+    cout << "EXPONENTIAL FIT" << endl;
     cout << "Status = " << r->status() << endl;
     cout << "EDM = " << r->edm() << endl;
     cout << "-log(L) at minimum = " << r->minNll() << endl;
@@ -955,9 +958,11 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
     if ( chi2ExponentialPvalue > 0.01 &&
 	 fitStatusExponential==0 &&
 	 !( nBG.getVal() < 10 || ( nBG.getVal()/(mass+5.0*stddev_window-std::max(minMforFit,mass-5.0*stddev_window)) < 1e-1 && nBG.getVal() < 1e1 ) ) ) {
-      bgPDFs.add(exponential);
+      //expo_slope.setMin(expo_slope.getVal() - 0.0001);
+      //expo_slope.setMax(expo_slope.getVal() + 0.0001);
+      bgPDFs.add(exponential); 
       if ( useOnlyExponential ) 
-	wfit.import(exponential);
+	      wfit.import(exponential);
 
       exponential.plotOn(frame,Name("background_exponential"),Range("fitRange"),RooFit::NormRange("fitRange"),LineColor(kRed));
       if ( drawFits ) {
@@ -1005,6 +1010,7 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
 
     //////Power-law PDF
     std::cout << "Power-law fit................." << std::endl;
+    //RooRealVar plaw_power(Form("plaw_power%s",catExt.Data()),Form("plaw_power%s",catExt.Data()),-3.0,-6.0,-0.0001); // Decreasing slope
     //RooRealVar plaw_power(Form("plaw_power%s",catExt.Data()),Form("plaw_power%s",catExt.Data()),-3.0,-6.0,-0.0001); // Decreasing slope
     RooRealVar plaw_power(Form("plaw_power%s",catExt.Data()),Form("plaw_power%s",catExt.Data()),-3.0,-25.0,12.0);
     RooGenericPdf powerlaw(Form("background_powerlaw%s",catExt.Data()),"TMath::Power(@0,@1)",RooArgList(x,plaw_power));
@@ -1076,7 +1082,9 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
     if ( chi2PowerlawPvalue > 0.01 &&
 	 fitStatusPowerlaw==0 && 
 	 !( nBG.getVal() < 10 || ( nBG.getVal()/(mass+5.0*stddev_window-std::max(minMforFit,mass-5.0*stddev_window)) < 1e-1 && nBG.getVal() < 10 ) ) ) {
-      bgPDFs.add(powerlaw);
+    //plaw_power.setMin(plaw_power.getVal() - 0.0001);
+    //plaw_power.setMax(plaw_power.getVal() + 0.0001);
+    bgPDFs.add(powerlaw); 
       if ( useOnlyPowerLaw )
 	wfit.import(powerlaw);
 
@@ -1138,12 +1146,12 @@ void fitmass(RooDataSet mmumuAll, TString sample, bool isData, bool isSignal, bo
     vector<int> fitStatusBernstein;
     for (int to=0; to<maxpolyorder+1; to++) { 
       RooArgList parList(Form("bernstein_order%d%s",to+1,catExt.Data()));
-      RooRealVar par0(Form("pbern0_order%d%s",to+1,catExt.Data()),Form("pbern0_order%d%s",to+1,catExt.Data()),0.0,10.0);
-      RooRealVar par1(Form("pbern1_order%d%s",to+1,catExt.Data()),Form("pbern1_order%d%s",to+1,catExt.Data()),0.0,10.0);
-      RooRealVar par2(Form("pbern2_order%d%s",to+1,catExt.Data()),Form("pbern2_order%d%s",to+1,catExt.Data()),0.0,10.0);
-      RooRealVar par3(Form("pbern3_order%d%s",to+1,catExt.Data()),Form("pbern3_order%d%s",to+1,catExt.Data()),0.0,10.0);
-      RooRealVar par4(Form("pbern4_order%d%s",to+1,catExt.Data()),Form("pbern4_order%d%s",to+1,catExt.Data()),0.0,10.0);
-      RooRealVar par5(Form("pbern5_order%d%s",to+1,catExt.Data()),Form("pbern5_order%d%s",to+1,catExt.Data()),0.0,10.0);
+      RooRealVar par0(Form("pbern0_order%d%s",to+1,catExt.Data()),Form("pbern0_order%d%s",to+1,catExt.Data()),0.0,1.0);
+      RooRealVar par1(Form("pbern1_order%d%s",to+1,catExt.Data()),Form("pbern1_order%d%s",to+1,catExt.Data()),0.0,1.0);
+      RooRealVar par2(Form("pbern2_order%d%s",to+1,catExt.Data()),Form("pbern2_order%d%s",to+1,catExt.Data()),0.0,1.0);
+      RooRealVar par3(Form("pbern3_order%d%s",to+1,catExt.Data()),Form("pbern3_order%d%s",to+1,catExt.Data()),0.0,1.0);
+      RooRealVar par4(Form("pbern4_order%d%s",to+1,catExt.Data()),Form("pbern4_order%d%s",to+1,catExt.Data()),0.0,1.0);
+      RooRealVar par5(Form("pbern5_order%d%s",to+1,catExt.Data()),Form("pbern5_order%d%s",to+1,catExt.Data()),0.0,1.0);
       RooAbsPdf *background;
       if ( to<=0 ) {
 	parList.add(par0);
