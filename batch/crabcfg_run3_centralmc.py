@@ -1,5 +1,7 @@
 from CRABClient.UserUtilities import config #, getUsernameFromSiteDB
 from CRABAPI.RawCommand import crabCommand
+from http.client import HTTPException
+from CRABClient.ClientExceptions import ClientException
 
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
 #config = config()
@@ -15,6 +17,8 @@ if ("2022") in era:
     year=2022
 elif ("2023") in era:
     year=2023
+elif ("2024") in era:
+    year=2024
 else:
     quit()
 
@@ -22,7 +26,7 @@ else:
 data=False
 
 # ntuple version defined now
-ntuple_version = "_hahm_6p2"
+ntuple_version = "_dqcd_2024"
 
 # Setup working environment
 import os
@@ -46,6 +50,8 @@ if (len(sys.argv)>2):
     config.Data.unitsPerJob = int(10e4)
     config.Data.publication = False # By defailt but set to true below
     config.Site.storageSite = "T2_US_UCSD"
+    config.User.voGroup = 'cms'
+    config.User.voRole = 'NULL'
     if "HTo2ZdTo2mu2x" in sys.argv[2]:
         config.Data.outLFNDirBase = "/store/group/Run3Scouting/RAWScouting_HTo2ZdTo2mu2x_" + str(year) + "_v"+ntuple_version # DB no
         config.Data.inputDBS = 'global'
@@ -252,35 +258,57 @@ if (len(sys.argv)>2):
                 config_list[-1].Data.inputDataset = dataset_name
             config_list[-1].General.requestName = 'centralSkim__{}_{}_m-{}_ctau-{}mm_{}'.format(signal, era, m, t, ntuple_version)
             print(config)
-            crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+            crabCommand('submit', config = config, dryrun = False)
     elif "DQCD" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privQCD_v'+ntuple_version # DB no
-        config.Data.inputDBS = 'phys03'
-        config.Data.splitting = 'FileBased'
+        #config.Data.inputDBS = 'phys03'
+        config.Data.inputDBS = 'global'
+        #config.Data.splitting = 'FileBased'
+        config.Data.splitting = 'EventAwareLumiBased'
+        config.Data.unitsPerJob = int(10e4)
         config.Data.publication = True
-        config.Data.unitsPerJob = int(10) # Increased to match 10 jobs per file aprox
         config.Data.outputDatasetTag = "private-Skim_{era}-v2".format(era=era)
         if era=="2022":
             inputfile = 'data/datasets_dqcd_2022.txt'
         if era=="2022postEE":
             inputfile = 'data/datasets_dqcd_2022postEE.txt'
+        if era=="2024":
+            inputfile = 'data/datasets_dqcd_2024.txt'
         with open(inputfile,'r') as f:
             dataset_list = f.readlines()
         for dataset_name in dataset_list:
             config_list.append(config)
             config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False",]
             print(dataset_name)
-            config_list[-1].Data.inputDataset = dataset_name[:-1]
-            model_name = 'S'+dataset_name.split('_')[0][2:]
-            mpi = dataset_name.split('mpi_')[1].split('_')[0]
-            mA = dataset_name.split('mA_')[1].split('_')[0]
-            t = dataset_name.split('ctau_')[1].split('/')[0]
-            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(model_name, era, mpi, mA, t, ntuple_version)
+            #config_list[-1].Data.inputDataset = dataset_name[:-1]
+            config_list[-1].Data.inputDataset = dataset_name.strip()
+            if era == "2024":
+                model_name = dataset_name.split('-')[1]
+                t = dataset_name.split('ctau-')[1].split('-')[0]
+                mA = dataset_name.split('mA-')[1].split('-')[0]
+                mpi = dataset_name.split('mpi-')[1].split('_')[0]
+            else:
+                model_name = 'S'+dataset_name.split('_')[0][2:]
+                mpi = dataset_name.split('mpi_')[1].split('_')[0]
+                mA = dataset_name.split('mA_')[1].split('_')[0]
+                t = dataset_name.split('ctau_')[1].split('/')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm{}'.format(model_name, era, mpi, mA, t, ntuple_version)
+            config_list[-1].Data.inputDataset = dataset_name.strip()
+
             print(config)
             try:
-                crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
-            except:
-                print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
+                crabCommand('submit', config = config, dryrun = True)
+            except HTTPException as hte:
+                print("HTTPException:")
+                print(hte.headers)
+            except ClientException as cle:
+                print("ClientException:")
+                print(cle)
+            except Exception as e:
+                print("Other Exception:")
+                print(e)
+            #except:
+            #    print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
     elif "ScenarioA" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
@@ -384,7 +412,7 @@ if (len(sys.argv)>2):
             # No 2023 eras for the moment, when adding them, you have to run . install_cmssw.sh 2023central first
             config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(signal, era, mpi, mA, t, ntuple_version)
             print(config)
-            crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+            crabCommand('submit', config = config, dryrun = True) ## dryrun = True for local test
     elif "ScenarioB1" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
