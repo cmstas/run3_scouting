@@ -15,6 +15,9 @@ using namespace fwlite;
 #include "DataFormats/Scouting/interface/Run3ScoutingParticle.h"
 #include "DataFormats/Scouting/interface/Run3ScoutingVertex.h"
 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
@@ -36,6 +39,9 @@ bool relaxedSVSel = false;
 float sfSVsel = (relaxedSVSel) ? 5.0 : 1.0;
 float maxXerr=0.05*sfSVsel, maxYerr=0.05*sfSVsel, maxZerr=0.10*sfSVsel, maxChi2=3.0*sfSVsel;
 float maxDXYerr=0.05*sfSVsel, maxD3Derr=0.10*sfSVsel; // for identification of overlapping SVs
+
+// BToPhi specific
+bool filterByB = true;
 
 template<class T>
 const T getObject(const Event& ev, const char* prodLabel, const char* outLabel = "") {
@@ -427,12 +433,14 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   TTree* tout = new TTree("tout","Run3ScoutingTree");
   TH1F* counts = new TH1F("counts", "", 1, 0, 1);
   TH1F* sum2Weights = new TH1F("sum2Weights", "", 1, 0, 1);
-  TH1F* cutflow = new TH1F("cutflow", "", 7, 0, 7);  
+  TH1F* cutflow = new TH1F("cutflow", "", 8, 0, 8);  
 
   // Branch variables
   unsigned int run, lumi, evtn;
+  float nPU, nPUTrue, wPU; 
   bool passL1, passHLT;
   float nPV, PV_x, PV_y, PV_z;
+  float GenB_pt, GenB_eta;
   //float ct1 = -1.0, ct2 = -1.0;
   GenPart GenParts;
   SV SVs;
@@ -473,6 +481,9 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
 
   tout->Branch("passHLT", &passHLT);
 
+  tout->Branch("wPU", &wPU);
+  tout->Branch("nPUTrue", &nPUTrue);
+
   tout->Branch("nPV", &nPV);
   tout->Branch("PV_x", &PV_x);
   tout->Branch("PV_y", &PV_y);
@@ -492,6 +503,8 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("GenPart_motherIndex", &GenParts.motherIndex);
   tout->Branch("GenPart_motherPdgId", &GenParts.motherPdgId);
   tout->Branch("GenPart_ct", &GenParts.ct);
+  tout->Branch("GenB_pt", &GenB_pt);
+  tout->Branch("GenB_eta", &GenB_eta);
 
   tout->Branch("SV_index", &SVs.index);
   tout->Branch("SV_ndof", &SVs.ndof);
@@ -610,6 +623,19 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       set_goodrun_file_json("../data/Cert_Collisions2023_366442_370790_Golden.json");
   }
 
+  edm::LumiReWeighting lumi_weights;
+  if (isMC) {
+    if (year == "2022" && process.Contains("2022postEE")) {
+      lumi_weights = edm::LumiReWeighting("pileup/MCPileupHistogram2022postEE.root", "pileup/DataPileupHistogram2022.root", "pileup", "pileup");
+    } else if (year == "2022" && process.Contains("2022")) {
+      lumi_weights = edm::LumiReWeighting("pileup/MCPileupHistogram2022.root", "pileup/DataPileupHistogram2022.root", "pileup", "pileup");
+    } else if (year == "2023" && process.Contains("2023BPix")) {
+      lumi_weights = edm::LumiReWeighting("pileup/MCPileupHistogram2023BPix.root", "pileup/DataPileupHistogram2023.root", "pileup", "pileup");
+    } else {
+      lumi_weights = edm::LumiReWeighting("pileup/MCPileupHistogram2023.root", "pileup/DataPileupHistogram2023.root", "pileup", "pileup");
+    }
+  }
+
   // File loop
   unsigned int iFile = 1;
   for (auto inputFile : inputFiles) {
@@ -644,6 +670,52 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       lumi = eID.luminosityBlock();
       evtn = eID.event();
 
+      // Only for b-hadrons (filter and pt-reweighting)
+      GenB_pt = -1.;
+      GenB_eta = -1.;
+      if (isMC  && inputFile.Contains("BToPhi_MPhi") && filterByB) {
+        //std::cout << "BToPhi sample identified: applying 1 b-hadron filtering\n"; // Uncomment only for testing
+        auto genparts_forB = getObject<std::vector<reco::GenParticle>>(ev, "genParticles", "");
+        int nbhadron = 0;
+        reco::GenParticle bhadron;
+        for (unsigned int iGen=0; iGen<genparts_forB.size(); iGen++) {
+          auto candidate = genparts_forB[iGen];
+          if (!candidate.isLastCopy())
+            continue;
+          if (abs(candidate.pdgId())!=521 && 
+              abs(candidate.pdgId())!=511 &&
+              abs(candidate.pdgId())!=531 &&
+              abs(candidate.pdgId())!=541 &&
+              abs(candidate.pdgId())!=5122)
+                continue;
+          for (unsigned int jGen=0; jGen<genparts_forB.size(); jGen++) {
+            auto dcand = genparts_forB[jGen];
+            if (!dcand.isLastCopy() || abs(dcand.pdgId())!=6000211)
+              continue;
+            if (dcand.motherRef().index() == iGen) {
+              bhadron = genparts_forB[iGen]; // last b-hadron identified
+              nbhadron++;
+              break;
+            }
+          }
+        }
+        //
+        //std::cout << nbhadron << "\t" << bhadron.pt() << std::endl;
+        if (nbhadron==1) {
+          // last b-hadron is the only b-hadron
+          if (bhadron.pt() < 5. || abs(bhadron.eta()) > 2.8) {
+            continue;
+          } else {
+            // We keep the event
+            //std::cout << "We keep the event, nbhadron = " << nbhadron << ", pt = " << bhadron.pt() << std::endl;
+            GenB_pt = bhadron.pt();
+            GenB_eta = bhadron.eta();
+          }
+        } else {
+          continue;
+        }
+
+      }
 
       //
       if (isMC){
@@ -665,6 +737,22 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         if ( doPartialUnblinding && rndm_partialUnblinding.Rndm() > partialUnblindingPercentage )
           continue;
         nFraction++;
+      }
+
+      // PU reweighting
+      nPU = -1;
+      nPUTrue = -1;
+      wPU = 1.;
+      if (isMC) {
+        auto puInfoH = getObject<std::vector<PileupSummaryInfo>>(ev, "addPileupInfo");
+        for(size_t i=0;i<puInfoH.size();++i) {
+          if( puInfoH.at(i).getBunchCrossing() == 0) {
+               nPU = puInfoH.at(i).getPU_NumInteractions();
+               nPUTrue = puInfoH.at(i).getTrueNumInteractions();
+               continue;                                          
+          }
+        }
+        wPU = lumi_weights.weight(nPUTrue);
       }
 
       // L1 selection
@@ -715,6 +803,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
           auto genpart = genparts[iGen];
           if (abs(genpart.pdgId())!=13 && // Muon
               abs(genpart.pdgId())!=999999 && // Dark photon
+              abs(genpart.pdgId())!=9900015 && // Dark photon (inconsistent with datacards)
               abs(genpart.pdgId())!=4900111 && // Dark pion
               abs(genpart.pdgId())!=4900211 && // Dark pion
               abs(genpart.pdgId())!=4900221 && // Dark eta
@@ -724,6 +813,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
               abs(genpart.pdgId())!=4900102 && // Dark mass
               abs(genpart.pdgId())!=1023 && // Dark photon from Higgs
               abs(genpart.pdgId())!=25 && // Higgs
+              abs(genpart.pdgId())!=6000211 && // Scalar from b-hadrons
               abs(genpart.pdgId())!=443) // JPsi
             continue;
           if (!genpart.isLastCopy())
@@ -755,7 +845,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
           // Generator-level information for lifetime reweighting
           int daughterIndex = -1;
           if (genpart.pdgId()==13) {
-            if (motherPdgId==1023) {
+            if (motherPdgId==1023 || motherPdgId==9900015 || motherPdgId==6000211) {
               float vx1 = lastCopy.vx() * 10.; // mm
               float vy1 = lastCopy.vy() * 10.; // mm
               float vx0 = genparts[motherIdx].vx() * 10.; // mm
@@ -902,14 +992,14 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
           float dx = x - xOther;
           float dy = y - yOther;
           float dz = z - zOther;
-	  float xeOther=SVs.xe[jSV], yeOther=SVs.ye[jSV], zeOther=SVs.ze[jSV];
+	        float xeOther=SVs.xe[jSV], yeOther=SVs.ye[jSV], zeOther=SVs.ze[jSV];
           float dxy = dx*dx + dy*dy;
           float d3d = dxy*dxy + dz*dz;
-	  float xeOverlap = std::max(xe, xeOther);
-	  float yeOverlap = std::max(ye, yeOther);
-	  float zeOverlap = std::max(ze, zeOther);
-	  float dxyeOverlap = TMath::Sqrt(xeOverlap*xeOverlap+yeOverlap*yeOverlap);
-	  float d3deOverlap = TMath::Sqrt(dxyeOverlap*dxyeOverlap+zeOverlap*zeOverlap);
+	        float xeOverlap = std::max(xe, xeOther);
+	        float yeOverlap = std::max(ye, yeOther);
+	        float zeOverlap = std::max(ze, zeOther);
+	        float dxyeOverlap = TMath::Sqrt(xeOverlap*xeOverlap+yeOverlap*yeOverlap);
+	        float d3deOverlap = TMath::Sqrt(dxyeOverlap*dxyeOverlap+zeOverlap*zeOverlap);
           if ( fabs(dx)<xeOverlap && fabs(dy)<yeOverlap && fabs(dz)<zeOverlap && TMath::Sqrt(dxy)<std::min(dxyeOverlap, maxDXYerr) && TMath::Sqrt(d3d)<std::min(d3deOverlap, maxD3Derr) ) {
             vtxIdxs_temp.push_back(jSV);
             sumOfProb += SVs.prob[jSV];
