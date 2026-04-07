@@ -108,6 +108,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         "keep *_hitMaker_*_*",
         "keep *_beamSpotMaker_*_*",
         "keep *_genParticles_*_HLT",
+        "keep *_addPileupInfo_*_*",
         ),
      basketSize = cms.untracked.int32(128*1024), # 128kb basket size instead of ~30kb default
 )
