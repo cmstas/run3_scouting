@@ -26,10 +26,16 @@ elif [ $# -lt 8 ]
 then
     MASS=$6
     CTAU=$7
+elif [ $# -lt 8 ]    
+then
+    MASS=$6
+    CTAU=$7
+    ITER=$8
 else
     MASS=$6
     CTAU=$7
     ITER=$8
+    ITER2=$9
 fi
 
 function stageout {
@@ -37,7 +43,7 @@ function stageout {
     COPY_DEST=$2
     retries=0
     COPY_STATUS=1
-    until [ $retries -ge 10 ]
+    until [ $retries -ge 3 ]
     do
         echo "Stageout attempt $((retries+1)): env -i X509_USER_PROXY=${X509_USER_PROXY} gfal-copy -p -f -t 7200 --verbose --checksum ADLER32 ${COPY_SRC} ${COPY_DEST}"
         env -i X509_USER_PROXY=${X509_USER_PROXY} gfal-copy -p -f -t 7200 --verbose --checksum ADLER32 ${COPY_SRC} ${COPY_DEST}
@@ -84,9 +90,13 @@ if [ $# -lt 8 ]
 then
     echo "combineScripts/submitSmartToyLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU}"
     bash combineScripts/submitSmartToyLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU}
-else
+elif [ $# -lt 8 ]
+then
     echo "combineScripts/submitSmartToyLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU} ${ITER}"
     bash combineScripts/submitSmartToyLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU} ${ITER}
+else
+    echo "combineScripts/submitSmartToyLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU} ${ITER} ${ITER2}"
+    bash combineScripts/submitSmartToyLimits.sh ${DIR} ${OUT} ${SIG} ${LIM} ${PERIOD} ${MASS} ${CTAU} ${ITER} ${ITER2}
 fi
 
 for FILE in $(ls ${OUT})

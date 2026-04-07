@@ -68,6 +68,11 @@ then
     #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_vsCTau_ToysEp1_onCondor_Test.sub
     #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_vsCTau_ToysEm2_onCondor_Test.sub
     #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_vsCTau_ToysEp2_onCondor_Test.sub
+elif [ ${TYPE} == "BToPhi_mass_asymptotic" ]
+then
+    #condor_submit condor/limits/runLimits_BToPhi_vsMass_1mm_Asymptotic_onCondor.sub
+    condor_submit condor/limits/runLimits_BToPhi_vsMass_10mm_Asymptotic_onCondor.sub
+    #condor_submit condor/limits/runLimits_BToPhi_vsMass_100mm_Asymptotic_onCondor.sub
 else
     echo "The type of limit was not specified -> Aborting submission..."
 fi

@@ -24,7 +24,9 @@ if model=="HTo2ZdTo2mu2x":
     if var=='ctau':
         #masses =  [0.5, 0.7, 1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 12.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0] # Full set of masses
         masses =  [1.5, 2.0, 2.5, 5.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
-        masses =  [20.0, 30.0, 40.0, 50.0]
+        masses =  [1.5, 2.0, 2.5, 5.0, 12.0, 20.0, 30.0, 40.0, 50.0]
+        #masses =  [20.0, 30.0, 40.0, 50.0]
+        #masses =  [40.000, 50.000]
         ctaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.00, 160.00, 250.00, 400.00, 630.00, 1000.00]
     elif var=='mass':
         masses = []
@@ -37,11 +39,12 @@ if model=="HTo2ZdTo2mu2x":
                 print(m)
 elif model=="BToPhi": 
     if var=='ctau':
-        masses =  [0.25, 0.30, 0.40, 0.50, 0.60, 0.70, 0.90, 1.25, 1.50, 2.0, 2.85, 3.35, 4.00, 5.00] # Just full set of masses
-        ctaus = [0.1, 1, 10, 100]
+        #masses =  [0.25, 0.30, 0.40, 0.50, 0.60, 0.70, 0.90, 1.25, 1.50, 2.0, 2.85, 3.35, 4.00, 5.00] # Just full set of masses
+        masses =  [1.25, 1.50, 2.0] # Just full set of masses
+        ctaus = [0.10, 0.16, 0.25, 0.40, 0.63, 1.00, 1.60, 2.50, 4.00, 6.30, 10.00, 16.00, 25.00, 40.00, 63.00, 100.0]
     elif var=='mass':
         masses = []
-        ctaus = [0.1, 1, 10, 100] # Lifetimes for the grid
+        ctaus = [1, 10, 100] # Lifetimes for the grid
         with open('data/BToPhi_limitgrid.txt', 'r') as f:
             lmasses = f.readlines()
             for mass in lmasses:
@@ -51,17 +54,31 @@ elif model=="BToPhi":
 elif model=="ScenarioA": 
     if var=='ctau':
         masses =  [] 
-        #masses.append([5.0, 2.40])
-        masses.append([4.0, 1.33])
-        ctaus = [0.1, 1, 10, 100]
+        #masses.append([1,0.33])
+        masses.append([2,0.67])
+        masses.append([4,1.33])
+        masses.append([5,1.67])
+        #masses.append([3.33,0.33])
+        masses.append([6.,2.])
+        masses.append([7.5,2.5])
+        masses.append([12.,1.20])
+        ctaus = [0.10, 0.25, 0.60, 1.00, 2.50, 6.00, 10.00, 25.00, 60.00, 100.00]
+        ctaus = [1000.0]
     elif var=='mass':
         print("No mass grid supported for this model")
 elif model=="ScenarioB1": 
     if var=='ctau':
         masses =  [] 
-        masses.append([5.0, 2.40])
-        #masses.append([4.0, 1.33])
-        ctaus = [0.1, 1, 10, 100]
+        #masses.append([1,0.33])
+        masses.append([2,0.67])
+        masses.append([4,1.33])
+        masses.append([5,1.67])
+        #masses.append([3.33,0.33])
+        masses.append([6.,2.])
+        masses.append([7.5,2.5])
+        masses.append([12.,1.20])
+        #ctaus = [0.10, 0.25, 0.60, 1.00, 2.50, 6.00, 10.00, 25.00, 60.00, 100.00]
+        ctaus = [1000.0]
     elif var=='mass':
         print("No mass grid supported for this model")
 

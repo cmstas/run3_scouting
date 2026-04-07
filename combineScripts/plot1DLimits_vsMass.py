@@ -16,6 +16,14 @@ def getUpperMask(upperBound):
     print(upperBound / (1 - window_size*rel_sigma))
     return upperBound / (1 - window_size*rel_sigma)
 
+def returnBEfficiency(mass_value):
+    b_masses = np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.25, 1.5, 2.0, 2.85, 3.35, 4.0, 4.6])
+    b_effs = np.array([0.3109463377536955, 0.26847013244436435, 0.24992711206799884, 0.23842898102216356, 0.23993801096038092, 0.23418752437541582, 0.24130093865769678, 0.24386724386724387, 0.26277917030444703, 0.31348230996459736, 0.36339318819852745, 0.4446176059404579, 0.5748189563275079])
+    graph = ROOT.TGraph(len(b_effs), np.array(b_masses), np.array(b_effs))
+    spline = ROOT.TSpline3("spline_BToPhi_efficiency", graph)
+    print(f"Efficiency for {mass_value} is {spline.Eval(mass_value)}")
+    return spline.Eval(mass_value)
+
 
 ROOT.gROOT.SetBatch(1)
 drawObserved = True
@@ -28,19 +36,24 @@ xsec_h = 59.8 # higgs cross section in pb at 13.6 GeV, used to normalize the MC
 scaleToFullLumi = False
 compare = True
 doSmartScaling = True
+hepdata_input=True
 
 # In-line arguments
 model = sys.argv[1]
 limdir = sys.argv[2]
 ctau = sys.argv[3]
 year = sys.argv[4]
+if len(sys.argv) > 5:
+    limtype = sys.argv[5]
+else:
+    limtype = 'asymptotic'
 
 if year=='2022':
     luminosity = 35
 elif year=='2023':
     luminosity = 27
 else:
-    luminosity = 27 + 35
+    luminosity = 62.4
 
 massl = []
 obsl  = []
@@ -69,7 +82,7 @@ elif typeOfLimit=="xsecBR":
     if model=="HTo2ZdTo2mu2x":
         ylabel = "95% CL upper limit on #sigma(h#rightarrowZ_{D}Z_{D})xB(Z_{D}#rightarrow#mu#mu) [pb]"
 
-fin = open("%s/limits_%s_%s.txt"%(limdir,model,year),"r")
+fin = open("%s/limits_%s_%s_%s.txt"%(limdir,model,limtype,year),"r")
 for l in fin.readlines():
     if l.startswith("#"):
         continue
@@ -90,16 +103,36 @@ for l in fin.readlines():
                     lls = ll.split(",")
                     if (float(lls[1])== float(ls[1])) and (float(lls[2])== float(ls[2])):
                         e2m = float(lls[5])
-                        NORMCONST = 0.01 * ( e2m / 0.2 )
-                        print(" -> Using smart scaling of %.2f for em2 limit of %.3f  to be 0.2" % (NORMCONST, e2m))
+                        NORMCONST = 0.01 * ( e2m / 0.6 )
+                        print(" -> Using smart scaling of %.5f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
                         xsec = xsec_base*NORMCONST
                         break
+        if model=="BToPhi":
+            #scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_1mm.txt' # Will have to merge
+            #scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_10-100mm.txt'
+            scalingFile = 'combineScripts/SmartLimitNorm/limits_BToPhi_asymptotic_allEras_vsCTau.txt' # Will have to merge
+            with open(scalingFile) as fin:
+                for ll in fin.readlines():
+                    if ll.startswith("#"):
+                        continue
+                    lls = ll.split(",")
+                    if (float(lls[1])== float(ls[1])) and (float(lls[2])== float(ls[2])):
+                        e2m = float(lls[5])
+                        NORMCONST = 1.0 * ( e2m / 0.6 )
+                        print(" -> Using smart scaling of %.2f for em2 limit of %.3f  to be 0.6" % (NORMCONST, e2m))
+                        xsec = xsec_base*NORMCONST
+                        break
+
     else:
         xsec = xsec_base*NORMCONST
     if typeOfLimit=="xsec":
         scale = xsec
     if typeOfLimit=="BRH":
-        scale = xsec/xsec_h
+        if 'BToPhi' in model:
+            eff_m = returnBEfficiency(float(ls[1])) 
+            scale = xsec/(2.0 * 1.2890e+08 * eff_m) # Here the value of the cross section is harcoded
+        else:
+            scale = xsec/xsec_h
     elif typeOfLimit=="xsecBR":
         if model=="HTo2ZdTo2mu2x":
             BR = 1.0
@@ -143,6 +176,7 @@ p2sv  = np.array(p2sl ,"d")
 
 cfile = None
 if compare:
+    l_dmu_Comb = None
     print("> Request to open files to compare")
     try:
         if model=="HTo2ZdTo2mu2x":
@@ -151,7 +185,7 @@ if compare:
                 l_dmu_13p6TeV = None
                 l_dmu_Comb = None
                 m_dmu = np.array([10., 20., 30., 40., 50.])
-                if ctau=="1":
+                if ctau=="1.00":
                     # Run 2 scouting
                     cfile = ROOT.TFile("data/run-2/scouting/HEPData-ins1997201-v2-Figure_8a.root")
                     cgobs = cfile.Get("Figure 8a/Graph1D_y1")
@@ -159,20 +193,28 @@ if compare:
                     l_dmu_13TeV   = np.array([7.2291e-05, 3.2762e-05, 3.5112e-05, 3.9441e-05, 3.6307e-05])
                     l_dmu_13p6TeV = np.array([8.8575e-05, 3.8366e-05, 3.9471e-05, 3.994e-05, 5.3028e-05])
                     l_dmu_Comb    = np.array([4.1748e-05, 1.8494e-05, 1.9962e-05, 2.0341e-05, 2.4934e-05])
-                if ctau=="10":
+                if ctau=="10.00":
                     l_dmu_13TeV   = np.array([5.6854e-05, 2.3299e-05, 2.4819e-05, 2.5004e-05, 2.9119e-05])
                     l_dmu_13p6TeV = np.array([6.7676e-05, 3.1077e-05, 2.8641e-05, 2.8811e-05, 2.7618e-05])
                     l_dmu_Comb    = np.array([3.3205e-05, 1.419e-05, 1.3834e-05, 1.452e-05, 1.5585e-05])
-                if ctau=="100":
+                if ctau=="100.00":
                     cfile = ROOT.TFile("data/run-2/scouting/HEPData-ins1997201-v2-Figure_8b.root")
                     cgobs = cfile.Get("Figure 8b/Graph1D_y1")
                     cgexp = cfile.Get("Figure 8b/Graph1D_y2")
                     l_dmu_13TeV   = np.array([0.00013573, 4.6619e-05, 2.7188e-05, 3.9799e-05, 3.8551e-05])
                     l_dmu_13p6TeV = np.array([0.00016167, 5.5121e-05, 4.5706e-05, 4.9023e-05, 3.6362e-05])
                     l_dmu_Comb    = np.array([7.9462e-05, 2.6091e-05, 2.0618e-05, 2.2415e-05, 1.9732e-05])
-                if ctau=="1000":
+                if ctau=="1000.00":
                     l_dmu_Comb    = np.array([0.00045647, 0.00014209, 5.2258E-05, 6.4816E-05, 5.1325E-05])
-
+        if model=="BToPhi":
+            if ctau=="1.00":
+                cfile = ROOT.TFile("data/run-2/scouting/HEPData-ins1997201-v2-Figure_6a.root")
+                cgobs = cfile.Get("Figure 6a/Graph1D_y1")
+                cgexp = cfile.Get("Figure 6a/Graph1D_y2")
+            if ctau=="100.00":
+                cfile = ROOT.TFile("data/run-2/scouting/HEPData-ins1997201-v2-Figure_6b.root")
+                cgobs = cfile.Get("Figure 6b/Graph1D_y1")
+                cgexp = cfile.Get("Figure 6b/Graph1D_y2")
         cgobs.SetLineColor(ROOT.kBlue)
         cgobs.SetMarkerColor(ROOT.kBlue)
         cgobs.SetMarkerStyle(20)
@@ -216,25 +258,43 @@ if drawObserved:
 #
 ax.plot(massv, expv, 'r--', label='Expected', linewidth=2, zorder=2)
 #
-ax.fill_between(massv, m2sv, p2sv, color='#FFDF7Fff', label=r'$\pm 2\sigma$ expected', zorder=1) # #F5BB54
-ax.fill_between(massv, m1sv, p1sv, color='#85D1FBff', label=r'$\pm 1\sigma$ expected', zorder=1) # #607641
+ax.fill_between(massv, m2sv, p2sv, color='#FFDF7Fff', label=r'95% CL expected', zorder=1) # #F5BB54
+ax.fill_between(massv, m1sv, p1sv, color='#85D1FBff', label=r'68% CL expected', zorder=1) # #607641
 #
 if compare:
     if l_dmu_Comb is not None:
         #ax.plot(m_dmu, l_dmu_13TeV, linestyle='solid', color='magenta', label=r'Displaced dimuon (13 TeV, 97.6 $fb^{-1}$) [Observed]', linewidth=2)
         #ax.plot(m_dmu, l_dmu_13p6TeV, linestyle='solid', color='deepskyblue', label=r'Displaced dimuon (13.6 TeV, 36.6 $fb^{-1}$) [Observed]', linewidth=2)
-        ax.plot(m_dmu, l_dmu_Comb, linestyle='solid', color='deepskyblue', label=r'Displaced dimuon with standard streams [JHEP 05 (2024) 047]', linewidth=2)
+        ax.plot(m_dmu, l_dmu_Comb, linestyle='solid', color='magenta', label=r'JHEP 05 (2024) 047', linewidth=2)
     if cfile is not None:
         m_cgexp = np.array(cgexp.GetX())
         l_cgexp = np.array(cgexp.GetY())
         print(m_cgexp)
-        indices = np.searchsorted(m_cgexp, [0.695, 1.18, 2.76, 4.28, 8.0, 11.5])
+        #indices = np.searchsorted(m_cgexp, [0.695, 1.18, 2.76, 4.28, 8.0, 11.5])
+        if model=="HTo2ZdTo2mu2x":
+            if float(ctau)==1.00:
+                indices = np.searchsorted(m_cgexp, [0.695, 0.895, 0.91, 1.14, 2.76, 4.16, 8.32, 11.5]) # 1mm
+            if float(ctau)==100.00:
+                indices = np.searchsorted(m_cgexp, [0.695, 1.18, 2.76, 4.16, 8.48, 11.9]) # 100 mm
+        if model=="BToPhi":
+            if float(ctau)==1.00:
+                indices = np.searchsorted(m_cgexp, [0.408, 0.615, 0.685, 0.885, 0.905, 1.14, 2.74, 4.12]) # 1mm
+            if float(ctau)==100.00:
+                indices = np.searchsorted(m_cgexp, [0.408, 0.615, 0.685, 0.885, 0.905, 1.14, 2.76, 4.12])  # 100 mm
+        #indices = np.searchsorted(m_cgexp, [0.695, 1.18, 2.76, 4.16, 8.48, 11.9]) # 100 mm
+        #indices = np.searchsorted(m_cgexp, [0.695, 0.895, 0.91, 1.14, 2.76, 4.16, 8.32, 11.5]) # 1mm
         segments_m_cgexp = np.split(m_cgexp, indices)
         segments_l_cgexp = np.split(l_cgexp, indices)
-        ax.plot(segments_m_cgexp[0], segments_l_cgexp[0], 'b--', label=r'Displaced dimuon with Run 2 scouting data [JHEP 04 (2022) 062]', linewidth=2)
-        ax.plot(segments_m_cgexp[2], segments_l_cgexp[2], 'b--', linewidth=2)
-        ax.plot(segments_m_cgexp[4], segments_l_cgexp[4], 'b--', linewidth=2)
-        ax.plot(segments_m_cgexp[6], segments_l_cgexp[6], 'b--', linewidth=2)
+        print(segments_m_cgexp)
+        ax.plot(segments_m_cgexp[0], segments_l_cgexp[0], 'b-', label=r'JHEP 04 (2022) 062', linewidth=2, zorder=10)
+        #ax.plot(segments_m_cgexp[0], segments_l_cgexp[0], 'b-', label=r'JHEP 04 (2022) 062', linewidth=2)
+        ax.plot(segments_m_cgexp[2], segments_l_cgexp[2], 'b-', linewidth=2, zorder=10)
+        ax.plot(segments_m_cgexp[4], segments_l_cgexp[4], 'b-', linewidth=2, zorder=10)
+        ax.plot(segments_m_cgexp[6], segments_l_cgexp[6], 'b-', linewidth=2, zorder=10)
+        if model=="HTo2ZdTo2mu2x" and ctau!="100.00" and ctau!="1000.00":
+            ax.plot(segments_m_cgexp[8], segments_l_cgexp[8], 'b-', linewidth=2, zorder=10)
+        if model=="BToPhi":
+            ax.plot(segments_m_cgexp[8], segments_l_cgexp[8], 'b-', linewidth=2, zorder=10)
 #
 
 # Masking
@@ -247,37 +307,39 @@ ax.axvspan(getLowerMask(2.89), getUpperMask(3.33), color='lightgray', alpha=1.0,
 ax.axvspan(getLowerMask(3.47), getUpperMask(3.94), color='lightgray', alpha=1.0, zorder=2) # PSi2S
 ax.axvspan(getLowerMask(8.88), getUpperMask(10.85), color='lightgray', alpha=1.0, zorder=2) # Upsilon
 
-# Other details
-ax.set_xscale('log')
-ax.set_yscale('log')
-ax.set_xlabel('Mass [GeV]')
-ax.set_ylabel(r'95% CL upper limit on Br($h \rightarrow Z_d Z_d$)')
-ax.set_xlim(massv[0], massv[-1])
-ax.set_xlim(0.5, 50)
-if ctau=='100':
-    ax.set_xlim(1.5, 50)
-    ax.set_xticks([2, 5, 10, 20, 30, 50])
-    ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
-if ctau=='1000':
-    ax.set_xlim(2.0, 50)
-    ax.set_xticks([2, 5, 10, 20, 30, 50])
-    ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
-else:
-    ax.set_xticks([0.5, 1, 2, 5, 10, 20, 30, 50])
-    ax.set_xticklabels(["0.5", "1", "2", "5", "10", "20", "30", "50"])
 
-ax.set_ylim(0.5*min(m2sv), 50.0*max(p2sv))
-ax.set_ylim(1e-6, 1e-1)
+#ax.set_ylim(0.5*min(m2sv), 50.0*max(p2sv))
+#ax.set_ylim(1e-6, 1e-1)
 ax.set_axisbelow(False)
 ax.tick_params(zorder=10)
 #
 if year!='allEras':
-    hep.cms.label(loc=0, data=True, llabel="Preliminary", lumi=luminosity, year=year, com=13.6)
+    hep.cms.label(loc=0, data=True, llabel="", lumi=luminosity, year=year, com=13.6)
 else:
-    hep.cms.label(loc=0, data=True, llabel="Preliminary", lumi=luminosity, com=13.6)
+    hep.cms.label(loc=0, data=True, llabel="", lumi=luminosity, com=13.6)
 #
 if model=="HTo2ZdTo2mu2x":
-    legend = ax.legend(loc='upper right', title=r"$H\rightarrow Z_DZ_D$ ($c\tau =$ %s mm)"%(ctau), fontsize=15, title_fontsize=16, frameon = True)
+    if ctau=='1.00':
+        ctaulabel = '0.1'
+    if ctau=='10.00':
+        ctaulabel = '1'
+    if ctau=='100.00':
+        ctaulabel = '10'
+    if ctau=='1000.00':
+        ctaulabel = '100'
+    legend = ax.legend(loc='upper right', title=r"$H\rightarrow Z_DZ_D$ ($c\tau =$ %s cm)"%(ctaulabel), fontsize=22, title_fontsize=22, frameon = True)
+elif model=="BToPhi":
+    if ctau=='1.00':
+        ctaulabel = '0.1'
+        location = 'upper left'
+    if ctau=='10.00':
+        ctaulabel = '1'
+        location = 'upper right'
+    if ctau=='100.00':
+        ctaulabel = '10'
+        location = 'upper right'
+    legend = ax.legend(loc=location, title=r"$h_{b}\rightarrow \phi X$ ($c\tau =$ %s cm)"%(ctaulabel), fontsize=22, title_fontsize=22, frameon = True)
+
 legend.get_title().set_weight('bold')
 legend.set_zorder(10)
 legend._legend_box.align = "left"
@@ -287,30 +349,82 @@ legend._legend_box.align = "left"
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_xlabel('Mass [GeV]')
-ax.set_ylabel(r'95% CL upper limit on Br($h \rightarrow Z_d Z_d$)')
-ax.set_xlim(massv[0], massv[-1])
-ax.set_xlim(0.5, 50)
-if ctau=='100':
-    ax.set_xlim(1.5, 50)
-    ax.set_xticks([2, 5, 10, 20, 30, 50])
-    ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
-elif ctau=='1000':
-    ax.set_xlim(2.0, 50)
-    ax.set_xticks([2, 5, 10, 20, 30, 50])
-    ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
-else:
-    ax.set_xticks([0.5, 1, 2, 5, 10, 20, 30, 50])
-    ax.set_xticklabels(["0.5", "1", "2", "5", "10", "20", "30", "50"])
+if model=="HTo2ZdTo2mu2x":
+    ax.set_ylabel(r'95% CL upper limit on $\mathcal{B}$($H \rightarrow Z_D Z_D$)')
+    ax.set_xlim(massv[0], massv[-1])
+    ax.set_xlim(0.5, 50)
+    if ctau=="1.00":
+        ax.set_ylim(4e-6, 1e-1)
+        ax.set_xticks([0.5, 1, 2, 5, 10, 20, 30, 50])
+        ax.set_xticklabels(["0.5", "1", "2", "5", "10", "20", "30", "50"])
+    if ctau=="10.00":
+        ax.set_ylim(4e-6, 5e-1)
+        ax.set_xticks([0.5, 1, 2, 5, 10, 20, 30, 50])
+        ax.set_xticklabels(["0.5", "1", "2", "5", "10", "20", "30", "50"])
+    if ctau=="100.00":
+        ax.set_ylim(4e-6, 5)
+        ax.set_xlim(1.5, 50)
+        ax.set_xticks([2, 5, 10, 20, 30, 50])
+        ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
+    if ctau=="1000.00":
+        ax.set_ylim(1e-5, 10)
+        ax.set_xlim(2.0, 50)
+        ax.set_xticks([2, 5, 10, 20, 30, 50])
+        ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
+elif "BToPhi" in model:
+    ax.set_xlim(0.3, 4.6)
+    ax.set_xticks([0.3, 0.4, 0.5, 0.6, 0.8, 1, 2, 3, 4])
+    ax.set_xticklabels(["0.3", "0.4", "0.5", "0.6", "0.8", "1", "2", "3", "4"])
+    if ctau=="1.00":
+        ax.set_ylim(5e-11, 1e-5)
+    if ctau=="10.00":
+        ax.set_ylim(1e-11, 1e-5)
+    if ctau=="100.00":
+        ax.set_ylim(5e-12, 3e-3)
+    ax.set_ylabel(r'95% CL limit on $\mathcal{B}$($h_{b} \rightarrow \phi X$)x$\mathcal{B}$($\phi \rightarrow \mu\mu$)')
+    #ax.set_xlim(ctauv[0], ctauv[-1])
 
-ax.set_ylim(0.5*min(m2sv), 50.0*max(p2sv))
-ax.set_ylim(2e-6, 1)
+
 ax.set_axisbelow(False)
 ax.tick_params(zorder=10)
 #
 #
 if drawObserved:
-    fig.savefig("%s/limits_%s_ctau%s_%s_alt_obs"%(limdir,model,ctau,typeOfLimit), dpi=140)
+    fig.savefig("%s/limits_%s_ctau%s_%s_alt_obs"%(limdir,model,ctau.replace('.','p'),typeOfLimit), dpi=140)
+    fig.savefig("%s/limits_%s_ctau%s_%s_alt_obs.pdf"%(limdir,model,ctau.replace('.','p'),typeOfLimit), dpi=140)
 else:
-    fig.savefig("%s/limits_%s_ctau%s_%s_alt"%(limdir,model,ctau,typeOfLimit), dpi=140)
+    fig.savefig("%s/limits_%s_ctau%s_%s_alt"%(limdir,model,ctau.replace('.','p'),typeOfLimit), dpi=140)
+    fig.savefig("%s/limits_%s_ctau%s_%s_alt.pdf"%(limdir,model,ctau.replace('.','p'),typeOfLimit), dpi=140)
+
+import pickle
+if hepdata_input:
+    if model=="HTo2ZdTo2mu2x":
+        if ctau=="1.00":
+            name = "Figure_011-a"
+        if ctau=="10.00":
+            name = "Figure_011-b"
+        if ctau=="100.00":
+            name = "Figure_011-c"
+        if ctau=="1000.00":
+            name = "Figure_011-d"
+    if model=="BToPhi":
+        if ctau=="1.00":
+            name = "Figure_015-a"
+        if ctau=="10.00":
+            name = "Figure_015-b"
+        if ctau=="100.00":
+            name = "Figure_015-c"
+    fig.savefig(f"paperPlots/{name}.png", dpi=140)
+    fig.savefig(f"paperPlots/{name}.pdf", dpi=140)
+    data_hep = {}
+    data_hep['mass_values'] = massv
+    data_hep['expected_values'] = expv
+    data_hep['observed_values'] = obsv
+    data_hep['p2sigma_values'] = p2sv
+    data_hep['p1sigma_values'] = p1sv
+    data_hep['m1sigma_values'] = m1sv
+    data_hep['m2sigma_values'] = m2sv, 
+    with open(f'paperPlots/hepdata_{name}.pkl', 'wb') as f:
+        pickle.dump(data_hep, f)
 
 
