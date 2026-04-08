@@ -22,8 +22,7 @@ else:
 data=False
 
 # ntuple version defined now
-#ntuple_version = "noFilter_v1"
-ntuple_version = "_v1"
+ntuple_version = "noFilter_v1"
 
 # Setup working environment
 import os
@@ -44,8 +43,7 @@ if len(sys.argv) > 2:
     config.Data.outLFNDirBase = '/store/group/Run3Scouting/GENScouting_'+ntuple_version # DB no
     config.Data.publication = True
     config.Data.outputPrimaryDataset = '{signal}-pythia8'.format(signal=signal)
-    #config.Data.outputDatasetTag = 'private-{datatag}_noFilter_'.format(datatag=datatag)
-    config.Data.outputDatasetTag = 'private-{datatag}_'.format(datatag=datatag)
+    config.Data.outputDatasetTag = 'private-{datatag}_noFilter_'.format(datatag=datatag)
     config.Site.storageSite = "T2_US_UCSD"
     config.General.requestName = 'crab_{signal}_{era}'.format(signal=signal, era=era)
     print(config)
