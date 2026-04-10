@@ -58,6 +58,8 @@ else:
         else:
             #gtag="124X_mcRun3_2022_realistic_postEE_v1"
             gtag="130X_mcRun3_2022_realistic_postEE_v6" # Found for central production
+    elif '2024' in opts.era:
+        gtag="140X_mcRun3_2024_realistic_v26" # Found for central production (RunIII2024Summer24DRPremix)
     else:
         #gtag="130X_mcRun3_2023_realistic_v9" # latest MC GT (=phase1_2023_realistic, in CMSSW_13_1_0)
         if not 'BPix' in opts.era:
@@ -70,7 +72,8 @@ process.GlobalTag.globaltag = gtag
 
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(opts.nevents))
 
-process.options = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'))
+#process.options = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'))
+process.options = cms.untracked.PSet(TryToContinue = cms.untracked.vstring('ProductNotFound'))
 
 if opts.data:
     process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -94,21 +97,29 @@ if not opts.data:
 # skim data, but keep all events for MC acceptance calculations
 do_skim = opts.data
 
+# Build output keep commands based on era (2024+ uses Vtx/NoVtx split collections)
+if '2024' in opts.era or '2025' in opts.era:
+    out_keep_muon = ["keep *_hltScoutingMuonPackerVtx_*_*", "keep *_hltScoutingMuonPackerNoVtx_*_*"]
+    out_keep_hit  = ["keep *_hitMakerVtx_*_*", "keep *_hitMakerNoVtx_*_*"]
+else:
+    out_keep_muon = ["keep *_hltScoutingMuonPacker_*_*"]
+    out_keep_hit  = ["keep *_hitMaker_*_*"]
+
 process.out = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string('file:output.root'),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('skimpath'),
         ),
     outputCommands = cms.untracked.vstring(
-        "drop *",
-        "keep *_hltScoutingMuonPacker_*_*",
+        ["drop *"] + out_keep_muon + [
         "keep *_hltScoutingPFPacker_*_*",
         "keep *_hltScoutingPrimaryVertexPacker_*_*",
         "keep *_triggerMaker_*_*",
-        "keep *_hitMaker_*_*",
+        ] + out_keep_hit + [
         "keep *_beamSpotMaker_*_*",
         "keep *_genParticles_*_HLT",
-        ),
+        "keep *_addPileupInfo_*_*",
+        ]),
      basketSize = cms.untracked.int32(128*1024), # 128kb basket size instead of ~30kb default
 )
 
@@ -121,15 +132,24 @@ process.Timing = cms.Service("Timing",
         summaryOnly = cms.untracked.bool(True)
         )
 
-process.countmu = cms.EDFilter("ScoutingMuonCountFilter",
-    src = cms.InputTag("hltScoutingMuonPacker"),
-    minNumber = cms.uint32(2)
-)
-
-process.countvtx = cms.EDFilter("ScoutingVertexCountFilter",
-    src = cms.InputTag("hltScoutingMuonPacker","displacedVtx"),
-    minNumber = cms.uint32(1)
-)
+if '2024' in opts.era or '2025' in opts.era:
+    process.countmu = cms.EDFilter("ScoutingMuonCountFilter",
+        src = cms.InputTag("hltScoutingMuonPackerVtx"),
+        minNumber = cms.uint32(2)
+    )
+    process.countvtx = cms.EDFilter("ScoutingVertexCountFilter",
+        src = cms.InputTag("hltScoutingMuonPackerVtx","displacedVtx"),
+        minNumber = cms.uint32(1)
+    )
+else:
+    process.countmu = cms.EDFilter("ScoutingMuonCountFilter",
+        src = cms.InputTag("hltScoutingMuonPacker"),
+        minNumber = cms.uint32(2)
+    )
+    process.countvtx = cms.EDFilter("ScoutingVertexCountFilter",
+        src = cms.InputTag("hltScoutingMuonPacker","displacedVtx"),
+        minNumber = cms.uint32(1)
+    )
 
 # To recover trigger info: https://hlt-config-editor-confdbv3.app.cern.ch/ + https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVRun3Analysis + https://cmsoms.cern.ch/cms/triggers/report?cms_run=<run>
 L1Info  = []
@@ -172,6 +192,19 @@ if '2022' in opts.era or (opts.data and '2023B' in opts.era) or '2023C-triggerV1
             "L1_SingleEG34er2p5", "L1_SingleEG36er2p5", "L1_SingleEG38er2p5", "L1_SingleEG40er2p5", "L1_SingleJet160er2p5", "L1_SingleJet180", "L1_SingleJet200", "L1_SingleTau120er2p1", "L1_SingleTau130er2p1", "L1_SingleEG42er2p5", "L1_SingleEG45er2p5", "L1_SingleEG60"
         ]
         L1Info = list(set(L1Info))
+elif '2024' in opts.era or '2025' in opts.era:
+    # 2024+: unprescaled DoubleMuon (no PixelTracking in path name) + SingleMuon L1/HLT seeds
+    L1Info = [
+        "L1_DoubleMu_12_5","L1_DoubleMu_15_7",
+        "L1_DoubleMu4p5er2p0_SQ_OS_Mass_Min7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_7to18",
+        "L1_DoubleMu4_SQ_OS_dR_Max1p2","L1_DoubleMu4p5_SQ_OS_dR_Max1p2",
+        "L1_DoubleMu0er1p4_SQ_OS_dR_Max1p4","L1_DoubleMu0er1p5_SQ_OS_dR_Max1p4","L1_DoubleMu8_SQ",
+        "L1_SingleMu22","L1_SingleMu25",
+    ]
+    HLTInfo = [
+        [ 'Run3_DoubleMu_PFScouting', 'DST_PFScouting_DoubleMuon_v*' ],
+        [ 'Run3_SingleMu_PFScouting', 'DST_PFScouting_SingleMuon_v*' ],
+    ]
 else:
     # for run >=367621 (during era Run2023C)
     L1Info = ["L1_DoubleMu_12_5","L1_DoubleMu_15_7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_Min7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_7to18","L1_DoubleMu4_SQ_OS_dR_Max1p2","L1_DoubleMu4p5_SQ_OS_dR_Max1p2","L1_DoubleMu0er1p4_SQ_OS_dR_Max1p4","L1_DoubleMu0er1p5_SQ_OS_dR_Max1p4","L1_DoubleMu8_SQ"]
@@ -244,11 +277,23 @@ process.triggerMaker = cms.EDProducer("TriggerMaker",
         l1Seeds = cms.vstring(L1Info),
         )
 
-process.hitMaker = cms.EDProducer("HitMaker",
-        muonInputTag = cms.InputTag("hltScoutingMuonPacker"),
-        dvInputTag = cms.InputTag("hltScoutingMuonPacker:displacedVtx"),
-        measurementTrackerEventInputTag = cms.InputTag("MeasurementTrackerEvent"),
-        )
+if '2024' in opts.era or '2025' in opts.era:
+    process.hitMakerVtx = cms.EDProducer("HitMaker",
+            muonInputTag = cms.InputTag("hltScoutingMuonPackerVtx"),
+            dvInputTag = cms.InputTag("hltScoutingMuonPackerVtx:displacedVtx"),
+            measurementTrackerEventInputTag = cms.InputTag("MeasurementTrackerEvent"),
+            )
+    process.hitMakerNoVtx = cms.EDProducer("HitMaker",
+            muonInputTag = cms.InputTag("hltScoutingMuonPackerNoVtx"),
+            dvInputTag = cms.InputTag("hltScoutingMuonPackerNoVtx:displacedVtx"),
+            measurementTrackerEventInputTag = cms.InputTag("MeasurementTrackerEvent"),
+            )
+else:
+    process.hitMaker = cms.EDProducer("HitMaker",
+            muonInputTag = cms.InputTag("hltScoutingMuonPacker"),
+            dvInputTag = cms.InputTag("hltScoutingMuonPacker:displacedVtx"),
+            measurementTrackerEventInputTag = cms.InputTag("MeasurementTrackerEvent"),
+            )
 
 process.beamSpotMaker = cms.EDProducer("BeamSpotMaker")
 
@@ -268,6 +313,10 @@ process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
 #process.patTrigger.triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT")
 process.patTrigger.stageL1Trigger = cms.uint32(2)
 
-#hitMaker not needed (Mario)
-if (opts.data): process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
-else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+if '2024' in opts.era or '2025' in opts.era:
+    if (opts.data): process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+    else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+else:
+    #hitMaker not needed (Mario)
+    if (opts.data): process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+    else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)

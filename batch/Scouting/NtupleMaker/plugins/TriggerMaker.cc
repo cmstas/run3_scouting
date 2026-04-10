@@ -115,13 +115,13 @@ void TriggerMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
       for(unsigned int i = 0; i < nTriggers; ++i){
           const string& name = triggerNames_.triggerName(i);
           //should check this part further
-          if (name.find("DST_Run3_PFScoutingPixelTracking") != std::string::npos || name.find("DST_Run3_DoubleMu3_PFScoutingPixelTracking") != std::string::npos) {
+          if (name.find("DST_Run3_PFScoutingPixelTracking") != std::string::npos || name.find("DST_Run3_DoubleMu3_PFScoutingPixelTracking") != std::string::npos || name.find("DST_PFScouting_DoubleMuon") != std::string::npos) {
               itrig = i;
               break;
           }
       }
       if (itrig < 0) {
-          throw cms::Exception("TriggerMaker::produce: Couldn't find DST_Run3_PFScoutingPixelTracking or DST_Run3_DoubleMu3_PFScoutingPixelTracking in the list of triggers");
+          throw cms::Exception("TriggerMaker::produce: Couldn't find DST_Run3_PFScoutingPixelTracking or DST_Run3_DoubleMu3_PFScoutingPixelTracking or DST_PFScouting_DoubleMuon in the list of triggers");
       }
 
       pat::TriggerObjectStandAlone TO;

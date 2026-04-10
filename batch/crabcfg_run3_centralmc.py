@@ -50,8 +50,6 @@ if (len(sys.argv)>2):
     config.Data.unitsPerJob = int(10e4)
     config.Data.publication = False # By defailt but set to true below
     config.Site.storageSite = "T2_US_UCSD"
-    config.User.voGroup = 'cms'
-    config.User.voRole = 'NULL'
     if "HTo2ZdTo2mu2x" in sys.argv[2]:
         config.Data.outLFNDirBase = "/store/group/Run3Scouting/RAWScouting_HTo2ZdTo2mu2x_" + str(year) + "_v"+ntuple_version # DB no
         config.Data.inputDBS = 'global'
