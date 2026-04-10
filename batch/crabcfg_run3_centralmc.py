@@ -1,5 +1,5 @@
 from CRABClient.UserUtilities import config #, getUsernameFromSiteDB
-from CRABAPI.RawCommand import crabCommand
+from CRABAPI.RawCommand import crabCommand4
 from http.client import HTTPException
 from CRABClient.ClientExceptions import ClientException
 
@@ -295,18 +295,9 @@ if (len(sys.argv)>2):
 
             print(config)
             try:
-                crabCommand('submit', config = config, dryrun = True)
-            except HTTPException as hte:
-                print("HTTPException:")
-                print(hte.headers)
-            except ClientException as cle:
-                print("ClientException:")
-                print(cle)
-            except Exception as e:
-                print("Other Exception:")
-                print(e)
-            #except:
-            #    print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
+                crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+            except:
+                print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
     elif "ScenarioA" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
