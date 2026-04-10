@@ -73,16 +73,43 @@ if [ ${notar} -gt 0 ]
 then
    if [ ${year23} -gt 0 ]
    then
-      condor_submit condor/runScoutingHistos_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_dataOnly_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_testSignal_onCondor2023.sub
+      condor_submit condor/runScoutingHistos_DQCD_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_HTo2ZdTo2mu2x_reweighting_onCondor2023.sub
    else
-      condor_submit condor/runScoutingHistos_onCondor.sub
+      #condor_submit condor/runScoutingHistos_onCondor.sub
+      #condor_submit condor/runScoutingHistos_HTo2ZdTo2mu2x_reweighting_onCondor.sub
+      #condor_submit condor/runScoutingHistos_dataOnly_onCondor.sub
+      condor_submit condor/runScoutingHistos_DQCD_onCondor.sub
+      #condor_submit condor/runScoutingHistos_limited_onCondor.sub
+      #condor_submit condor/runScoutingHistos_testSignal_onCondor.sub
    fi
 else
    sh condor/create_package.sh
    if [ ${year23} -gt 0 ]
    then
-      condor_submit condor/runScoutingHistos_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_DQCD_onCondor2023.sub
+      condor_submit condor/runScoutingHistos_BToPhi_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_BToPhi_reweighting_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_DQCD_reweighting_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_dataOnly_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_testSignal_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_DQCD_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_HTo2ZdTo2mu2x_reweighting1000mm_onCondor2023.sub
+      #condor_submit condor/runScoutingHistos_HTo2ZdTo2mu2x_reweighting_onCondor2023.sub
    else
-      condor_submit condor/runScoutingHistos_onCondor.sub
+      #condor_submit condor/runScoutingHistos_onCondor.sub
+      #condor_submit condor/runScoutingHistos_DQCD_reweighting_onCondor.sub
+      #condor_submit condor/runScoutingHistos_HTo2ZdTo2mu2x_reweighting1000mm_onCondor.sub
+      #condor_submit condor/runScoutingHistos_HTo2ZdTo2mu2x_reweighting_onCondor.sub
+      #condor_submit condor/runScoutingHistos_DQCD_onCondor.sub
+      condor_submit condor/runScoutingHistos_BToPhi_onCondor.sub
+      #condor_submit condor/runScoutingHistos_BToPhi_reweighting_onCondor.sub
+      #condor_submit condor/runScoutingHistos_dataOnly_onCondor.sub
+      #condor_submit condor/runScoutingHistos_limited_onCondor.sub
+      #condor_submit condor/runScoutingHistos_testSignal_onCondor.sub
    fi
 fi

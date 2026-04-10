@@ -197,7 +197,7 @@ thisDir = os.environ.get("PWD")
 useCategorizedSignal = True
 useCategorizedBackground = True
 useSignalMC = True
-doSystVariations = True
+doSystVariations = False
 sigModel = "HTo2ZdTo2mu2x" # HTo2ZdTo2mu2x  ScenarioB1
 
 outDir = ("%s/plotsSRs_"%(thisDir))+today
@@ -254,18 +254,19 @@ dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
 
 years = []
 years.append("2022")
-#years.append("2023")
+years.append("2023")
 
 ROOT.gStyle.SetOptStat(0)
 
 
-NORMCONST = 1.0 # Assuming a cross section of 1 pb
+NORMCONST = 0.01 # Assuming a cross section of 1 pb
 
 # Load signals
 if useSignalMC:
     if sigModel=="HTo2ZdTo2mu2x":
-        sigMasses = [0.5, 0.7, 1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
-        sigCTaus = [1, 10, 100, 1000]
+        #sigMasses = [1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
+        sigMasses = [2.0]
+        sigCTaus = [0.63, 1.00, 1.60]
     elif sigModel=="ScenarioB1":
         sigMasses = [1.33]
         sigCTaus = [0.1, 1, 10, 100]
@@ -273,7 +274,8 @@ if useSignalMC:
 
 ## Loop to make the plots
 for y in years:
-    inDir  = "%s/fitResults_%s/"%(thisDir, y)
+    #inDir  = "%s/fitResults_%s_MCSignal/"%(thisDir, y)
+    inDir  = "%s/fitResults_%s_HTo2ZdTo2mu2_vsCTau_100bins"%(thisDir, y)
     # Normalization:
     values_norm_trg = {} # mass, ctau, dname
     values_norm_sel = {} # mass, ctau, dname
@@ -315,7 +317,7 @@ for y in years:
                  continue
             sigTag = ""
             if (sigModel=="HTo2ZdTo2mu2x"):
-                sigTag = "Signal_HTo2ZdTo2mu2x_MZd-%s_ctau-%imm"%(str(m).replace('.','p'), t)
+                sigTag = "Signal_HTo2ZdTo2mu2x_MZd-%s_ctau-%.2fmm"%(str(m).replace('.','p'), t)
                 legLabels.append(r"$h\rightarrow Z_{D}Z_{D}$, $m_{Z_D} = $%s GeV, $c\tau =$ %s mm"%(str(m), str(t)))
             elif (sigModel=="ScenarioB1"):
                 sigTag = "Signal_ScenarioB1_mpi-4_mA-%s_ctau-%smm"%(str(m).replace(".", "p"),str(t).replace('.','p'))

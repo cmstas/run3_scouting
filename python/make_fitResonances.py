@@ -209,7 +209,8 @@ def fitDataset(name, dataset, mass, fit_range=(2.6, 3.6), outDir="output", year=
                 residuals.append(0.0)
         #
         plt.style.use(hep.style.CMS)
-        fig, (ax, ax_residuals) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1], 'hspace': 0.05}, sharex=True, figsize=(10, 10))
+        #fig, (ax, ax_residuals) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1], 'hspace': 0.05}, sharex=True, figsize=(10, 10))
+        fig, ax = plt.subplots(1, 1, figsize=(10, 7.5))
         # Main plot
         ax.set_ylabel(r'Events / 0.01 GeV', fontsize=24)
         ax.set_xlabel('')
@@ -246,17 +247,17 @@ def fitDataset(name, dataset, mass, fit_range=(2.6, 3.6), outDir="output", year=
             ax.text(0.05, 0.74, r'$l_{xy} \in [11.0, 70.0]$ cm', fontsize=18, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
         ax.legend(loc='upper left', fontsize = 18, frameon = True, ncol=1)
         # Residual subplot
-        ax_residuals.stairs(np.array(residuals), bins, color="red", alpha=0.3)
-        ax_residuals.fill_between(bins[:-1], residuals, 0, color="red", alpha=0.3, step="post")
-        ax_residuals.set_ylabel(r"$\mathrm{\frac{Data - Fit_{Bkg}}{\sigma_{Data}}}$")
-        ax_residuals.set_xlabel("Dimuon Mass [GeV]")
+        #ax_residuals.stairs(np.array(residuals), bins, color="red", alpha=0.3)
+        #ax_residuals.fill_between(bins[:-1], residuals, 0, color="red", alpha=0.3, step="post")
+        #ax_residuals.set_ylabel(r"$\mathrm{\frac{Data - Fit_{Bkg}}{\sigma_{Data}}}$")
+        #ax_residuals.set_xlabel("Dimuon Mass [GeV]")
         fig.savefig('%s/%s_%s_fit.png'%(outDir,name,pdf), dpi=140) 
 
 if __name__=="__main__":
 
     # Year
-    year = 2023
-    lumi = 35 if year==2022 else 27
+    year = 2022
+    lumi = 27 if year==2022 else 35
     # Inclusive regions for fitting
     sdNames = {}
     
@@ -297,7 +298,9 @@ if __name__=="__main__":
     #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Sep-25-2024_RooDatasets_unblind"
     #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Oct-30-2024_2022_unblind_noMuonIPSel"
     #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Oct-30-2024_unblind_allCuts"
-    inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Nov-11-2024_MinBias_fixed_noIP"
+    inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Dec-03-2024_2022_complete"
+    #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Dec-03-2024_2023_complete"
+    #inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Nov-11-2024_MinBias_fixed_noIP"
     files = os.listdir(inDir)
     #
     eras = []
@@ -310,7 +313,7 @@ if __name__=="__main__":
     elif year==2023:
         eras.append("DataC")
         eras.append("DataD")
-    eras = ["DileptonMinBias"] # Remove if you want to run on Data
+    #eras = ["DileptonMinBias"] # Remove if you want to run on Data
 
     #
     today = date.today().strftime("%b-%d-%Y")

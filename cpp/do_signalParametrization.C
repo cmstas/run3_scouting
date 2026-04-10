@@ -7,14 +7,16 @@
   bool mergeEras = true;
   bool writeWS = false;
   bool mergeLifetimes = true;
-  TString model = "HTo2ZdTo2mu2x";
+  TString model = "BToPhi";
   
   // Dir with the RooDataSets
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Apr-03-2024_onlySignal";
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Mar-26-2024_allCuts";
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jun-14-2024_SRsOnly_2022";
   //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Jul-10-2024_2022_allCuts_full";
-  TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Sep-25-2024_RooDatasets_unblind";
+  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Sep-25-2024_RooDatasets_unblind";
+  //TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Dec-03-2024_2022_complete";
+  TString inDir = "/ceph/cms/store/user/fernance/Run3ScoutingOutput/outputHistograms_Oct-01-2025_allEras_BToPhiAnalysis_RooOnly";
 
   // Names of the search regions we want to parametrize
   vector<TString> dNames = { };
@@ -56,12 +58,22 @@
            selectedPoint.push_back(true);
       }
     }
+  } else if ( model=="BToPhi" ) {
+    //sigMass = {0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.25, 1.5, 2.0, 2.85, 3.35, 4.0, 5.0};
+    sigMass = {0.25, 0.3, 0.4, 0.6, 0.7, 0.9, 1.25, 1.5, 2.85, 3.35, 4.00, 5.00};
+    sigCtau = {0.0, 0.1, 1, 10, 100};
+    sigTemplate = "Signal_BToPhi_MPhi-%s_ctau-%smm";
+    for (unsigned int t=0; t<sigCtau.size(); t++) {
+      for (unsigned int m=0; m<sigMass.size(); m++) {
+        selectedPoint.push_back(true);
+      }
+    }
   }
 
   // Loop over signals 
   for ( unsigned int d=0; d<dNames.size(); d++ ) {
     vector<vector<RooDataSet>> mmumu_sigs {{}};
-    TString outfile = Form("utils/signalFitParameters_%s.root", dNames[d].Data());
+    TString outfile = Form("utils/signalFitParameters_%s_%s.root", dNames[d].Data(), model.Data());
     std::cout << outfile << std::endl;
     TFile *finit = new TFile(outfile.Data(), "RECREATE");
     finit->Close();
@@ -74,17 +86,18 @@
             vector<RooDataSet> tds_aux{};
             mmumu_sigs.push_back( tds_aux );
           }
-          TString massString = Form("%.1f",sigMass[m]);
+          TString massString = Form("%.2f",sigMass[m]); // Check the precision for each model
           massString.ReplaceAll(".", "p");
           std::cout << "For mass: " <<  massString << std::endl;
           for (unsigned int t=0; t<sigCtau.size(); t++) {
             unsigned int isample = t*sigMass.size() + m;
             if (!selectedPoint[isample])
               continue;
-            TString ctauString = Form("%.0f",sigCtau[t]);
+            TString ctauString = Form("%.2f",sigCtau[t]);
             std::cout << "For ctau: " << ctauString << std::endl;
             TString sample = Form(sigTemplate.Data(), massString.Data(),ctauString.Data());
             TString inFile = Form("%s/histograms_%s_%s_%s_0.root",inDir.Data(),sample.Data(),era.Data(),year.Data());
+            std::cout << inFile << std::endl;
             TFile fin(inFile);
             if (t==0) {
               RooDataSet *tds = (RooDataSet*) fin.Get(dNames[d])->Clone();
@@ -150,15 +163,16 @@
        gaL->SetName("gaL_"+dNames[d]);
        gaR->SetName("gaR_"+dNames[d]);
        gmean->SetName("gmean_"+dNames[d]);
-       gmean->SetName("gmcfrac_"+dNames[d]);
+       gmcfrac->SetName("gmcfrac_"+dNames[d]);
 
        for (unsigned int m=0; m<sigMass.size(); m++) {
-
+         std::cout << "Loop mass: " << sigMass.at(m) << std::endl;
          // Create worksapce, import data and model
          std::cout << "Creating container workspace" << std::endl;
          RooWorkspace wfit("wfit","workspace"); 
          int idx = 0;
          for (unsigned int iera=0; iera<eras.size(); iera++ ) {
+            std::cout << "Era: " << iera << std::endl;
            if (iera==0) {
              mmumu_sig_merged.push_back(mmumu_sigs[m][iera]);
            } else {
@@ -168,7 +182,7 @@
            cout << iera << " ...filling...  "<< mmumu_sigs[m][iera].GetName() << endl;
          }  
 
-         TString massString = Form("%.1f",sigMass[m]);
+         TString massString = Form("%.2f",sigMass[m]);
          TString sample = Form(sigTemplate.Data(), massString.Data(),ctau_label.Data());
          mmumu_sig_merged[idx].SetName(dNames[d]+"_"+sample.Data()+"_allEras");
          cout << "Merged dataset for signal " << sample.Data() << " with entries " << mmumu_sig_merged[idx].sumEntries() << endl;
@@ -185,6 +199,7 @@
          wfit.Print();
 
          // Get the values
+         std::cout << "Building splines..." << std::endl;
          RooRealVar *sigma;
          RooRealVar *nL;
          RooRealVar *nR;

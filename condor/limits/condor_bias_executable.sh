@@ -62,6 +62,9 @@ cmssw-el8
 tar xvf package.tar.gz
 cd ScoutingRun3/
 
+echo "Inside ScoutingRun3/"
+ls ./
+
 cmsrel CMSSW_13_3_0
 cp -r HiggsAnalysis CMSSW_13_3_0/src
 cd CMSSW_13_3_0/src

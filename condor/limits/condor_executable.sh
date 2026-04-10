@@ -7,6 +7,7 @@ OUT=$2
 SIG=$3 # HTo2ZdTo2mu2x
 LIM=$4 # asymptotic, toysObs, toysExp, toysEm2, toysEm1, toysEp1, toysEp2, sigExp, sigObs
 PERIOD=$5 # Year
+LABEL=$(basename $OUT)
 
 MASS=2.0
 CTAU=1
@@ -58,7 +59,7 @@ function stageout {
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmssw-el8
-tar xvf package.tar.gz
+tar xvf package_${LABEL}.tar.gz
 cd ScoutingRun3/
 
 cmsrel CMSSW_13_3_0

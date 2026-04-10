@@ -45,8 +45,8 @@ if not os.path.exists(outDir):
     os.makedirs(outDir)
 
 dNames = []
-#dNames.append("d_FourMu_sep")
-#dNames.append("d_FourMu_osv")
+dNames.append("d_FourMu_sep")
+dNames.append("d_FourMu_osv")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_ptlow")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_pthigh")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso1_ptlow")
@@ -92,12 +92,12 @@ years = []
 years.append(year)
 
 # Signals
-model = "BToPhi" # HTo2ZdTo2mu2x
+model = "HTo2ZdTo2mu2x" # HTo2ZdTo2mu2x
 
 sigMasses = []
 if useSignalMC:
     if (model=="HTo2ZdTo2mu2x"):
-        sigMasses = [0.5, 0.7, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
+        sigMasses = [1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
         sigCtau = [1, 10, 100]
     elif (model=="ScenarioB1"):
         sigMasses = [1.33]
@@ -205,8 +205,9 @@ for y in years:
             for d_,d in enumerate(dNames):
                 if (model=="HTo2ZdTo2mu2x"):
                     if useSignalMC:
-                        sample = "Signal_HTo2ZdTo2mu2x_MZd-%.3f_ctau-%.1fmm" % (float(m), float(t))
+                        #sample = "Signal_HTo2ZdTo2mu2x_MZd-%.3f_ctau-%.1fmm" % (float(m), float(t))
                         #sample = "Signal_HTo2ZdTo2mu2x_MZd-%s_ctau-%imm"%(m.replace(".", "p"),t)
+                        sample = "Signal_HTo2ZdTo2mu2x_MZd-%s_ctau-%.2fmm"%(m.replace(".", "p"),t)
                     else:
                         sample = "Signal_HTo2ZdTo2mu2x_MZd-%.3f_ctau-%.1fmm"%(float(mf),float(t))
                 elif (model=="BToPhi"):

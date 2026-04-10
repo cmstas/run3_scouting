@@ -5,8 +5,10 @@ from datetime import date
 
 ### Initial setup 
 mphi_grid = [0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.25, 1.5, 2.0, 2.85, 3.35, 4.0, 5.0]
-ctau_grid = [0.0, 0.1, 1, 10, 100]
+ctau_grid = [0.1, 1.0, 10.0, 100.0]
 
+#fragmentTEMPLATE = 'fragment-templates/BToPhi_MPhi-MPHI_ctau-CTAUmm_TuneCP5_13p6TeV-pythia8_noFilter_cfi.py' # should be common for both
+#fragmentNAME = 'BToPhi_MPhi-{MPHI}_ctau-{CTAU}mm_TuneCP5_13p6TeV-pythia8_noFilter_cfi.py'
 fragmentTEMPLATE = 'fragment-templates/BToPhi_MPhi-MPHI_ctau-CTAUmm_TuneCP5_13p6TeV-pythia8_cfi.py' # should be common for both
 fragmentNAME = 'BToPhi_MPhi-{MPHI}_ctau-{CTAU}mm_TuneCP5_13p6TeV-pythia8_cfi.py'
 

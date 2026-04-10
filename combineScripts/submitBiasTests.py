@@ -39,8 +39,8 @@ inDir  = "%s/%s"%(thisDir,inDir)
 biasCombination = True
 biasPerChannel = False
 biasPerPDF = False
-nToysPerChannel = 500
-nToysPerCombination = 500
+nToysPerChannel = 300
+nToysPerCombination = 300
 biasSummary = False
 checkIndividualPDFs = False
 plotEnvelope = False
@@ -121,19 +121,19 @@ dNames.append("d_Dimuon_lxy16p0to70p0_iso0_ptlow")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso0_pthigh")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso1_ptlow")
 dNames.append("d_Dimuon_lxy16p0to70p0_iso1_pthigh")
-dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
-dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
-dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
-dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
-dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
-dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
-dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
-dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
+#dNames.append("d_Dimuon_lxy0p0to0p2_non-pointing")
+#dNames.append("d_Dimuon_lxy0p2to1p0_non-pointing")
+#dNames.append("d_Dimuon_lxy1p0to2p4_non-pointing")
+#dNames.append("d_Dimuon_lxy2p4to3p1_non-pointing")
+#dNames.append("d_Dimuon_lxy3p1to7p0_non-pointing")
+#dNames.append("d_Dimuon_lxy7p0to11p0_non-pointing")
+#dNames.append("d_Dimuon_lxy11p0to16p0_non-pointing")
+#dNames.append("d_Dimuon_lxy16p0to70p0_non-pointing")
 
 
 years = []
 ###
-years.append("2022")
+years.append("2023")
 
 # Signals
 sigModels = []
@@ -196,7 +196,7 @@ for y in years:
                 # Define model identifier
                 modelTag = ""
                 if s=="HTo2ZdTo2mu2x":
-                    modelTag = "Signal_HTo2ZdTo2mu2x_MZd-%.3f_ctau-%imm"%(m, t)
+                    modelTag = "Signal_HTo2ZdTo2mu2x_MZd-%.3f_ctau-%.2fmm"%(m, t)
                 ### Add more models when ready
                 combinedCards = ""
                 # Loop over card channels:
@@ -301,7 +301,7 @@ for y in years:
                     if useCategorizedBackground:
                         catExtB = "_ch%d_%s"%(binidx,y)
                     # Open input file with workspace
-                    card = "%s/card_ch%d_%s_M%.3f_ctau%i_%s.root"%(inDir,binidx,s,m,t,y)
+                    card = "%s/card_ch%d_%s_M%.3f_ctau%.2f_%s.root"%(inDir,binidx,s,m,t,y)
                     print("> Reading card: %s"%(card))
                     f = ROOT.TFile(card)
                     print("> Opened file: %s"%(card))

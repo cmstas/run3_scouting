@@ -1,0 +1,38 @@
+executable      = $ENV(STARTDIR)/python/B-norm/executable.sh
+output          = $ENV(STARTDIR)/python/B-norm/logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(STARTDIR)/python/B-norm/logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(STARTDIR)/python/B-norm/logs/job.$(ClusterId).$(ProcId).log
+
+getenv = True
++JobFlavour = "workday"
++DESIRED_Sites = "T2_US_UCSD"
+transfer_input_files = $ENV(STARTDIR)/package_b.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy=$ENV(X509_USER_PROXY)
+use_x509userproxy = True
+
+# Comment out any of the following configurations
+queue arguments from (
+#0 5 $ENV(MASS) output
+0 50 $ENV(MASS) output
+50 100 $ENV(MASS) output
+100 150 $ENV(MASS) output
+150 200 $ENV(MASS) output
+200 250 $ENV(MASS) output
+250 300 $ENV(MASS) output
+300 350 $ENV(MASS) output
+350 400 $ENV(MASS) output
+400 450 $ENV(MASS) output
+450 500 $ENV(MASS) output
+500 550 $ENV(MASS) output
+550 600 $ENV(MASS) output
+600 650 $ENV(MASS) output
+650 700 $ENV(MASS) output
+700 750 $ENV(MASS) output
+750 800 $ENV(MASS) output
+800 850 $ENV(MASS) output
+850 900 $ENV(MASS) output
+900 950 $ENV(MASS) output
+950 1000 $ENV(MASS) output
+)

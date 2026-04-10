@@ -10,3 +10,8 @@ rootDict.cc
 *plotting_logs*
 *_logs*
 *.swp
+*.png
+*.pdf
+outputHistograms_*
+plotsAcceptance_*
+plotsBias_*

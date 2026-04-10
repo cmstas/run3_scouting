@@ -80,6 +80,7 @@ else:
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(True),
     fileNames = cms.untracked.vstring(),
+    bypassVersionCheck = cms.untracked.bool(True),
     inputCommands = cms.untracked.vstring(
         'keep *',
         'drop *_hltScoutingTrackPacker_*_*',
@@ -107,6 +108,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         "keep *_hitMaker_*_*",
         "keep *_beamSpotMaker_*_*",
         "keep *_genParticles_*_HLT",
+        "keep *_addPileupInfo_*_*",
         ),
      basketSize = cms.untracked.int32(128*1024), # 128kb basket size instead of ~30kb default
 )

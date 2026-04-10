@@ -40,5 +40,7 @@ for FILE in Configuration/GenProduction/python/*.py; do
     CFG="$prefix$suffix";
     ROOT="file:$prefix.root"
     cmsDriver.py $FILE --python_filename $CFG --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --fileout file:output_gensim.root --conditions 124X_mcRun3_2022_realistic_postEE_v1 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --no_exec --mc -n $EVENTS;
+    echo $PWD
+    echo $CFG
     mv $CFG $CFGPATH;
 done

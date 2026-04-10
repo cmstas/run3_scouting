@@ -1,6 +1,7 @@
 import os
 import sys
 from utils import *
+import argparse
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--model", default="mass_epsilon_gamma_ctau.txt", help="Table with the model")

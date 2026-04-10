@@ -86,8 +86,8 @@ luminosity2022F = 18.006671456
 luminosity2022G = 3.108858306
 luminosity2023 = 27.208114203999997
 luminosity2023B = 0.622430830
-luminosity2023C = 5.557004785
-luminosity2023C_triggerV10 = 11.503479528
+luminosity2023C_triggerV10 = 5.557004785 # Trigger old
+luminosity2023C = 11.503479528 # Trigger new
 luminosity2023D = 9.525199061
 if float(args.lumi) > 0.00001:
     luminosity = float(args.lumi)
@@ -233,6 +233,7 @@ if not isMultiDir:
                 os.system('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_*_*.root")')
         else:
             if not os.path.isfile("%s/%s_%s_%s_all.root"%(indir,hname,s,inyears[i])):
+                print('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_'+inyears[i]+'*.root")')
                 os.system('hadd '+indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root $(find '+indir+' -name "'+hname+'_'+s+'*_'+inyears[i]+'*.root")')
         infiles.append(indir+'/'+hname+'_'+s+'_'+inyears[i]+'_all.root')
 else:

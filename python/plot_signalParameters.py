@@ -112,7 +112,12 @@ def getLegend(ch,gd,p,hp,hs,smodel,smass,sigsf=-1.0,plotSignal=True,plotData=Tru
 
 ROOT.gStyle.SetOptStat(0)
 
-f = ROOT.TFile.Open("utils/signalFitParameters_lxybins_2022_new.root")
+model = "BToPhi" # HTo2ZdTo2mu2x
+
+if model=="HTo2ZdTo2mu2x":
+    f = ROOT.TFile.Open("utils/signalFitParameters_HTo2ZdTo2mu2x_lxybins_2022.root")
+elif model=="BToPhi":
+    f = ROOT.TFile.Open("utils/signalFitParameters_BToPhi_lxybins_2022.root")
 
 params = []
 params.append(['gsigma', 'splines', r'width $\sigma$'])
@@ -121,6 +126,7 @@ params.append(['gnL', 'splinenL', r'$n_{L}$'])
 params.append(['gnR', 'splinenR', r'$n_{R}$'])
 params.append(['gaL', 'splineaL', r'$a_{L}$'])
 params.append(['gaR', 'splineaR', r'$a_{R}$'])
+params.append(['gmcfrac', 'splinef', 'Fraction Gauss to DCB'])
 
 colors = ['#3f90da', '#ffa90e', '#bd1f01', '#94a4a2', '#832db6', '#a96b59', '#e76300', '#b9ac70', '#717581', '#92dadd']
 isRelative = True
@@ -185,7 +191,12 @@ for p,par in enumerate(params):
     else:
         ax.set_ylabel(par[2], fontsize=20)
     ax.set_xscale('log')
-    ax.set_xlim(0.5, 50.0)
+    if model=="HTo2ZdTo2mu2x":
+        ax.set_xlim(0.5, 50.0)
+    if model=="BToPhi":
+        ax.set_xlim(0.25, 5.0)
+        ax.set_xticks([0.25, 0.4, 0.6, 1, 3, 10])
+        ax.set_xticklabels(["0.25", "0.4", "0.6", "1", "3", "10"])
     if isRelative:
         ax.set_ylim(0.1*min(relpoints), 1.1*max(relpoints))
     else:
@@ -198,9 +209,9 @@ for p,par in enumerate(params):
         ax.text(0.6, 2.1*max(relpoints), r'$h\rightarrow Z_{D}Z_{D}$, $Z_{D}\rightarrow\mu\mu$ (c$\tau$ = 1, 10, 100, 1000 mm)', fontsize=13)
 
     if isRelative:
-        fig.savefig('rel_%s.png'%(par[0]), dpi=140)
+        fig.savefig('%s/rel_%s.png'%(outDir,par[0]), dpi=140)
     else:
-        fig.savefig('%s.png'%(par[0]), dpi=140)
+        fig.savefig('%s/%s.png'%(outDir,par[0]), dpi=140)
 
 
 

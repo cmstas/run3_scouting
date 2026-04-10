@@ -1,0 +1,40 @@
+
+executable      = $ENV(HOMEDIR)/condor/fitting/condor_executable.sh
+output          = $ENV(HOMEDIR)/condor/fitting/fitting_logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(HOMEDIR)/condor/fitting/fitting_logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(HOMEDIR)/condor/fitting/fitting_logs/job.$(ClusterId).$(ProcId).log
+
+getenv = True
++JobFlavour = "workday"
++DESIRED_Sites = "T2_US_UCSD"
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64"
+transfer_input_files = $ENV(HOMEDIR)/package.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy=$ENV(X509_USER_PROXY)
+use_x509userproxy = True
+
+# Comment out any of the following configurations
+queue arguments from (
+##
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 0.500
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 0.700 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 1.500 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 2.000 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 2.500 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 5.000 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 6.000 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 7.000 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 8.000 
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 14.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 16.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 20.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 22.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 24.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 30.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 34.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 40.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 44.000
+$ENV(SCOUTINGSNTOUTPUTDIR) HTo2ZdTo2mu2x $ENV(PERIOD) 50.000
+##
+)

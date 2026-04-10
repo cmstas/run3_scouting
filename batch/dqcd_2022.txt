@@ -1,0 +1,336 @@
+﻿Datasets 2022preEE
+
+
+"scenarioA_mpi_10_mA_1p00_ctau_0p1": "/scenarioA_mpi_10_mA_1p00_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_1p00_ctau_10": "/scenarioA_mpi_10_mA_1p00_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_1p00_ctau_100": "/scenarioA_mpi_10_mA_1p00_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_1p00_ctau_1p0": "/scenarioA_mpi_10_mA_1p00_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_3p33_ctau_0p1": "/scenarioA_mpi_10_mA_3p33_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_3p33_ctau_10": "/scenarioA_mpi_10_mA_3p33_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_3p33_ctau_100": "/scenarioA_mpi_10_mA_3p33_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_3p33_ctau_1p0": "/scenarioA_mpi_10_mA_3p33_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p33_ctau_0p1": "/scenarioA_mpi_1_mA_0p33_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p33_ctau_10": "/scenarioA_mpi_1_mA_0p33_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p33_ctau_100": "/scenarioA_mpi_1_mA_0p33_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p33_ctau_1p0": "/scenarioA_mpi_1_mA_0p33_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p67_ctau_0p1": "/scenarioA_mpi_2_mA_0p67_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",   DONE
+"scenarioA_mpi_2_mA_0p67_ctau_10": "/scenarioA_mpi_2_mA_0p67_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p67_ctau_100": "/scenarioA_mpi_2_mA_0p67_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p67_ctau_1p0": "/scenarioA_mpi_2_mA_0p67_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p40_ctau_0p1": "/scenarioA_mpi_4_mA_0p40_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p40_ctau_10": "/scenarioA_mpi_4_mA_0p40_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p40_ctau_100": "/scenarioA_mpi_4_mA_0p40_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p40_ctau_1p0": "/scenarioA_mpi_4_mA_0p40_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_1p33_ctau_0p1": "/scenarioA_mpi_4_mA_1p33_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_1p33_ctau_10": "/scenarioA_mpi_4_mA_1p33_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_1p33_ctau_100": "/scenarioA_mpi_4_mA_1p33_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_1p33_ctau_1p0": "/scenarioA_mpi_4_mA_1p33_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioB1_mpi_1_mA_0p33_ctau_0p1": "/scenarioB1_mpi_1_mA_0p33_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_1_mA_0p33_ctau_10": "/scenarioB1_mpi_1_mA_0p33_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_1_mA_0p33_ctau_100": "/scenarioB1_mpi_1_mA_0p33_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioB1_mpi_1_mA_0p33_ctau_1p0": "/scenarioB1_mpi_1_mA_0p33_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p40_ctau_0p1": "/scenarioB1_mpi_2_mA_0p40_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p40_ctau_10": "/scenarioB1_mpi_2_mA_0p40_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p40_ctau_100": "/scenarioB1_mpi_2_mA_0p40_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioB1_mpi_2_mA_0p40_ctau_1p0": "/scenarioB1_mpi_2_mA_0p40_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p67_ctau_0p1": "/scenarioB1_mpi_2_mA_0p67_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p67_ctau_10": "/scenarioB1_mpi_2_mA_0p67_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p67_ctau_100": "/scenarioB1_mpi_2_mA_0p67_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p67_ctau_1p0": "/scenarioB1_mpi_2_mA_0p67_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p80_ctau_0p1": "/scenarioB1_mpi_4_mA_0p80_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p80_ctau_10": "/scenarioB1_mpi_4_mA_0p80_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p80_ctau_100": "/scenarioB1_mpi_4_mA_0p80_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p80_ctau_1p0": "/scenarioB1_mpi_4_mA_0p80_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p33_ctau_0p1": "/scenarioB1_mpi_4_mA_1p33_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p33_ctau_10": "/scenarioB1_mpi_4_mA_1p33_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p33_ctau_100": "/scenarioB1_mpi_4_mA_1p33_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p33_ctau_1p0": "/scenarioB1_mpi_4_mA_1p33_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_1_mA_0p60_ctau_0p1": "/scenarioB2_mpi_1_mA_0p60_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_1_mA_0p60_ctau_10": "/scenarioB2_mpi_1_mA_0p60_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_1_mA_0p60_ctau_100": "/scenarioB2_mpi_1_mA_0p60_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_1_mA_0p60_ctau_1p0": "/scenarioB2_mpi_1_mA_0p60_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_2_mA_1p10_ctau_0p1": "/scenarioB2_mpi_2_mA_1p10_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_2_mA_1p10_ctau_10": "/scenarioB2_mpi_2_mA_1p10_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_2_mA_1p10_ctau_100": "/scenarioB2_mpi_2_mA_1p10_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_2_mA_1p10_ctau_1p0": "/scenarioB2_mpi_2_mA_1p10_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_4_mA_2p10_ctau_0p1": "/scenarioB2_mpi_4_mA_2p10_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_4_mA_2p10_ctau_10": "/scenarioB2_mpi_4_mA_2p10_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_4_mA_2p10_ctau_100": "/scenarioB2_mpi_4_mA_2p10_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_4_mA_2p10_ctau_1p0": "/scenarioB2_mpi_4_mA_2p10_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_2p00_ctau_0p1": "/scenarioA_mpi_10_mA_2p00_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_2p00_ctau_100": "/scenarioA_mpi_10_mA_2p00_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_2p00_ctau_10": "/scenarioA_mpi_10_mA_2p00_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_2p00_ctau_1p0": "/scenarioA_mpi_10_mA_2p00_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_4p90_ctau_0p1": "/scenarioA_mpi_10_mA_4p90_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_4p90_ctau_100": "/scenarioA_mpi_10_mA_4p90_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_4p90_ctau_10": "/scenarioA_mpi_10_mA_4p90_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_10_mA_4p90_ctau_1p0": "/scenarioA_mpi_10_mA_4p90_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p25_ctau_0p1": "/scenarioA_mpi_1_mA_0p25_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p25_ctau_100": "/scenarioA_mpi_1_mA_0p25_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p25_ctau_10": "/scenarioA_mpi_1_mA_0p25_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p25_ctau_1p0": "/scenarioA_mpi_1_mA_0p25_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p45_ctau_0p1": "/scenarioA_mpi_1_mA_0p45_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p45_ctau_100": "/scenarioA_mpi_1_mA_0p45_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p45_ctau_0p1": "/scenarioA_mpi_1_mA_0p45_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_1_mA_0p45_ctau_1p0": "/scenarioA_mpi_1_mA_0p45_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p25_ctau_0p1": "/scenarioA_mpi_2_mA_0p25_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p25_ctau_100": "/scenarioA_mpi_2_mA_0p25_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p25_ctau_10": "/scenarioA_mpi_2_mA_0p25_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p25_ctau_1p0": "/scenarioA_mpi_2_mA_0p25_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p40_ctau_0p1": "/scenarioA_mpi_2_mA_0p40_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p40_ctau_100": "/scenarioA_mpi_2_mA_0p40_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p40_ctau_10": "/scenarioA_mpi_2_mA_0p40_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p40_ctau_1p0": "/scenarioA_mpi_2_mA_0p40_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p50_ctau_0p1": "/scenarioA_mpi_2_mA_0p50_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p50_ctau_100": "/scenarioA_mpi_2_mA_0p50_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p50_ctau_10": "/scenarioA_mpi_2_mA_0p50_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p50_ctau_1p0": "/scenarioA_mpi_2_mA_0p50_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p90_ctau_0p1": "/scenarioA_mpi_2_mA_0p90_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",   DONE
+"scenarioA_mpi_2_mA_0p90_ctau_100": "/scenarioA_mpi_2_mA_0p90_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_2_mA_0p90_ctau_10": "/scenarioA_mpi_2_mA_0p90_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_2_mA_0p90_ctau_1p0": "/scenarioA_mpi_2_mA_0p90_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p25_ctau_0p1": "/scenarioA_mpi_4_mA_0p25_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p25_ctau_100": "/scenarioA_mpi_4_mA_0p25_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p25_ctau_10": "/scenarioA_mpi_4_mA_0p25_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p25_ctau_1p0": "/scenarioA_mpi_4_mA_0p25_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_4_mA_0p80_ctau_0p1": "/scenarioA_mpi_4_mA_0p80_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_0p80_ctau_100": "/scenarioA_mpi_4_mA_0p80_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE 
+"scenarioA_mpi_4_mA_0p80_ctau_10": "/scenarioA_mpi_4_mA_0p80_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_4_mA_0p80_ctau_1p0": "/scenarioA_mpi_4_mA_0p80_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_4_mA_1p90_ctau_0p1": "/scenarioA_mpi_4_mA_1p90_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",   DONE
+"scenarioA_mpi_4_mA_1p90_ctau_100": "/scenarioA_mpi_4_mA_1p90_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_4_mA_1p90_ctau_10": "/scenarioA_mpi_4_mA_1p90_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_4_mA_1p90_ctau_1p0": "/scenarioA_mpi_4_mA_1p90_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_0p50_ctau_0p1": "/scenarioA_mpi_5_mA_0p50_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_5_mA_0p50_ctau_100": "/scenarioA_mpi_5_mA_0p50_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_0p50_ctau_10": "/scenarioA_mpi_5_mA_0p50_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_0p50_ctau_1p0": "/scenarioA_mpi_5_mA_0p50_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p00_ctau_0p1": "/scenarioA_mpi_5_mA_1p00_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p00_ctau_100": "/scenarioA_mpi_5_mA_1p00_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p00_ctau_10": "/scenarioA_mpi_5_mA_1p00_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p00_ctau_1p0": "/scenarioA_mpi_5_mA_1p00_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p67_ctau_0p1": "/scenarioA_mpi_5_mA_1p67_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p67_ctau_100": "/scenarioA_mpi_5_mA_1p67_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p67_ctau_10": "/scenarioA_mpi_5_mA_1p67_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_1p67_ctau_1p0": "/scenarioA_mpi_5_mA_1p67_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_2p40_ctau_0p1": "/scenarioA_mpi_5_mA_2p40_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioA_mpi_5_mA_2p40_ctau_100": "/scenarioA_mpi_5_mA_2p40_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_5_mA_2p40_ctau_10": "/scenarioA_mpi_5_mA_2p40_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioA_mpi_5_mA_2p40_ctau_1p0": "/scenarioA_mpi_5_mA_2p40_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioB1_mpi_1_mA_0p40_ctau_0p1": "/scenarioB1_mpi_1_mA_0p40_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_1_mA_0p40_ctau_100": "/scenarioB1_mpi_1_mA_0p40_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_1_mA_0p40_ctau_10": "/scenarioB1_mpi_1_mA_0p40_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_1_mA_0p40_ctau_1p0": "/scenarioB1_mpi_1_mA_0p40_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p33_ctau_0p1": "/scenarioB1_mpi_2_mA_0p33_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p33_ctau_100": "/scenarioB1_mpi_2_mA_0p33_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER"", DONE
+"scenarioB1_mpi_2_mA_0p33_ctau_10": "/scenarioB1_mpi_2_mA_0p33_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p33_ctau_1p0: "/scenarioB1_mpi_2_mA_0p33_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p90_ctau_0p1": "/scenarioB1_mpi_2_mA_0p90_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p90_ctau_100": "/scenarioB1_mpi_2_mA_0p90_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p90_ctau_10": "/scenarioB1_mpi_2_mA_0p90_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_2_mA_0p90_ctau_1p0": "/scenarioB1_mpi_2_mA_0p90_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p67_ctau_0p1": "/scenarioB1_mpi_4_mA_0p67_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p67_ctau_100": "/scenarioB1_mpi_4_mA_0p67_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p67_ctau_10": "/scenarioB1_mpi_4_mA_0p67_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_0p67_ctau_1p0": "/scenarioB1_mpi_4_mA_0p67_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p90_ctau_0p1": "/scenarioB1_mpi_4_mA_1p90_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p90_ctau_100": "/scenarioB1_mpi_4_mA_1p90_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p90_ctau_10": "/scenarioB1_mpi_4_mA_1p90_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_4_mA_1p90_ctau_1p0": "/scenarioB1_mpi_4_mA_1p90_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_0p83_ctau_0p1": "/scenarioB1_mpi_5_mA_0p83_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_0p83_ctau_100": "/scenarioB1_mpi_5_mA_0p83_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_0p83_ctau_10": "/scenarioB1_mpi_5_mA_0p83_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_0p83_ctau_1p0": "/scenarioB1_mpi_5_mA_0p83_ctau_1p0/jleonhol-AODSIM_2022_ext_v2-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_1p00_ctau_0p1": "/scenarioB1_mpi_5_mA_1p00_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_1p00_ctau_100": "/scenarioB1_mpi_5_mA_1p00_ctau_100/jleonhol-AODSIM_2022_ext_v2-bd8711905ed05b0226f084d42f06d7ac/USER",  DONE
+"scenarioB1_mpi_5_mA_1p00_ctau_10": "/scenarioB1_mpi_5_mA_1p00_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_1p00_ctau_1p0": "/scenarioB1_mpi_5_mA_1p00_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_1p67_ctau_0p1": "", NOT DONE, res with v2
+"scenarioB1_mpi_5_mA_1p67_ctau_100": "/scenarioB1_mpi_5_mA_1p67_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_1p67_ctau_10": "/scenarioB1_mpi_5_mA_1p67_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_1p67_ctau_1p0": "", NOT DONE, res with v2
+"scenarioB1_mpi_5_mA_2p40_ctau_0p1": "/scenarioB1_mpi_5_mA_2p40_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_2p40_ctau_100": "/scenarioB1_mpi_5_mA_2p40_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_2p40_ctau_10": "/scenarioB1_mpi_5_mA_2p40_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB1_mpi_5_mA_2p40_ctau_1p0": "/scenarioB1_mpi_5_mA_2p40_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_5_mA_2p60_ctau_0p1": "/scenarioB2_mpi_5_mA_2p60_ctau_0p1/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_5_mA_2p60_ctau_100": "/scenarioB2_mpi_5_mA_2p60_ctau_100/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_5_mA_2p60_ctau_10": "/scenarioB2_mpi_5_mA_2p60_ctau_10/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+"scenarioB2_mpi_5_mA_2p60_ctau_1p0": "/scenarioB2_mpi_5_mA_2p60_ctau_1p0/jleonhol-AODSIM_2022_ext-bd8711905ed05b0226f084d42f06d7ac/USER", DONE
+
+
+
+
+
+
+________________
+
+
+Datasets 2022postEE
+"scenarioA_mpi_10_mA_1p00_ctau_0p1":"/scenarioA_mpi_10_mA_1p00_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_1p00_ctau_10":"/scenarioA_mpi_10_mA_1p00_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_1p00_ctau_100":"/scenarioA_mpi_10_mA_1p00_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_1p00_ctau_1p0":"/scenarioA_mpi_10_mA_1p00_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_2p00_ctau_0p1":"/scenarioA_mpi_10_mA_2p00_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_10_mA_2p00_ctau_10":"/scenarioA_mpi_10_mA_2p00_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_2p00_ctau_100":"/scenarioA_mpi_10_mA_2p00_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_2p00_ctau_1p0":"/scenarioA_mpi_10_mA_2p00_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_10_mA_3p33_ctau_0p1":"/scenarioA_mpi_10_mA_3p33_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_3p33_ctau_10":"/scenarioA_mpi_10_mA_3p33_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_10_mA_3p33_ctau_100":"/scenarioA_mpi_10_mA_3p33_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_3p33_ctau_1p0":"/scenarioA_mpi_10_mA_3p33_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_4p90_ctau_0p1":"/scenarioA_mpi_10_mA_4p90_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_10_mA_4p90_ctau_10":"/scenarioA_mpi_10_mA_4p90_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_4p90_ctau_100":"/scenarioA_mpi_10_mA_4p90_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_10_mA_4p90_ctau_1p0":"/scenarioA_mpi_10_mA_4p90_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_1_mA_0p25_ctau_0p1":"/scenarioA_mpi_1_mA_0p25_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":226
+"scenarioA_mpi_1_mA_0p25_ctau_10":"/scenarioA_mpi_1_mA_0p25_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":236
+"scenarioA_mpi_1_mA_0p25_ctau_100":"/scenarioA_mpi_1_mA_0p25_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_1_mA_0p25_ctau_1p0":"/scenarioA_mpi_1_mA_0p25_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":230
+"scenarioA_mpi_1_mA_0p33_ctau_0p1":"/scenarioA_mpi_1_mA_0p33_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":232
+"scenarioA_mpi_1_mA_0p33_ctau_10":"/scenarioA_mpi_1_mA_0p33_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":213
+"scenarioA_mpi_1_mA_0p33_ctau_100":"/scenarioA_mpi_1_mA_0p33_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioA_mpi_1_mA_0p33_ctau_1p0":"/scenarioA_mpi_1_mA_0p33_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":215
+"scenarioA_mpi_1_mA_0p45_ctau_0p1":"/scenarioA_mpi_1_mA_0p45_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":244
+"scenarioA_mpi_1_mA_0p45_ctau_10":"/scenarioA_mpi_1_mA_0p45_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":231
+"scenarioA_mpi_1_mA_0p45_ctau_100":"/scenarioA_mpi_1_mA_0p45_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":244
+"scenarioA_mpi_1_mA_0p45_ctau_1p0":"/scenarioA_mpi_1_mA_0p45_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":232
+"scenarioA_mpi_2_mA_0p25_ctau_0p1":"/scenarioA_mpi_2_mA_0p25_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":220
+"scenarioA_mpi_2_mA_0p25_ctau_10":"/scenarioA_mpi_2_mA_0p25_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":209
+"scenarioA_mpi_2_mA_0p25_ctau_100":"/scenarioA_mpi_2_mA_0p25_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":244
+"scenarioA_mpi_2_mA_0p25_ctau_1p0":"/scenarioA_mpi_2_mA_0p25_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":222
+"scenarioA_mpi_2_mA_0p40_ctau_0p1":"/scenarioA_mpi_2_mA_0p40_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":230
+"scenarioA_mpi_2_mA_0p40_ctau_10":"/scenarioA_mpi_2_mA_0p40_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":223
+"scenarioA_mpi_2_mA_0p40_ctau_100":"/scenarioA_mpi_2_mA_0p40_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_2_mA_0p40_ctau_1p0":"/scenarioA_mpi_2_mA_0p40_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":228
+"scenarioA_mpi_2_mA_0p50_ctau_0p1":"/scenarioA_mpi_2_mA_0p50_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":242
+"scenarioA_mpi_2_mA_0p50_ctau_10":"/scenarioA_mpi_2_mA_0p50_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":242
+"scenarioA_mpi_2_mA_0p50_ctau_100":"/scenarioA_mpi_2_mA_0p50_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_2_mA_0p50_ctau_1p0":"/scenarioA_mpi_2_mA_0p50_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":240
+"scenarioA_mpi_2_mA_0p67_ctau_0p1":"/scenarioA_mpi_2_mA_0p67_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_2_mA_0p67_ctau_10":"/scenarioA_mpi_2_mA_0p67_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_2_mA_0p67_ctau_100":"/scenarioA_mpi_2_mA_0p67_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_2_mA_0p67_ctau_1p0":"/scenarioA_mpi_2_mA_0p67_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_2_mA_0p90_ctau_0p1":"/scenarioA_mpi_2_mA_0p90_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":241
+"scenarioA_mpi_2_mA_0p90_ctau_10":"/scenarioA_mpi_2_mA_0p90_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":242
+"scenarioA_mpi_2_mA_0p90_ctau_100":"/scenarioA_mpi_2_mA_0p90_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_2_mA_0p90_ctau_1p0":"/scenarioA_mpi_2_mA_0p90_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_4_mA_0p25_ctau_0p1":"/scenarioA_mpi_4_mA_0p25_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":226
+"scenarioA_mpi_4_mA_0p25_ctau_10":"/scenarioA_mpi_4_mA_0p25_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":206
+"scenarioA_mpi_4_mA_0p25_ctau_100":"/scenarioA_mpi_4_mA_0p25_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_4_mA_0p25_ctau_1p0":"/scenarioA_mpi_4_mA_0p25_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":233
+"scenarioA_mpi_4_mA_0p40_ctau_0p1":"/scenarioA_mpi_4_mA_0p40_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":240
+"scenarioA_mpi_4_mA_0p40_ctau_10":"/scenarioA_mpi_4_mA_0p40_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":230
+"scenarioA_mpi_4_mA_0p40_ctau_100":"/scenarioA_mpi_4_mA_0p40_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioA_mpi_4_mA_0p40_ctau_1p0":"/scenarioA_mpi_4_mA_0p40_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":221
+"scenarioA_mpi_4_mA_0p80_ctau_0p1":"/scenarioA_mpi_4_mA_0p80_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioA_mpi_4_mA_0p80_ctau_10":"/scenarioA_mpi_4_mA_0p80_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_4_mA_0p80_ctau_100":"/scenarioA_mpi_4_mA_0p80_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_4_mA_0p80_ctau_1p0":"/scenarioA_mpi_4_mA_0p80_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_4_mA_1p33_ctau_0p1":"/scenarioA_mpi_4_mA_1p33_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioA_mpi_4_mA_1p33_ctau_10":"/scenarioA_mpi_4_mA_1p33_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_4_mA_1p33_ctau_100":"/scenarioA_mpi_4_mA_1p33_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_4_mA_1p33_ctau_1p0":"/scenarioA_mpi_4_mA_1p33_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioA_mpi_4_mA_1p90_ctau_0p1":"/scenarioA_mpi_4_mA_1p90_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioA_mpi_4_mA_1p90_ctau_10":"/scenarioA_mpi_4_mA_1p90_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_4_mA_1p90_ctau_100":"/scenarioA_mpi_4_mA_1p90_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_4_mA_1p90_ctau_1p0":"/scenarioA_mpi_4_mA_1p90_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioA_mpi_5_mA_0p50_ctau_0p1":"/scenarioA_mpi_5_mA_0p50_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":190
+"scenarioA_mpi_5_mA_0p50_ctau_10":"/scenarioA_mpi_5_mA_0p50_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioA_mpi_5_mA_0p50_ctau_100":"/scenarioA_mpi_5_mA_0p50_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_5_mA_0p50_ctau_1p0":"/scenarioA_mpi_5_mA_0p50_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":241
+"scenarioA_mpi_5_mA_1p00_ctau_0p1":"/scenarioA_mpi_5_mA_1p00_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_5_mA_1p00_ctau_10":"/scenarioA_mpi_5_mA_1p00_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_5_mA_1p00_ctau_100":"/scenarioA_mpi_5_mA_1p00_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_5_mA_1p00_ctau_1p0":"/scenarioA_mpi_5_mA_1p00_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_5_mA_1p67_ctau_0p1":"/scenarioA_mpi_5_mA_1p67_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_5_mA_1p67_ctau_100":"/scenarioA_mpi_5_mA_1p67_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioA_mpi_5_mA_1p67_ctau_1p0":"/scenarioA_mpi_5_mA_1p67_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_5_mA_2p40_ctau_0p1":"/scenarioA_mpi_5_mA_2p40_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_5_mA_2p40_ctau_10":"/scenarioA_mpi_5_mA_2p40_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioA_mpi_5_mA_2p40_ctau_100":"/scenarioA_mpi_5_mA_2p40_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioA_mpi_5_mA_2p40_ctau_1p0":"/scenarioA_mpi_5_mA_2p40_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioB1_mpi_1_mA_0p33_ctau_0p1":"/scenarioB1_mpi_1_mA_0p33_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":235
+"scenarioB1_mpi_1_mA_0p33_ctau_10":"/scenarioB1_mpi_1_mA_0p33_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":204
+"scenarioB1_mpi_1_mA_0p33_ctau_100":"/scenarioB1_mpi_1_mA_0p33_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":243
+"scenarioB1_mpi_1_mA_0p33_ctau_1p0":"/scenarioB1_mpi_1_mA_0p33_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":195
+"scenarioB1_mpi_1_mA_0p40_ctau_0p1":"/scenarioB1_mpi_1_mA_0p40_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":226
+"scenarioB1_mpi_1_mA_0p40_ctau_10":"/scenarioB1_mpi_1_mA_0p40_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":223
+"scenarioB1_mpi_1_mA_0p40_ctau_100":"/scenarioB1_mpi_1_mA_0p40_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":245
+"scenarioB1_mpi_1_mA_0p40_ctau_1p0":"/scenarioB1_mpi_1_mA_0p40_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":231
+"scenarioB1_mpi_2_mA_0p33_ctau_0p1":"/scenarioB1_mpi_2_mA_0p33_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":230
+"scenarioB1_mpi_2_mA_0p33_ctau_10":"/scenarioB1_mpi_2_mA_0p33_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":228
+"scenarioB1_mpi_2_mA_0p33_ctau_100":"/scenarioB1_mpi_2_mA_0p33_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":232
+"scenarioB1_mpi_2_mA_0p33_ctau_1p0":"/scenarioB1_mpi_2_mA_0p33_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":225
+"scenarioB1_mpi_2_mA_0p40_ctau_0p1":"/scenarioB1_mpi_2_mA_0p40_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":231
+"scenarioB1_mpi_2_mA_0p40_ctau_10":"/scenarioB1_mpi_2_mA_0p40_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":237
+"scenarioB1_mpi_2_mA_0p40_ctau_100":"/scenarioB1_mpi_2_mA_0p40_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":238
+"scenarioB1_mpi_2_mA_0p40_ctau_1p0":"/scenarioB1_mpi_2_mA_0p40_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":227
+"scenarioB1_mpi_2_mA_0p67_ctau_0p1":"/scenarioB1_mpi_2_mA_0p67_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":244
+"scenarioB1_mpi_2_mA_0p67_ctau_10":"/scenarioB1_mpi_2_mA_0p67_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_2_mA_0p67_ctau_100":"/scenarioB1_mpi_2_mA_0p67_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_2_mA_0p67_ctau_1p0":"/scenarioB1_mpi_2_mA_0p67_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioB1_mpi_2_mA_0p90_ctau_0p1":"/scenarioB1_mpi_2_mA_0p90_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioB1_mpi_2_mA_0p90_ctau_10":"/scenarioB1_mpi_2_mA_0p90_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioB1_mpi_2_mA_0p90_ctau_100":"/scenarioB1_mpi_2_mA_0p90_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_2_mA_0p90_ctau_1p0":"/scenarioB1_mpi_2_mA_0p90_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":242
+"scenarioB1_mpi_4_mA_0p67_ctau_0p1":"/scenarioB1_mpi_4_mA_0p67_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_4_mA_0p67_ctau_10":"/scenarioB1_mpi_4_mA_0p67_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_4_mA_0p67_ctau_100":"/scenarioB1_mpi_4_mA_0p67_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioB1_mpi_4_mA_0p67_ctau_1p0":"/scenarioB1_mpi_4_mA_0p67_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_4_mA_0p80_ctau_0p1":"/scenarioB1_mpi_4_mA_0p80_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_4_mA_0p80_ctau_10":"/scenarioB1_mpi_4_mA_0p80_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_4_mA_0p80_ctau_100":"/scenarioB1_mpi_4_mA_0p80_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_4_mA_0p80_ctau_1p0":"/scenarioB1_mpi_4_mA_0p80_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_4_mA_1p33_ctau_0p1":"/scenarioB1_mpi_4_mA_1p33_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":237
+"scenarioB1_mpi_4_mA_1p33_ctau_10":"/scenarioB1_mpi_4_mA_1p33_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":242
+"scenarioB1_mpi_4_mA_1p33_ctau_100":"/scenarioB1_mpi_4_mA_1p33_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_4_mA_1p33_ctau_1p0":"/scenarioB1_mpi_4_mA_1p33_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioB1_mpi_4_mA_1p90_ctau_0p1":"/scenarioB1_mpi_4_mA_1p90_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":244
+"scenarioB1_mpi_4_mA_1p90_ctau_10":"/scenarioB1_mpi_4_mA_1p90_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_4_mA_1p90_ctau_100":"/scenarioB1_mpi_4_mA_1p90_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":244
+"scenarioB1_mpi_4_mA_1p90_ctau_1p0":"/scenarioB1_mpi_4_mA_1p90_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":245
+"scenarioB1_mpi_5_mA_0p83_ctau_0p1":"/scenarioB1_mpi_5_mA_0p83_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_5_mA_0p83_ctau_10":"/scenarioB1_mpi_5_mA_0p83_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_5_mA_0p83_ctau_100":"/scenarioB1_mpi_5_mA_0p83_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_5_mA_0p83_ctau_1p0":"/scenarioB1_mpi_5_mA_0p83_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":249
+"scenarioB1_mpi_5_mA_1p00_ctau_0p1":"/scenarioB1_mpi_5_mA_1p00_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB1_mpi_5_mA_1p00_ctau_10":"/scenarioB1_mpi_5_mA_1p00_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":241
+"scenarioB1_mpi_5_mA_1p00_ctau_100":"/scenarioB1_mpi_5_mA_1p00_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":245
+"scenarioB1_mpi_5_mA_1p00_ctau_1p0":"/scenarioB1_mpi_5_mA_1p00_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":245
+"scenarioB1_mpi_5_mA_1p67_ctau_0p1":"/scenarioB1_mpi_5_mA_1p67_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":234
+"scenarioB1_mpi_5_mA_1p67_ctau_10":"/scenarioB1_mpi_5_mA_1p67_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioB1_mpi_5_mA_1p67_ctau_100":"/scenarioB1_mpi_5_mA_1p67_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioB1_mpi_5_mA_1p67_ctau_1p0":"/scenarioB1_mpi_5_mA_1p67_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioB1_mpi_5_mA_2p40_ctau_0p1":"/scenarioB1_mpi_5_mA_2p40_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":247
+"scenarioB1_mpi_5_mA_2p40_ctau_10":"/scenarioB1_mpi_5_mA_2p40_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":246
+"scenarioB1_mpi_5_mA_2p40_ctau_100":"/scenarioB1_mpi_5_mA_2p40_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":248
+"scenarioB1_mpi_5_mA_2p40_ctau_1p0":"/scenarioB1_mpi_5_mA_2p40_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":245
+"scenarioB2_mpi_1_mA_0p60_ctau_0p1":"/scenarioB2_mpi_1_mA_0p60_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_1_mA_0p60_ctau_10":"/scenarioB2_mpi_1_mA_0p60_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_1_mA_0p60_ctau_100":"/scenarioB2_mpi_1_mA_0p60_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_1_mA_0p60_ctau_1p0":"/scenarioB2_mpi_1_mA_0p60_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_2_mA_1p10_ctau_0p1":"/scenarioB2_mpi_2_mA_1p10_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_2_mA_1p10_ctau_10":"/scenarioB2_mpi_2_mA_1p10_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_2_mA_1p10_ctau_100":"/scenarioB2_mpi_2_mA_1p10_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_2_mA_1p10_ctau_1p0":"/scenarioB2_mpi_2_mA_1p10_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_4_mA_2p10_ctau_0p1":"/scenarioB2_mpi_4_mA_2p10_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_4_mA_2p10_ctau_10":"/scenarioB2_mpi_4_mA_2p10_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_4_mA_2p10_ctau_100":"/scenarioB2_mpi_4_mA_2p10_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_4_mA_2p10_ctau_1p0":"/scenarioB2_mpi_4_mA_2p10_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":243
+"scenarioB2_mpi_5_mA_2p60_ctau_0p1":"/scenarioB2_mpi_5_mA_2p60_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_5_mA_2p60_ctau_10":"/scenarioB2_mpi_5_mA_2p60_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_5_mA_2p60_ctau_100":"/scenarioB2_mpi_5_mA_2p60_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioB2_mpi_5_mA_2p60_ctau_1p0":"/scenarioB2_mpi_5_mA_2p60_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_10_mA_8p00_ctau_0p1":"/scenarioC_mpi_10_mA_8p00_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_10_mA_8p00_ctau_10":"/scenarioC_mpi_10_mA_8p00_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_10_mA_8p00_ctau_100":"/scenarioC_mpi_10_mA_8p00_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_10_mA_8p00_ctau_1p0":"/scenarioC_mpi_10_mA_8p00_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_2_mA_1p60_ctau_0p1":"/scenarioC_mpi_2_mA_1p60_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_2_mA_1p60_ctau_10":"/scenarioC_mpi_2_mA_1p60_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_2_mA_1p60_ctau_100":"/scenarioC_mpi_2_mA_1p60_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_2_mA_1p60_ctau_1p0":"/scenarioC_mpi_2_mA_1p60_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_4_mA_3p20_ctau_0p1":"/scenarioC_mpi_4_mA_3p20_ctau_0p1/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_4_mA_3p20_ctau_10":"/scenarioC_mpi_4_mA_3p20_ctau_10/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_4_mA_3p20_ctau_100":"/scenarioC_mpi_4_mA_3p20_ctau_100/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
+"scenarioC_mpi_4_mA_3p20_ctau_1p0":"/scenarioC_mpi_4_mA_3p20_ctau_1p0/tafoyava-AODSIM_2022-6c55dbd4f99ed6c824b000a7a99348b1/USER","nfiles":250
