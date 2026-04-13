@@ -15,7 +15,7 @@ today= date.today().strftime("%b-%d-%Y")
 
 doRatio = False
 doPull = False
-useSignalMC = False
+useSignalMC = True
 doPartialUnblinding = False
 normalizeSignal = False # Only if background is > 0
 
@@ -56,6 +56,7 @@ dNames = []
 #dNames.append("d_Dimuon_lxy7p0to11p0_inclusive")
 #dNames.append("d_Dimuon_lxy11p0to16p0_inclusive")
 #dNames.append("d_Dimuon_lxy16p0to70p0_inclusive")
+#
 dNames.append("d_FourMu_sep")
 dNames.append("d_FourMu_osv")
 dNames.append("d_Dimuon_lxy0p0to0p2_iso0_ptlow")
@@ -103,9 +104,9 @@ years = []
 years.append(year)
 
 # Signals
-model = "HTo2ZdTo2mu2x" # HTo2ZdTo2mu2x
+#model = "HTo2ZdTo2mu2x" # HTo2ZdTo2mu2x
 #model = "ScenarioA" # HTo2ZdTo2mu2x
-#model = "ScenarioA"
+model = "ScenarioA"
 #model = "BToPhi"
 
 sigMasses = []
@@ -113,8 +114,8 @@ if useSignalMC:
     if (model=="HTo2ZdTo2mu2x"):
         sigMasses = [1.5, 2.0, 2.5, 5.0, 6.0, 7.0, 8.0, 14.0, 16.0, 20.0, 22.0, 24.0, 30.0, 34.0, 40.0, 44.0, 50.0]
         sigCtau = [1, 10, 100]
-        sigMasses = [2.400]
-        sigCtau = [1]
+        sigMasses = [7.000]
+        sigCtau = [10]
     elif (model=="ScenarioB1"):
         sigMasses = []
         sigMasses.append([4, 1.33])
@@ -122,14 +123,14 @@ if useSignalMC:
         sigCtau = [0.1, 1, 10, 100]
     elif (model=="ScenarioA"):
         sigMasses = []
-        sigMasses.append([4, 1.33])
-        sigMasses.append([5, 2.40])
-        sigCtau = [0.1, 1, 10, 100]
+        #sigMasses.append([4, 1.33])
+        sigMasses.append([5, 1.67])
+        sigCtau = [0.1, 0.25]
     elif model == "BToPhi":
-        #sigMasses = [0.9, 1.25, 1.5, 1.5, 2.0, 5.0]
-        sigMasses = [2.85]
-        #sigCtau = ["0p0", "0p1", "1", "10", "100"]
-        sigCtau = [1]
+        #sigMasses = [0.3, 1.25, 1.5, 2.0]
+        #sigCtau = [0.1, 1, 10, 100]
+        sigMasses = [5.00]
+        sigCtau = [1.0, 10.0]
 else:
     if (model=="HTo2ZdTo2mu2x"):
         sigCtau = [1, 10, 100]
@@ -139,7 +140,7 @@ else:
             if not ROOT.passMassVeto(lastmass):
                 continue
             sigMasses.append(lastmass)
-        sigMasses = [2.400]
+        sigMasses = [7.000]
         sigCtau = [1]
 
 def drawLabels(year="all",lumi=59.83+41.48+19.5+16.8,plotData=False):
@@ -228,6 +229,8 @@ for year in years:
                 continue
             if (model=="HTo2ZdTo2mu2x" or model=='BToPhi'):
                 m = str(mf)
+            if model=='BToPhi':
+                m = "%.2f"%(mf)
             elif (model=="ScenarioB1"):
                 m = "%.3f_%.2f"%(mf[0], mf[1])
             for d_,d in enumerate(dNames):
@@ -242,6 +245,7 @@ for year in years:
                 elif (model=="BToPhi"):
                     #sample = ("Signal_BToPhi-%s_ctau-%smm"%(m.replace('.','p'), t))
                     sample = "Signal_BToPhi_MPhi-%s_ctau-%.2fmm" % (m.replace(".", "p"), float(t))
+                    #sample = "Signal_BToPhi_MPhi-%.2f_ctau-%.2fmm" % (float(mf), float(t))
                     #finame = "%s/%s_%s_%s_2022_workspace.root"%(inDir,d,sample,y)
                 elif (model=="ScenarioB1"):
                     sample = "Signal_ScenarioB1_Mpi-%s_MA-%s_ctau-%.2fmm" % (("%.0f"%(mf[0])), ("%.2f"%(mf[1])).replace('.','p'),float(t))
@@ -311,7 +315,7 @@ for year in years:
                 #nBins = int((maxx-minx)/(0.01*float(m)))
                 nBins = 5*10;
                 # Retrieve signal normalization
-                lumi=35. if year=='2022' else 27.2 # 27.2              
+                lumi=34.6 if year=='2022' else 27.8              
                 if doPartialUnblinding:
                     lumi = 0.1*lumi
                 nSig = w.var("signalNorm%s"%catExtS).getValV()
@@ -354,6 +358,7 @@ for year in years:
                     hpr = []
                     numpars = []
                     gp = []
+                    print(nPDF)
                     for pp in range(nPDF):
                         p.append(bpdf.getPdf(pp))
                         numpars.append(w.pdf(bpdf.getPdf(pp).GetName()).getVariables().getSize()-1)
@@ -431,10 +436,10 @@ for year in years:
 
 
                 ## Plot with mplhep
-                fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+                fig, ax = plt.subplots(1, 1, figsize=(11, 8))
                 plt.style.use(hep.style.CMS)
                 if plotBackground:
-                    luminosity = 35 if year=="2022" else 27
+                    luminosity = 34.6 if year=="2022" else 27.8
                     hep.cms.label("Preliminary", data=True, year=year, lumi = luminosity, com='13.6', ax=ax)
                 else:
                     hep.cms.label("Simulation Preliminary", data=True, year=year, com='13.6', ax=ax)
@@ -521,39 +526,39 @@ for year in years:
                 lxybin = catnames[2]
                 lxybin = (lxybin[3:]).split("to")
                 if "d_Dimuon" in d:
-                    ax.text(0.03, 0.95, 'Dimuon', fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
-                    ax.text(0.03, 0.9, r"$l_{{xy}} \in [{},{}]$ cm".format(lxybin[0].replace("p", "."), lxybin[1].replace("p", ".")), fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                    ax.text(0.03, 0.95, 'Dimuon', fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
+                    ax.text(0.03, 0.9, r"$l_{{xy}} \in [{},{}]$ cm".format(lxybin[0].replace("p", "."), lxybin[1].replace("p", ".")), fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                     if "non-pointing" not in d:
                         isobin = "Isolated" if catnames[3]=="iso1" else "Non isolated"
-                        ax.text(0.03, 0.85, isobin, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.85, isobin, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                         ptbin = r"High $p_{T}^{\mu\mu}$" if catnames[4]=="pthigh" else r"Low $p_{T}^{\mu\mu}$"
-                        ax.text(0.03, 0.8, ptbin, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.8, ptbin, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                     else:
-                        ax.text(0.03, 0.85, 'Non-pointing', fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.85, 'Non-pointing', fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                 elif "d_FourMu" in d:
-                    ax.text(0.03, 0.95, 'Four muon', fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
+                    ax.text(0.03, 0.95, 'Four muon', fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
                     fourmucat = "Resolved" if "sep" in d else "Overlapping"
-                    ax.text(0.03, 0.9, fourmucat, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                    ax.text(0.03, 0.9, fourmucat, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                 
                 # Signal label
                 if plotSignal:
                     if (model=="HTo2ZdTo2mu2x"):
-                        signal_label = r"$M_{Z_D} = %.1f$ GeV, $c\tau = %.0f$ mm"%(mf, t)
+                        signal_label = r"$M_{Z_D} = %.1f$ GeV, $c\tau = %.0f$ cm"%(mf, t*0.1) # provisionally to cm
                         signal_label = signal_label.replace('.0', '')
-                        ax.text(0.03, 0.7, r"$h\rightarrow Z_D Z_D$", fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
-                        ax.text(0.03, 0.65, signal_label, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.7, r"$h\rightarrow Z_D Z_D$", fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
+                        ax.text(0.03, 0.65, signal_label, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                     if (model=="ScenarioB1"):
-                        ax.text(0.03, 0.7, "Scenario B1", fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
+                        ax.text(0.03, 0.7, "Scenario B1", fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
                         signal_label = r"$M_{\pi} = %.0f$ GeV, $M_{A} = %.2f$ GeV, $c\tau = %.1f$ mm"%(mf[0], mf[1], t)
-                        ax.text(0.03, 0.65, signal_label, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.65, signal_label, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                     if (model=="ScenarioA"):
-                        ax.text(0.03, 0.7, "Scenario A", fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
+                        ax.text(0.03, 0.7, "Scenario A", fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
                         signal_label = r"$M_{\pi} = %.0f$ GeV, $M_{A} = %.2f$ GeV, $c\tau = %.1f$ mm"%(mf[0], mf[1], t)
-                        ax.text(0.03, 0.65, signal_label, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.65, signal_label, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
                     if (model=="BToPhi"):
-                        ax.text(0.03, 0.7, r"$B\rightarrow\phi X (\phi \rightarrow \mu\mu)$", fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
+                        ax.text(0.03, 0.7, r"$B\rightarrow\phi X (\phi \rightarrow \mu\mu)$", fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes, fontweight='bold')
                         signal_label = r"$M_{\phi} = %.2f$ GeV, $c\tau = %.1f$ mm"%(mf, t)
-                        ax.text(0.03, 0.65, signal_label, fontsize=17, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+                        ax.text(0.03, 0.65, signal_label, fontsize=20, color='black', horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
 
                 # Axis
                 ax.set_ylabel(r'Events / %.2f GeV'%(bwidth), fontsize=24)
@@ -565,10 +570,11 @@ for year in years:
                 ax.set_ylim(0, None)
                 
                 # Legend
-                ax.legend(loc='upper right', fontsize = 17, frameon = True, ncol=1)
+                ax.legend(loc='upper right', fontsize = 26, frameon = False, ncol=1)
                 
                 # Save
                 fig.savefig("%s/fitSIG_%s_%s.png" % (outDir, sample, d), dpi=140)
+                fig.savefig("%s/fitSIG_%s_%s.pdf" % (outDir, sample, d), dpi=140)
                 
                 
 

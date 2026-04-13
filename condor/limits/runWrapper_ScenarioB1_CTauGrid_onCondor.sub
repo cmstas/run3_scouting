@@ -1,0 +1,31 @@
+
+executable      = $ENV(HOMEDIR)/condor/limits/condor_wrap_executable.sh
+output          = $ENV(HOMEDIR)/condor/limits/limits_logs/job.$(ClusterId).$(ProcId).out
+error           = $ENV(HOMEDIR)/condor/limits/limits_logs/job.$(ClusterId).$(ProcId).err
+log             = $ENV(HOMEDIR)/condor/limits/limits_logs/job.$(ClusterId).$(ProcId).log
+
+getenv = True
++JobFlavour = "workday"
++DESIRED_Sites = "T2_US_UCSD"
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64"
+transfer_input_files = $ENV(HOMEDIR)/package_$ENV(LABEL)_wp.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy=$ENV(X509_USER_PROXY)
+use_x509userproxy = True
+JobBatchName = "$ENV(LABEL)_ScenarioB1_Wrapper_$ENV(MASS)"
+
+# Comment out any of the following configurations
+queue arguments from (
+#
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 0.10
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 0.25
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 0.60
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 1.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 2.50
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 6.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 10.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 25.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 60.00
+$ENV(SCOUTINGSNTINPUTDIRLIM) $ENV(SCOUTINGSNTOUTPUTDIRLIM) ScenarioB1 $ENV(PERIOD) $ENV(MASS) 100.00
+)

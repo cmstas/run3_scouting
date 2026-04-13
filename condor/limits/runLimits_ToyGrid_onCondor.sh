@@ -26,7 +26,7 @@ export SCOUTINGSNTOUTPUTDIRLIM=$2
 export PERIOD=$3
 export HOMEDIR=$PWD
 export LABEL=$(basename $SCOUTINGSNTOUTPUTDIRLIM)
-export TYPE=$4
+#export TYPE=$4
 
 echo "Creating dirs..."
 mkdir -p condor/limits/limits_logs
@@ -56,10 +56,37 @@ mv package.tar.gz package_${LABEL}.tar.gz
 #    done
 #done
 
-#allmasses=(20.000 30.000 40.000 50.000)
-allmasses=(20.000 30.000)
+#### CTau Grid
+#allmasses=(1.500 5.000 20.000 30.000 40.000 50.000)
+allmasses=(1.250 1.500 2.000)
+#allmasses=(2.000)
 for m in ${allmasses[@]}
 do
     export MASS="${m}"
-    condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_CTauGrid_onCondor.sub
+    #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_CTauGrid_onCondor.sub
+    condor_submit condor/limits/runLimits_BToPhi_CTauGrid_onCondor.sub
 done
+
+#### Mass grid (1 mm)
+#allrs=(0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100)
+#for r in ${allrs[@]}
+#do
+#    export IMIN="${r}"
+#    #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_MassGrid_1mm_onCondor.sub
+#    #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_MassGrid_10mm_onCondor.sub
+#    #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_MassGrid_100mm_onCondor.sub
+#    #condor_submit condor/limits/runLimits_HTo2ZdTo2mu2x_MassGrid_1000mm_onCondor.sub
+#    #condor_submit condor/limits/runLimits_ScenarioA_MassGrid_CTauGrid_onCondor.sub
+#    #condor_submit condor/limits/runLimits_BToPhi_vsMass_1mm_Grid_onCondor.sub
+#    #condor_submit condor/limits/runLimits_ScenarioB1_CTauGrid_onCondor.sub
+#    condor_submit condor/limits/runLimits_ScenarioA_CTauGrid_onCondor.sub
+#    #condor_submit condor/limits/runLimits_BToPhi_vsMass_10mm_Grid_onCondor.sub
+#    #condor_submit condor/limits/runLimits_BToPhi_vsMass_100mm_Grid_onCondor.sub
+#    #
+#    #allCTaus=("1.00" "10.00" "100.00")
+#    #for ctau_value in ${allCTaus[@]}
+#    #do
+#    #    export CTAU="${ctau_value}"
+#    #    condor_submit condor/limits/runLimits_BToPhi_vsMass_Grid_onCondor.sub
+#    #done
+#done

@@ -32,11 +32,10 @@ doRatio = True
 
 # In-line arguments
 model = sys.argv[1]
-limdir1 = sys.argv[2]
-limdir2 = sys.argv[3]
-ctau = sys.argv[4]
-labels = sys.argv[5]
-year = sys.argv[6]
+limfiles = sys.argv[2]
+ctau = sys.argv[3]
+labels = sys.argv[4]
+year = sys.argv[5]
 
 if year=='2022':
     luminosity = 35
@@ -64,7 +63,7 @@ elif typeOfLimit=="xsecBR":
 #
 #
 basedir = '/ceph/cms/store/user/fernance/Run3ScoutingOutput'
-files = ["%s/%s/limits_%s_%s.txt"%(basedir,limdir1,model,year), "%s/%s/limits_%s_%s.txt"%(basedir,limdir2,model,year)]
+files = ["%s/%s"%(basedir,limfile) for limfile in limfiles.split(',')]
 #
 all_labels = labels.split(',')
 #
@@ -207,17 +206,14 @@ for j in range(6):
     ax.set_xlabel('Mass [GeV]')
     ax.set_xlim(massv[0], massv[-1])
     ax.set_xlim(0.5, 50)
-    if ctau=='100':
+    if ctau=='100.00':
         ax.set_xlim(1.5, 50)
         ax.set_xticks([2, 5, 10, 20, 30, 50])
         ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
-    if ctau=='1000':
+    if ctau=='1000.00':
         ax.set_xlim(2.0, 50)
         ax.set_xticks([2, 5, 10, 20, 30, 50])
         ax.set_xticklabels(["2", "5", "10", "20", "30", "50"])
-    else:
-        ax.set_xticks([0.5, 1, 2, 5, 10, 20, 30, 50])
-        ax.set_xticklabels(["0.5", "1", "2", "5", "10", "20", "30", "50"])
 
     ax.set_axisbelow(False)
     ax.tick_params(zorder=10)
@@ -245,11 +241,14 @@ for j in range(6):
         val_b = np.array([limitvalue[j][1][x] for x in index_b])
         #print(len(index_a), len(index_b))
         ax_ratio.plot(mass_ab, val_a/val_b, marker=mstyles[i], linestyle=styles[i], color=colors[i], label=r'%s (%s)'%(limitname[j], all_labels[i]), linewidth=2, zorder=2)    #
+        ax_ratio.set_xlabel('Mass [GeV]')
+        ax_ratio.set_ylabel('Ratio')
+        ax.set_xlabel('')
     #
     #
     if not os.path.exists('limitComparison_vsMass'):
         os.makedirs('limitComparison_vsMass')
     #
-    fig.savefig("limitComparison_vsMass/limitsComparison_%s_ctau%s_%s_%s"%(model,ctau,typeOfLimit,limitlabel[j]), dpi=140)
+    fig.savefig("limitComparison_vsMass/limitsComparison_%s_ctau%s_%s_%s"%(model,ctau.replace('.','p'),typeOfLimit,limitlabel[j]), dpi=140)
 
 

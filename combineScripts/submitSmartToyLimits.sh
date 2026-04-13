@@ -64,9 +64,9 @@ then
 fi
 
 
-#options="--cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_freezeDisassociatedParams --X-rtd MINIMIZER_multiMin_hideConstants --X-rtd MINIMIZER_multiMin_maskConstraints --X-rtd MINIMIZER_multiMin_maskChannels=1"
+options="--cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_freezeDisassociatedParams --X-rtd MINIMIZER_multiMin_hideConstants --X-rtd MINIMIZER_multiMin_maskConstraints --X-rtd MINIMIZER_multiMin_maskChannels=2 -v 0"
 #options="--cminDefaultMinimizerStrategy 0 -v 0 --rMax 10"
-options="--cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_freezeDisassociatedParams -v 0"
+#options="--cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_freezeDisassociatedParams -v 0"
 for m in ${allmasses[@]}
 do
     for t in ${allCTaus[@]}
@@ -79,6 +79,12 @@ do
             eval "combineTool.py -M AsymptoticLimits ${indir}/${card} ${options} ${name} -m 125 --parallel 16 >& ${outdir}/lim_asymptotic_${model}_m${m}_ctau${t}_${period}.txt"
             # Get limit values for next limit derivation
             eval $(root -b -q "combineScripts/getLimitResults.C(\"${limitfile}\")" | grep '^LIM' | tr -d '\r')
+            echo "Values of asymptotics: "
+            echo $LIM0
+            echo $LIM1
+            echo $LIM2
+            echo $LIM3
+            echo $LIM4
             if [ ${which} == "toysObs" ]
             then
 		        RMIN=$(echo "0.5 * ${LIM0}" | bc -l)
@@ -121,10 +127,15 @@ do
             elif [ ${which} == "grid" ]
             then
                 NTOY=500
-		        RMIN=$(echo "0.5 * ${LIM0}" | bc -l)
-		        RMAX=$(echo "1.1 * ${LIM4}" | bc -l)
+		        #RMIN=$(echo "0.5 * ${LIM0}" | bc -l)
+		        RMIN=$(echo "0.1 * ${LIM0}" | bc -l)
+		        RMAX=$(echo "1.5 * ${LIM4}" | bc -l)
                 INT=$(echo "${RMAX} - ${RMIN}" | bc -l)
                 STEP=$(echo "0.01 * ${INT}" | bc -l)
+                echo $RMIN
+                echo $RMAX
+                echo $INT
+                echo $STEP
                 if [ $# -lt 8 ]
                 then
                     # Run a grid of 100 r points well defined in one go
@@ -143,13 +154,13 @@ do
                 then
                     # Run point NUM of the 100 r points (only)
                     name="-n _${which}_${model}_M${m}_ctau${t}"
-                    NTOY=2000
+                    NTOY=2000 #3000
                     NUM=$8
                     DELTA=$(echo "${NUM} * ${STEP}" | bc -l)
                     POINT=$(echo "${RMIN} + ${DELTA}" | bc -l)
                     echo "Running point ${POINT} of grid from ${RMIN} to ${RMAX} in steps of ${STEP}"
-                    echo "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${POINT} --iterations 2"
-                    eval "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${POINT} --iterations 2"
+                    echo "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${POINT} --iterations 2 -s -1 -H AsymptoticLimits"
+                    eval "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${POINT} --iterations 2 -s -1 -H AsymptoticLimits"
                     mv higgsCombine*HybridNew*.root ${outdir}
                 else
                     # Run from point MINNUM to MAXNUM of the 100 r points (only)
@@ -161,8 +172,9 @@ do
                     MAXDELTA=$(echo "${MAXNUM} * ${STEP}" | bc -l)
                     IRMIN=$(echo "${RMIN} + ${MINDELTA}" | bc -l)
                     IRMAX=$(echo "${RMIN} + ${MAXDELTA}" | bc -l)
-                    echo "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${IRMIN}:${IRMAX}:${STEP} --iterations 2 -s -1"
-                    eval "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${IRMIN}:${IRMAX}:${STEP} --iterations 2 -s -1"
+                    echo "Running grid from ${MINNUM} to ${MAXNUM} in steps of ${STEP}"
+                    echo "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${IRMIN}:${IRMAX}:${STEP} --iterations 2"
+                    eval "combineTool.py ${indir}/${card} -M HybridNew --LHCmode LHC-limits -T ${NTOY} ${options} ${name} --saveHybridResult -m 125 --clsAcc 0 --singlePoint ${IRMIN}:${IRMAX}:${STEP} --iterations 2"
                     mv higgsCombine*HybridNew*.root ${outdir}
                 fi
             elif [ ${which} == "sigExp" ]
