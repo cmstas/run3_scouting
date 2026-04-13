@@ -72,8 +72,11 @@ process.GlobalTag.globaltag = gtag
 
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(opts.nevents))
 
-#process.options = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'))
-process.options = cms.untracked.PSet(TryToContinue = cms.untracked.vstring('ProductNotFound'))
+if '2024' in opts.era or '2025' in opts.era:
+    process.options = cms.untracked.PSet(TryToContinue = cms.untracked.vstring('ProductNotFound'))
+else:
+    process.options = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'))
+
 
 if opts.data:
     process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -133,12 +136,16 @@ process.Timing = cms.Service("Timing",
         )
 
 if '2024' in opts.era or '2025' in opts.era:
-    process.countmu = cms.EDFilter("ScoutingMuonCountFilter",
+    process.countmuVtx = cms.EDFilter("ScoutingMuonCountFilter",
         src = cms.InputTag("hltScoutingMuonPackerVtx"),
         minNumber = cms.uint32(2)
     )
-    process.countvtx = cms.EDFilter("ScoutingVertexCountFilter",
-        src = cms.InputTag("hltScoutingMuonPackerVtx","displacedVtx"),
+    process.countmuNoVtx = cms.EDFilter("ScoutingMuonCountFilter",
+        src = cms.InputTag("hltScoutingMuonPackerNoVtx"),
+        minNumber = cms.uint32(2)
+    )
+    process.countvtxNoVtx = cms.EDFilter("ScoutingVertexCountFilter",
+        src = cms.InputTag("hltScoutingMuonPackerNoVtx","displacedVtx"),
         minNumber = cms.uint32(1)
     )
 else:
@@ -314,7 +321,10 @@ process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
 process.patTrigger.stageL1Trigger = cms.uint32(2)
 
 if '2024' in opts.era or '2025' in opts.era:
-    if (opts.data): process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+    if (opts.data):
+        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('skimpath_vtx', 'skimpath_novtx'))
     else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
 else:
     #hitMaker not needed (Mario)
