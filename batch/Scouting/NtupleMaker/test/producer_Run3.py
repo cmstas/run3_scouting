@@ -5,13 +5,14 @@ vpbool   = VarParsing.VarParsing.varType.bool
 vpint    = VarParsing.VarParsing.varType.int
 vpstring = VarParsing.VarParsing.varType.string
 
-opts.register('data',    True,          mytype = vpbool)
-opts.register('monitor', False,         mytype = vpbool)
-opts.register('era',     "2022D",       mytype = vpstring)
-opts.register('output',  "output.root", mytype = vpstring)
-opts.register('inputs',  "",            mytype = vpstring) # comma separated list of input files
-opts.register('nevents', -1,            mytype = vpint)
-opts.register('testL1',    False,       mytype = vpbool)
+opts.register('data',       True,          mytype = vpbool)
+opts.register('monitor',    False,         mytype = vpbool)
+opts.register('background', False,         mytype = vpbool) # apply skim filters for background MC (e.g. QCD)
+opts.register('era',        "2022D",       mytype = vpstring)
+opts.register('output',     "output.root", mytype = vpstring)
+opts.register('inputs',     "",            mytype = vpstring) # comma separated list of input files
+opts.register('nevents',    -1,            mytype = vpint)
+opts.register('testL1',     False,         mytype = vpbool)
 opts.parseArguments()
 
 def convert_fname(fname):
@@ -97,8 +98,8 @@ process.source.fileNames = lin
 if not opts.data:
     process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
-# skim data, but keep all events for MC acceptance calculations
-do_skim = opts.data
+# skim data and background MC; keep all events for signal MC acceptance calculations
+do_skim = opts.data or opts.background
 
 # Build output keep commands based on era (2024+ uses Vtx/NoVtx split collections)
 if '2024' in opts.era or '2025' in opts.era:
@@ -321,12 +322,12 @@ process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
 process.patTrigger.stageL1Trigger = cms.uint32(2)
 
 if '2024' in opts.era or '2025' in opts.era:
-    if (opts.data):
+    if do_skim:
         process.skimpath_vtx   = cms.Path(process.countmuVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
         process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
         process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('skimpath_vtx', 'skimpath_novtx'))
     else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
 else:
     #hitMaker not needed (Mario)
-    if (opts.data): process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+    if do_skim: process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
     else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
