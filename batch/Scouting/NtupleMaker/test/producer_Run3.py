@@ -60,7 +60,7 @@ else:
             #gtag="124X_mcRun3_2022_realistic_postEE_v1"
             gtag="130X_mcRun3_2022_realistic_postEE_v6" # Found for central production
     elif '2024' in opts.era:
-        gtag="140X_mcRun3_2024_realistic_v26" # Found for central production (RunIII2024Summer24DRPremix)
+        gtag="150X_mcRun3_2024_realistic_v2" # Found for central production (RunIII2024Summer24DRPremix)
     else:
         #gtag="130X_mcRun3_2023_realistic_v9" # latest MC GT (=phase1_2023_realistic, in CMSSW_13_1_0)
         if not 'BPix' in opts.era:
@@ -121,8 +121,10 @@ process.out = cms.OutputModule("PoolOutputModule",
         "keep *_triggerMaker_*_*",
         ] + out_keep_hit + [
         "keep *_beamSpotMaker_*_*",
-        "keep *_genParticles_*_HLT",
-        "keep *_addPileupInfo_*_*",
+        #"keep *_genParticles_*_HLT",       # AOD; in MiniAOD gen particles are prunedGenParticles::PAT
+        "keep *_prunedGenParticles_*_PAT",
+        #"keep *_addPileupInfo_*_*",        # AOD; in MiniAOD it is slimmedAddPileupInfo::PAT
+        "keep *_slimmedAddPileupInfo_*_PAT",
         ]),
      basketSize = cms.untracked.int32(128*1024), # 128kb basket size instead of ~30kb default
 )
@@ -277,10 +279,14 @@ process.triggerMaker = cms.EDProducer("TriggerMaker",
             usePathStatus = cms.bool(False),
             ),
         doL1 = cms.bool(True),
-        doTriggerObjects = cms.bool(do_trigger_objects),
-        AlgInputTag = cms.InputTag("gtStage2Digis"),
-        l1tAlgBlkInputTag = cms.InputTag("gtStage2Digis"),
-        l1tExtBlkInputTag = cms.InputTag("gtStage2Digis"),
+        #doTriggerObjects = cms.bool(do_trigger_objects),  # MiniAOD: patTrigger needs hltTriggerSummaryAOD which is absent; slimmedPatTrigger::PAT exists but TriggerMaker.cc hardcodes "patTrigger"
+        doTriggerObjects = cms.bool(False),
+        #AlgInputTag = cms.InputTag("gtStage2Digis"),  # MiniAOD: use explicit RECO process
+        AlgInputTag = cms.InputTag("gtStage2Digis","","RECO"),
+        #l1tAlgBlkInputTag = cms.InputTag("gtStage2Digis"),
+        l1tAlgBlkInputTag = cms.InputTag("gtStage2Digis","","RECO"),
+        #l1tExtBlkInputTag = cms.InputTag("gtStage2Digis"),
+        l1tExtBlkInputTag = cms.InputTag("gtStage2Digis","","RECO"),
         ReadPrescalesFromFile = cms.bool(False),
         l1Seeds = cms.vstring(L1Info),
         )
@@ -308,26 +314,35 @@ process.beamSpotMaker = cms.EDProducer("BeamSpotMaker")
 from RecoTracker.MeasurementDet.measurementTrackerEventDefault_cfi import measurementTrackerEventDefault as _measurementTrackerEventDefault
 process.MeasurementTrackerEvent = _measurementTrackerEventDefault.clone()
 
-process.load("EventFilter.L1TRawToDigi.gtStage2Digis_cfi")
-if opts.monitor:
-    process.gtStage2Digis.InputLabel = cms.InputTag( "rawDataCollector", "", "LHC" )
-else:
-    process.gtStage2Digis.InputLabel = cms.InputTag( "hltFEDSelectorL1" )
+# MiniAOD: gtStage2Digis::RECO is already stored; no need to re-unpack from raw FED data
+#process.load("EventFilter.L1TRawToDigi.gtStage2Digis_cfi")
+#if opts.monitor:
+#    process.gtStage2Digis.InputLabel = cms.InputTag( "rawDataCollector", "", "LHC" )
+#else:
+#    process.gtStage2Digis.InputLabel = cms.InputTag( "hltFEDSelectorL1" )
 
 process.offlineBeamSpot = cms.EDProducer("BeamSpotProducer")
 
-process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
+# MiniAOD: patTrigger producer needs hltTriggerSummaryAOD which is absent in MiniAOD
+# slimmedPatTrigger::PAT contains trigger objects but TriggerMaker.cc hardcodes InputTag("patTrigger")
+# For now doTriggerObjects=False above; re-enable once TriggerMaker.cc is updated to read slimmedPatTrigger
+#process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
 #process.patTrigger.triggerResults = cms.InputTag("TriggerResults","","HLT")
 #process.patTrigger.triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT")
-process.patTrigger.stageL1Trigger = cms.uint32(2)
+#process.patTrigger.stageL1Trigger = cms.uint32(2)
 
 if '2024' in opts.era or '2025' in opts.era:
     if do_skim:
-        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
-        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+        #process.skimpath_vtx   = cms.Path(process.countmuVtx+process.gtStage2Digis+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis (already in RECO)
+        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+        #process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.gtStage2Digis+process.triggerMaker+...)
+        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
         process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('skimpath_vtx', 'skimpath_novtx'))
-    else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+    #else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis and patTrigger
+    else: process.skimpath = cms.Path(process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
 else:
     #hitMaker not needed (Mario)
-    if do_skim: process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
-    else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+    #if do_skim: process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis
+    if do_skim: process.skimpath = cms.Path(process.countmu+process.countvtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+    #else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis and patTrigger
+    else: process.skimpath = cms.Path(process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)

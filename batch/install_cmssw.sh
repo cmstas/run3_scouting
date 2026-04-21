@@ -18,7 +18,7 @@ then
     fi
     if [ ${1} == "2024central" ]
     then
-    release=CMSSW_14_0_22_patch1
+    release=CMSSW_15_0_2
 fi
 fi
 
