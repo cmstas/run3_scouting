@@ -104,7 +104,7 @@ do_skim = opts.data or opts.background
 # Build output keep commands based on era (2024+ uses Vtx/NoVtx split collections)
 if '2024' in opts.era or '2025' in opts.era:
     out_keep_muon = ["keep *_hltScoutingMuonPackerVtx_*_*", "keep *_hltScoutingMuonPackerNoVtx_*_*"]
-    out_keep_hit  = ["keep *_hitMakerVtx_*_*", "keep *_hitMakerNoVtx_*_*"]
+    out_keep_hit  = ["keep *_vertexMakerVtx_*_*", "keep *_hitMakerVtx_*_*", "keep *_hitMakerNoVtx_*_*"]
 else:
     out_keep_muon = ["keep *_hltScoutingMuonPacker_*_*"]
     out_keep_hit  = ["keep *_hitMaker_*_*"]
@@ -279,8 +279,8 @@ process.triggerMaker = cms.EDProducer("TriggerMaker",
             usePathStatus = cms.bool(False),
             ),
         doL1 = cms.bool(True),
-        #doTriggerObjects = cms.bool(do_trigger_objects),  # MiniAOD: patTrigger needs hltTriggerSummaryAOD which is absent; slimmedPatTrigger::PAT exists but TriggerMaker.cc hardcodes "patTrigger"
-        doTriggerObjects = cms.bool(False),
+        doTriggerObjects = cms.bool(do_trigger_objects),
+        isMiniAOD = cms.bool('2024' in opts.era or '2025' in opts.era),
         #AlgInputTag = cms.InputTag("gtStage2Digis"),  # MiniAOD: use explicit RECO process
         AlgInputTag = cms.InputTag("gtStage2Digis","","RECO"),
         #l1tAlgBlkInputTag = cms.InputTag("gtStage2Digis"),
@@ -292,14 +292,24 @@ process.triggerMaker = cms.EDProducer("TriggerMaker",
         )
 
 if '2024' in opts.era or '2025' in opts.era:
+
+    from TrackingTools.TransientTrack.TransientTrackBuilder_cfi import *
+    process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
+
+    process.vertexMakerVtx = cms.EDProducer("VertexMaker",
+            muonVtxInputTag = cms.InputTag("hltScoutingMuonPackerVtx")
+            )
+    
     process.hitMakerVtx = cms.EDProducer("HitMaker",
             muonInputTag = cms.InputTag("hltScoutingMuonPackerVtx"),
-            dvInputTag = cms.InputTag("hltScoutingMuonPackerVtx:displacedVtx"),
+            dvInputTag = cms.InputTag("vertexMakerVtx:verticesVtx"),
+            vtxIndxInputTag = cms.InputTag("vertexMakerVtx", "vtxIndxVtx"),
             measurementTrackerEventInputTag = cms.InputTag("MeasurementTrackerEvent"),
             )
     process.hitMakerNoVtx = cms.EDProducer("HitMaker",
             muonInputTag = cms.InputTag("hltScoutingMuonPackerNoVtx"),
             dvInputTag = cms.InputTag("hltScoutingMuonPackerNoVtx:displacedVtx"),
+            vtxIndxInputTag = cms.InputTag(""),
             measurementTrackerEventInputTag = cms.InputTag("MeasurementTrackerEvent"),
             )
 else:
@@ -313,36 +323,28 @@ process.beamSpotMaker = cms.EDProducer("BeamSpotMaker")
 
 from RecoTracker.MeasurementDet.measurementTrackerEventDefault_cfi import measurementTrackerEventDefault as _measurementTrackerEventDefault
 process.MeasurementTrackerEvent = _measurementTrackerEventDefault.clone()
-
-# MiniAOD: gtStage2Digis::RECO is already stored; no need to re-unpack from raw FED data
-#process.load("EventFilter.L1TRawToDigi.gtStage2Digis_cfi")
-#if opts.monitor:
-#    process.gtStage2Digis.InputLabel = cms.InputTag( "rawDataCollector", "", "LHC" )
-#else:
-#    process.gtStage2Digis.InputLabel = cms.InputTag( "hltFEDSelectorL1" )
-
 process.offlineBeamSpot = cms.EDProducer("BeamSpotProducer")
-
-# MiniAOD: patTrigger producer needs hltTriggerSummaryAOD which is absent in MiniAOD
-# slimmedPatTrigger::PAT contains trigger objects but TriggerMaker.cc hardcodes InputTag("patTrigger")
-# For now doTriggerObjects=False above; re-enable once TriggerMaker.cc is updated to read slimmedPatTrigger
-#process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
-#process.patTrigger.triggerResults = cms.InputTag("TriggerResults","","HLT")
-#process.patTrigger.triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT")
-#process.patTrigger.stageL1Trigger = cms.uint32(2)
 
 if '2024' in opts.era or '2025' in opts.era:
     if do_skim:
-        #process.skimpath_vtx   = cms.Path(process.countmuVtx+process.gtStage2Digis+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis (already in RECO)
-        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
-        #process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.gtStage2Digis+process.triggerMaker+...)
-        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
         process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('skimpath_vtx', 'skimpath_novtx'))
-    #else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis and patTrigger
-    else: process.skimpath = cms.Path(process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMakerVtx+process.hitMakerNoVtx)
+    else: 
+        process.skimpath = cms.Path(process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
 else:
     #hitMaker not needed (Mario)
-    #if do_skim: process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis
-    if do_skim: process.skimpath = cms.Path(process.countmu+process.countvtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
-    #else: process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+...)  # MiniAOD: removed gtStage2Digis and patTrigger
-    else: process.skimpath = cms.Path(process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+    process.load("EventFilter.L1TRawToDigi.gtStage2Digis_cfi")
+    if opts.monitor:
+        process.gtStage2Digis.InputLabel = cms.InputTag( "rawDataCollector", "", "LHC" )
+    else:
+        process.gtStage2Digis.InputLabel = cms.InputTag( "hltFEDSelectorL1" )
+        process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
+    process.patTrigger.triggerResults = cms.InputTag("TriggerResults","","HLT")
+    process.patTrigger.triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT")
+    process.patTrigger.stageL1Trigger = cms.uint32(2)
+
+    if do_skim:
+        process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
+    else:
+        process.skimpath = cms.Path(process.gtStage2Digis+process.patTrigger+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)

@@ -50,6 +50,7 @@ private:
 
   bool doL1_;
   bool doTriggerObjects_;
+  bool isMiniAOD_;
   triggerExpression::Data triggerCache_;
   std::vector<triggerExpression::Evaluator*> vtriggerSelector_;
   std::vector<std::string> vtriggerAlias_, vtriggerSelection_;

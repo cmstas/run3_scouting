@@ -26,6 +26,7 @@ propagatorToken_(esConsumes(edm::ESInputTag("", "PropagatorWithMaterial")))
     muonToken_ = consumes<Run3ScoutingMuonCollection>(iConfig.getParameter<InputTag>("muonInputTag"));
     dvToken_ = consumes<Run3ScoutingVertexCollection>(iConfig.getParameter<InputTag>("dvInputTag"));
     measurementTrackerEventToken_ = consumes<MeasurementTrackerEvent>(iConfig.getParameter<InputTag>("measurementTrackerEventInputTag"));
+    vtxIndxToken_ = mayConsume<std::vector<std::vector<int>>>(iConfig.getParameter<InputTag>("vtxIndxInputTag"));
 
     produces<vector<vector<vector<bool> > > >("isbarrel").setBranchAlias("Muon_hit_barrel");
     produces<vector<vector<vector<bool> > > >("ispixel").setBranchAlias("Muon_hit_pixel");
@@ -137,6 +138,9 @@ void HitMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     edm::Handle<Run3ScoutingVertexCollection> dvHandle;
     iEvent.getByToken(dvToken_, dvHandle);
+
+    edm::Handle<std::vector<std::vector<int>>> vtxIndxHandle;
+    iEvent.getByToken(vtxIndxToken_, vtxIndxHandle);
 
     if (debug) {
         std::cout << std::endl;
@@ -264,7 +268,8 @@ void HitMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
         }
     }
    
-    for (auto const& muon : *muonHandle) {
+    for (unsigned int imu = 0; imu < muonHandle->size(); ++imu) {
+        auto const& muon = (*muonHandle)[imu];
 
 	vector<int> dv_nhitsbeforesv;
 	vector<vector<bool>> dv_isbarrel;
@@ -275,7 +280,7 @@ void HitMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 	vector<vector<float>> dv_hitx;
 	vector<vector<float>> dv_hity;
 	vector<vector<float>> dv_hitz;
-        vector<int> dv_nexpectedhits;
+    vector<int> dv_nexpectedhits;
 	vector<int> dv_ncompatible;
 	vector<int> dv_nexpectedhitsmultiple;
 	vector<int> dv_nexpectedhitstotal;
@@ -331,7 +336,7 @@ void HitMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
         CurvilinearTrajectoryError err(track_cov);
         // Loop over the vertices
-        vector<int> vertex_indices = muon.vtxIndx();
+        vector<int> vertex_indices = vtxIndxHandle.isValid() ? (*vtxIndxHandle)[imu] : muon.vtxIndx();
         for (auto idx : vertex_indices) {
             if (!(idx >= 0 && idx < (int)(*dvHandle).size())) 
                 continue;

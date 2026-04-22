@@ -7,6 +7,7 @@ using namespace std;
 TriggerMaker::TriggerMaker(const edm::ParameterSet& iConfig) :
   doL1_(iConfig.getParameter<bool>("doL1")),
   doTriggerObjects_(iConfig.getParameter<bool>("doTriggerObjects")),
+  isMiniAOD_(iConfig.getParameter<bool>("isMiniAOD")),
   triggerCache_(triggerExpression::Data(iConfig.getParameterSet("triggerConfiguration"), consumesCollector())),
   vtriggerAlias_(iConfig.getParameter<vector<string>>("triggerAlias")),
   vtriggerSelection_(iConfig.getParameter<vector<string>>("triggerSelection")),
@@ -22,9 +23,10 @@ TriggerMaker::TriggerMaker(const edm::ParameterSet& iConfig) :
   }
 
   if (doTriggerObjects_) {
-    // triggerPrescaleToken = consumes<pat::PackedTriggerPrescales>(edm::InputTag("patTrigger"));
-    // triggerObjectsToken = consumes<pat::TriggerObjectStandAloneCollection>(edm::InputTag("selectedPatTrigger"));
-    triggerObjectsToken = consumes<pat::TriggerObjectStandAloneCollection>(edm::InputTag("patTrigger"));
+    edm::InputTag trigObjTag = isMiniAOD_
+        ? edm::InputTag("slimmedPatTrigger", "", "PAT")
+        : edm::InputTag("patTrigger");
+    triggerObjectsToken = consumes<pat::TriggerObjectStandAloneCollection>(trigObjTag);
     triggerResultsToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","", "HLT"));
 
     produces<std::vector<std::string> >("trigObjsfilters").setBranchAlias("trigObjs_filters");
