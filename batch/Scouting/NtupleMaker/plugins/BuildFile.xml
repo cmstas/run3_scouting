@@ -45,6 +45,7 @@
     <use name="TrackingTools/TransientTrackingRecHit"/>
     <use name="TrackingTools/TransientTrack"/>
     <use name="TrackingTools/KalmanUpdators"/>
+    <use name="RecoVertex/KalmanVertexFit"/>
 
     <flags EDM_PLUGIN="1"/>
 </library>
