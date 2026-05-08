@@ -2,10 +2,14 @@ SCRAMARCH=slc7_amd64_gcc10
 CMSSWVERSION=CMSSW_12_6_0
 if [ $# -gt 0 ]
 then
-    if [ $1=="EL8" ]
+    if [ "$1" = "EL8" ]
     then
-	SCRAMARCH="el8_amd64_gcc10"
-	CMSSWVERSION=CMSSW_12_6_0
+        SCRAMARCH="el8_amd64_gcc10"
+        CMSSWVERSION=CMSSW_12_6_0
+    elif [ "$1" = "2024" ]
+    then
+        SCRAMARCH="el9_amd64_gcc12"
+        CMSSWVERSION=CMSSW_15_0_2
     fi
 fi
 

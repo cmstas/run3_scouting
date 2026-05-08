@@ -1,5 +1,5 @@
 from CRABClient.UserUtilities import config #, getUsernameFromSiteDB
-from CRABAPI.RawCommand import crabCommand4
+from CRABAPI.RawCommand import crabCommand
 from http.client import HTTPException
 from CRABClient.ClientExceptions import ClientException
 
@@ -29,10 +29,10 @@ data=False
 
 # ntuple version defined now
 
-ntuple_version = "vhahm_8p0"
+#ntuple_version = "vhahm_8p0"
 #ntuple_version = "vdqcd_final_8p0"
 #ntuple_version = "btophi_extra_8p0"
-#ntuple_version = "_dqcd_2024"
+ntuple_version = "_dqcd_2024"
 
 # Setup working environment
 import os
@@ -376,7 +376,7 @@ if (len(sys.argv)>2):
         config.Data.unitsPerJob = int(10e4)
         config.Data.publication = True
         config.Data.unitsPerJob = int(20) # Increased to match 10 jobs per file aprox
-        config.Data.outputDatasetTag = "private-Skim_{era}-v2".format(era=era)
+        config.Data.outputDatasetTag = "private-Skim_final_{era}-v2".format(era=era)
         if era=="2022":
             inputfile = 'data/datasets_dqcd_2022_1000mm.txt'
         if era=="2022postEE":

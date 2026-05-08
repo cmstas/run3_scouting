@@ -74,7 +74,7 @@ std::vector<TString> getFiles(const std::string inputDir, const int startFile, c
     else
       fullInputDir = inputDir;
     std::string command;
-    command = "xrdfs redirector.t2.ucsd.edu:1095 ls ";
+    command = "python3 recursive_xrdls.py ";
     command += fullInputDir;
     command += " > infiles.txt";
     std::system(command.c_str());
@@ -278,9 +278,17 @@ int main(int argc, char **argv) {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Jan-9-2024/Data/Mon2022G/", startFile, nFiles, isCondor, fromCrab);  // 5 files
     process = "MonDataG";
   }
+  if (sampleArg == "LocalTest" && year == "2024") {
+    files.push_back("/eos/home-g/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/batch/output.root");
+    process = "LocalTest";
+  }
   std::cout << "################################## \n";
   std::cout << "Number of files to process: " << files.size() << "\n";
   std::cout << "################################## \n";
+  if (files.empty()) {
+    std::cerr << "No files found for sample " << sampleArg << " year " << year << ". Exiting.\n";
+    return 1;
+  }
   run3ScoutingLooper(files, year, process, outdir, "_"+std::to_string(startFile)+"To"+std::to_string(startFile+nFiles-1));
 
   return 0;
