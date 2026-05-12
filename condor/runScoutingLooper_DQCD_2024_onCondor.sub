@@ -4,7 +4,12 @@ error           = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).$(ProcId)
 log             = $ENV(STARTDIR)/condor/plotting_logs/job.$(ClusterId).log
 
 getenv = True
-+JobFlavour = "workday"
++DESIRED_Sites = "T2_US_UCSD"
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el9:latest"
+requirements = (GLIDEIN_Site =!= "UCSDT2-C")
+transfer_input_files = $ENV(STARTDIR)/package.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
 x509userproxy=$ENV(X509_USER_PROXY)
 use_x509userproxy = True
 JobBatchName = "Looper_DQCD_2024"
@@ -13,19 +18,19 @@ JobBatchName = "Looper_DQCD_2024"
 # FROMCRAB=0: all 2024 MC samples (QCD and signal) are on T2 UCSD, accessed via recursive_xrdls
 queue arguments from (
 #
-# QCD Background (12 PT bins) — not in DAS, use isCondor xrdls (FROMCRAB=0)
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-15to20_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-20to30_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-30to50_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-50to80_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-80to120_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-120to170_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-170to300_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-300to470_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-470to600_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-600to800_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-800to1000_Fil-MuEnriched_2024 0 1000000 0
-$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-1000_Fil-MuEnriched_2024 0 1000000 0
+# QCD Background (12 PT bins) — skipped: files predate vertexMakerVtx, need re-skim
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-15to20_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-20to30_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-30to50_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-50to80_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-80to120_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-120to170_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-170to300_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-300to470_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-470to600_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-600to800_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-800to1000_Fil-MuEnriched_2024 0 1000000 0
+#$ENV(SCOUTINGOUTPUTDIR) 2024 QCD_Bin-PT-1000_Fil-MuEnriched_2024 0 1000000 0
 #
 # Signal ScenarioA (84 samples) — mpi-1
 $ENV(SCOUTINGOUTPUTDIR) 2024 Signal_ScenarioA_Par_2024_mpi-1_mA-0p25_ctau-0p1mm 0 1000000 0

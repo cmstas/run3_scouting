@@ -12,7 +12,7 @@ usage()
     echo "  output_tag : a label for the output directory, e.g. looperOutput_2024_May-04-2026"
     echo "  notar      : skip repackaging (use existing package.tar.gz)"
     echo ""
-    echo "Output lands in: <project_root>/<output_tag>/"
+    echo "Output lands in: /store/group/Run3Scouting/<output_tag>/"
     echo ""
     exit
 }
@@ -34,8 +34,8 @@ if [ -z "$indir" ]; then usage; fi
 export SCOUTINGOUTPUTDIR=${indir}
 export STARTDIR=$PWD
 
-echo "Output will be staged to: ${STARTDIR}/${SCOUTINGOUTPUTDIR}"
-mkdir -p ${STARTDIR}/${SCOUTINGOUTPUTDIR}
+echo "Output will be staged to: /store/group/Run3Scouting/${SCOUTINGOUTPUTDIR}"
+mkdir -p /ceph/cms/store/group/Run3Scouting/${SCOUTINGOUTPUTDIR}
 mkdir -p condor/plotting_logs
 
 if [ ${notar} -eq 0 ]; then
@@ -43,5 +43,4 @@ if [ ${notar} -eq 0 ]; then
     sh condor/create_package_2024.sh
 fi
 
-module load lxbatch/eossubmit
 condor_submit condor/runScoutingLooper_DQCD_2024_onCondor.sub
