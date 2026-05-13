@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRAMARCH=el9_amd64_gcc12
+SCRAMARCH=el8_amd64_gcc12
 CMSSWVERSION=CMSSW_15_0_2
 
 OUTDIR=$1
@@ -45,6 +45,7 @@ function stageout {
 
 ulimit -s unlimited
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+cmssw-el8
 cd /cvmfs/cms.cern.ch/$SCRAMARCH/cms/cmssw/$CMSSWVERSION/src ; eval `scramv1 runtime -sh` ; cd -
 
 # package.tar.gz is transferred by HTCondor via transfer_input_files

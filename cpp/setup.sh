@@ -10,6 +10,10 @@ then
     then
         SCRAMARCH="el9_amd64_gcc12"
         CMSSWVERSION=CMSSW_15_0_2
+    elif [ "$1" = "2024_el8" ]
+    then
+        SCRAMARCH="el8_amd64_gcc12"
+        CMSSWVERSION=CMSSW_15_0_2
     fi
 fi
 
