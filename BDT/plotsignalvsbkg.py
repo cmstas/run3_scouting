@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Signal vs background shape comparison for all BDT input variables.
 
-One set of plots per ctau value (all mpi/mA combined for that ctau).
+One set of plots per ctau lifetime. Each plot overlays:
+  - the combined QCD background (filled, with sqrt(N) uncertainty band)
+  - one step-line per (mpi, mA) mass point available at that ctau
+
 Ranges are auto-computed from combined sig+bkg data (1st-99th percentile).
-Output: BDT/signal_vs_bkg_ctau{label}/{var}.png
+Output: BDT/signal_vs_bkg_ctau{X}mm/{var}.png
 """
 import os
 import re
@@ -13,6 +16,31 @@ import uproot
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import mplhep as hep
+hep.style.use("CMS")
+
+# --- Aesthetic overrides on top of the CMS style ---------------------------
+# The CMS mplhep style is sized for publication-scale plots; for these many
+# small figures we want lighter text and a more compact look.
+plt.rcParams.update({
+    "font.size":             13,
+    "axes.labelsize":        13,
+    "axes.titlesize":        13,
+    "xtick.labelsize":       11,
+    "ytick.labelsize":       11,
+    "legend.fontsize":       9,
+    "legend.title_fontsize": 10,
+    "axes.linewidth":        1.0,
+    "xtick.major.size":      5,
+    "ytick.major.size":      5,
+    "xtick.minor.size":      3,
+    "ytick.minor.size":      3,
+    "xtick.major.width":     0.9,
+    "ytick.major.width":     0.9,
+})
+
+FIGSIZE = (8.5, 6.5)
+
 from pathlib import Path
 
 _HERE      = Path(__file__).resolve().parent
@@ -21,29 +49,41 @@ TREE_NAME  = "tuples"
 
 N_BINS = 50
 
+# Colors for mass-point overlays (ordered light -> heavy).
+MASS_COLORS = ["#d62728", "#ff7f0e", "#2ca02c", "#1f77b4", "#e377c2"]
+
+# Background colours
+BKG_FACE = "#7fc7c4"
+BKG_EDGE = "#2f5f5d"
+
 # ---------------------------------------------------------------------------
-# Discover signal files grouped by ctau
+# Discover signal files grouped by (mpi, mA) then ctau
 # ---------------------------------------------------------------------------
 _SIG_RE = re.compile(
-    r"tuples_Signal_ScenarioA_Par_2024_mpi-\w+_mA-\w+_ctau-(\w+)mm_2024\.root"
+    r"tuples_Signal_ScenarioA_Par_2024_mpi-(\w+?)_mA-(\w+?)_ctau-(\w+?)mm_2024\.root"
 )
 
 def _p2f(s):
     return float(s.replace("p", "."))
 
-def _ctau_label(c):
-    s = f"{c:g}"
-    return s.replace(".", "p")
+def _f2lbl(x):
+    return f"{x:g}".replace(".", "p")
 
-ctau_to_files = {}
+# mpi_mA_files[(mpi, mA)][ctau] = [files]
+mpi_mA_files = {}
 for fpath in sorted(glob.glob(os.path.join(TUPLES_DIR, "tuples_Signal_ScenarioA_Par_2024_*.root"))):
     m = _SIG_RE.search(os.path.basename(fpath))
-    if m:
-        ctau = _p2f(m.group(1))
-        ctau_to_files.setdefault(ctau, []).append(fpath)
+    if not m:
+        continue
+    mpi  = _p2f(m.group(1))
+    mA   = _p2f(m.group(2))
+    ctau = _p2f(m.group(3))
+    mpi_mA_files.setdefault((mpi, mA), {}).setdefault(ctau, []).append(fpath)
 
-ctau_values = sorted(ctau_to_files)
-print(f"ctau values found: {ctau_values}")
+mpi_values = sorted(set(k[0] for k in mpi_mA_files))
+print(f"(mpi, mA) points found ({len(mpi_mA_files)}):")
+for (mpi, mA), ctau_dict in sorted(mpi_mA_files.items()):
+    print(f"  mpi={mpi}, mA={mA}: ctau={sorted(ctau_dict)}")
 
 BKG_FILES = sorted(glob.glob(os.path.join(TUPLES_DIR, "tuples_QCD_*.root")))
 
@@ -177,53 +217,85 @@ def load_all(files):
 print("Loading background...")
 bkg = load_all(BKG_FILES)
 
-for ctau in ctau_values:
-    lbl    = _ctau_label(ctau)
-    outdir = str(_HERE / f"signal_vs_bkg_ctau{lbl}")
-    os.makedirs(outdir, exist_ok=True)
+for mpi in mpi_values:
+    mA_vals = sorted(set(k[1] for k in mpi_mA_files if k[0] == mpi))
+    for mA in mA_vals:
+        ctau_dict = mpi_mA_files[(mpi, mA)]
+        ctau_vals = sorted(ctau_dict)
+        outdir = str(_HERE / f"signal_vs_bkg_mpi{mpi:g}" / f"mA_{mA:g}")
+        os.makedirs(outdir, exist_ok=True)
 
-    print(f"Loading signal ctau={ctau}mm ({len(ctau_to_files[ctau])} files)...")
-    sig = load_all(ctau_to_files[ctau])
+        sig_per_ctau = {}
+        for ctau in ctau_vals:
+            print(f"  Loading mpi={mpi}, mA={mA}, ctau={ctau} ({len(ctau_dict[ctau])} files)...")
+            sig_per_ctau[ctau] = load_all(ctau_dict[ctau])
 
-    variables = [v for v in AXIS_LABELS if v in sig and v in bkg]
-    print(f"  Plotting {len(variables)} variables...")
+        common = set(bkg.keys())
+        for s in sig_per_ctau.values():
+            common &= set(s.keys())
+        variables = [v for v in AXIS_LABELS if v in common]
+        print(f"  ({len(variables)} vars) -> {outdir}/")
 
-    for var in variables:
-        s = sig[var].astype(float)
-        b = bkg[var].astype(float)
+        for var in variables:
+            all_vals = [bkg[var].astype(float)]
+            for s in sig_per_ctau.values():
+                all_vals.append(s[var].astype(float))
+            combined = np.concatenate(all_vals)
+            combined = combined[np.isfinite(combined)]
+            if len(combined) == 0:
+                continue
 
-        combined = np.concatenate([s, b])
-        combined = combined[np.isfinite(combined)]
-        if len(combined) == 0:
-            continue
+            lo = np.percentile(combined, 1)
+            hi = np.percentile(combined, 99)
+            if lo == hi:
+                lo, hi = combined.min(), combined.max()
+            if lo == hi:
+                continue
 
-        lo = np.percentile(combined, 1)
-        hi = np.percentile(combined, 99)
-        if lo == hi:
-            lo, hi = combined.min(), combined.max()
-        if lo == hi:
-            continue
+            b  = bkg[var].astype(float)
+            hb, edges = np.histogram(b, bins=N_BINS, range=(lo, hi))
+            bsum = hb.sum()
+            hb_norm = hb / bsum if bsum > 0 else hb.astype(float)
 
-        hs, edges = np.histogram(s, bins=N_BINS, range=(lo, hi))
-        hb, _     = np.histogram(b, bins=N_BINS, range=(lo, hi))
+            widths = np.diff(edges)
+            xlabel = AXIS_LABELS.get(var, var)
 
-        hs = hs / hs.sum() if hs.sum() > 0 else hs
-        hb = hb / hb.sum() if hb.sum() > 0 else hb
+            fig, ax = plt.subplots(figsize=FIGSIZE)
 
-        xlabel = AXIS_LABELS.get(var, var)
+            ax.bar(edges[:-1], hb_norm, width=widths, align='edge',
+                   color=BKG_FACE, edgecolor=BKG_EDGE, linewidth=0.6,
+                   label="Background", zorder=1)
 
-        fig, ax = plt.subplots(figsize=(7, 5))
-        ax.step(edges[:-1], hb, where='post', color='red',  linewidth=1.5, label="QCD")
-        ax.step(edges[:-1], hs, where='post', color='blue', linewidth=1.5,
-                label=rf"Signal ($c\tau$={ctau}mm, all masses)")
-        ax.set_xlabel(xlabel, fontsize=11)
-        ax.set_ylabel("a.u.", fontsize=11)
-        ax.set_title(var, fontsize=10)
-        ax.legend(fontsize=9)
-        fig.tight_layout()
-        fig.savefig(os.path.join(outdir, f"{var}.png"), dpi=100)
-        plt.close(fig)
+            for i, ctau in enumerate(ctau_vals):
+                s = sig_per_ctau[ctau][var].astype(float)
+                hs, _ = np.histogram(s, bins=N_BINS, range=(lo, hi))
+                if hs.sum() > 0:
+                    hs = hs / hs.sum()
+                ax.stairs(hs, edges, color=MASS_COLORS[i % len(MASS_COLORS)], linewidth=1.6,
+                          label=rf"$c\tau = {ctau:g}$ mm", zorder=3 + i)
 
-    print(f"  Done. Saved to {outdir}/")
+            pos_vals = hb_norm[hb_norm > 0]
+            if pos_vals.size > 0:
+                ax.set_yscale('log')
+                ymin = max(pos_vals.min() * 0.3, 1e-6)
+                ax.set_ylim(bottom=ymin)
 
-print("All done.")
+            ax.set_title(var, fontsize=11)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel("a.u.")
+
+            ax.text(0.02, 0.97, "Preliminary",
+                    transform=ax.transAxes,
+                    fontsize=11, fontstyle="italic", fontweight="bold",
+                    va="top", ha="left")
+            ax.legend(loc="best", framealpha=0.9,
+                      title=rf"$m_\pi = {mpi:g}$ GeV, $m_A = {mA:g}$ GeV",
+                      title_fontsize=10)
+            ax.tick_params(direction="in", top=True, right=True, which="both")
+            fig.tight_layout()
+            fig.savefig(os.path.join(outdir, f"{var}.png"), dpi=130)
+            plt.close(fig)
+
+        print("    Done.")
+
+print("\nAll done.")

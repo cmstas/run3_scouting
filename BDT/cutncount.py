@@ -20,7 +20,7 @@ TUPLES_DIR = Path(__file__).resolve().parent.parent / "tuples"
 TREE_NAME  = "tuples"
 
 # One benchmark signal — edit as needed
-SIG_PATTERN = str(TUPLES_DIR / "tuples_Signal_ScenarioA_Par_2024_mpi-2_mA-0p50_ctau-1p0mm_2024.root")
+SIG_PATTERN = str(TUPLES_DIR / "tuples_Signal_ScenarioA_Par_2024_mpi-2_mA-0p50_ctau-10mm_2024.root")
 BKG_PATTERN = str(TUPLES_DIR / "tuples_QCD_*.root")
 
 SIG_FILES = sorted(glob.glob(SIG_PATTERN))
@@ -98,7 +98,7 @@ def dimuon_mask(arr, sv):
 
     dphi = (phi1 - phi2 + np.pi) % (2 * np.pi) - np.pi
     dphi = np.where(np.abs(dphi) > 1e-6, dphi, 1e-6)
-    deta = eta1 - eta2
+    deta = np.where(np.abs(eta1 - eta2) > 1e-6, eta1 - eta2, 1e-6)
     log_ratio = np.log10(np.abs(deta) / np.abs(dphi))
 
     denom     = lxy * mass / ptmm
@@ -106,8 +106,8 @@ def dimuon_mask(arr, sv):
     dxy_lxy2  = np.abs(dxy2) / np.where(denom > 1e-9, denom, 1e-9)
 
     return (
-        (dxysig1   > 2   ) &
-        (dxysig2   > 2   ) &
+        (np.abs(dxysig1) > 2   ) &
+        (np.abs(dxysig2) > 2   ) &
         (chi2ndof1 < 3   ) &
         (chi2ndof2 < 3   ) &
         (dphi      < 2.8 ) &
@@ -121,7 +121,7 @@ def material_veto_mask(arr, sv):
     dx = arr[f"SV{sv}_minDistanceFromDet_x"]
     dy = arr[f"SV{sv}_minDistanceFromDet_y"]
     dz = arr[f"SV{sv}_minDistanceFromDet_z"]
-    return (dx >= 0.81) & (dy >= 3.24) & (dz >= 0.0145)
+    return (np.abs(dx) >= 0.81) | (np.abs(dy) >= 3.24) | (np.abs(dz) >= 0.0145)
 
 
 def excess_hits_mask(arr, sv):
@@ -170,3 +170,90 @@ for lo, hi, lbl in zip(LXY_BINS[:-1], LXY_BINS[1:], LXY_LABELS):
         f"{sig_pass:>6}/{sig_total:<8}  {sig_eff:>8.3f} | "
         f"{bkg_pass:>6}/{bkg_total:<8}  {bkg_rej:>8.3f}"
     )
+
+# ---------------------------------------------------------------------------
+# Cutflow — sequential cut breakdown (all lxy bins combined)
+# ---------------------------------------------------------------------------
+CUT_STAGES = [
+    ("SV quality",
+     lambda a: (sv_mask(a, 1))
+             | (sv_mask(a, 2))),
+    ("+ Dimuon cuts",
+     lambda a: (sv_mask(a, 1) & dimuon_mask(a, 1))
+             | (sv_mask(a, 2) & dimuon_mask(a, 2))),
+    ("+ Excess hits",
+     lambda a: (sv_mask(a, 1) & dimuon_mask(a, 1) & excess_hits_mask(a, 1))
+             | (sv_mask(a, 2) & dimuon_mask(a, 2) & excess_hits_mask(a, 2))),
+    ("+ Material veto",
+     lambda a: (sv_mask(a, 1) & dimuon_mask(a, 1) & excess_hits_mask(a, 1) & material_veto_mask(a, 1))
+             | (sv_mask(a, 2) & dimuon_mask(a, 2) & excess_hits_mask(a, 2) & material_veto_mask(a, 2))),
+]
+
+sig_total_all = len(sig["label"])
+bkg_total_all = len(bkg["label"])
+
+print()
+print("Cutflow (all lxy bins)")
+print(f"{'cut':<18} | {'sig pass':>8}  {'sig eff':>8}  {'sig drop':>9} | {'bkg pass':>9}  {'bkg rej':>8}  {'bkg drop':>9}")
+print("-" * 82)
+print(f"{'All events':<18} | {sig_total_all:>8}  {'100.0%':>8}  {'—':>9} | {bkg_total_all:>9}  {'0.0%':>8}  {'—':>9}")
+
+prev_sig = sig_total_all
+prev_bkg = bkg_total_all
+for name, cut_fn in CUT_STAGES:
+    sig_pass = int(cut_fn(sig).sum())
+    bkg_pass = int(cut_fn(bkg).sum())
+    sig_eff  = sig_pass / sig_total_all if sig_total_all > 0 else float("nan")
+    bkg_rej  = 1 - bkg_pass / bkg_total_all if bkg_total_all > 0 else float("nan")
+    sig_drop = (prev_sig - sig_pass) / prev_sig if prev_sig > 0 else float("nan")
+    bkg_drop = (prev_bkg - bkg_pass) / prev_bkg if prev_bkg > 0 else float("nan")
+    print(f"{name:<18} | {sig_pass:>8}  {sig_eff:>8.1%}  {sig_drop:>9.1%} | {bkg_pass:>9}  {bkg_rej:>8.1%}  {bkg_drop:>9.1%}")
+    prev_sig = sig_pass
+    prev_bkg = bkg_pass
+
+# ---------------------------------------------------------------------------
+# Dimuon sub-cut breakdown on signal (SV1, all events)
+# ---------------------------------------------------------------------------
+print()
+print("Dimuon sub-cut breakdown on signal (SV1, standalone — not cumulative)")
+print(f"{'cut':<30} | {'sig pass':>8}  {'sig eff':>8}")
+print("-" * 46)
+
+def _dimuon_subcuts(arr, sv):
+    dxysig1   = arr[f"SV{sv}_mu1_dxysig"]
+    dxysig2   = arr[f"SV{sv}_mu2_dxysig"]
+    dxy1      = arr[f"SV{sv}_mu1_dxy"]
+    dxy2      = arr[f"SV{sv}_mu2_dxy"]
+    chi2ndof1 = arr[f"SV{sv}_mu1_normChi2"]
+    chi2ndof2 = arr[f"SV{sv}_mu2_normChi2"]
+    phi1      = arr[f"SV{sv}_mu1_phi"]
+    phi2      = arr[f"SV{sv}_mu2_phi"]
+    eta1      = arr[f"SV{sv}_mu1_eta"]
+    eta2      = arr[f"SV{sv}_mu2_eta"]
+    lxy       = arr[f"SV{sv}_lxy"]
+    mass      = arr[f"SV{sv}_mass"]
+    ptmm      = arr[f"SV{sv}_ptmm"]
+    dphi = (phi1 - phi2 + np.pi) % (2 * np.pi) - np.pi
+    dphi = np.where(np.abs(dphi) > 1e-6, dphi, 1e-6)
+    deta = np.where(np.abs(eta1 - eta2) > 1e-6, eta1 - eta2, 1e-6)
+    log_ratio = np.log10(np.abs(deta) / np.abs(dphi))
+    denom    = lxy * mass / ptmm
+    dxy_lxy1 = np.abs(dxy1) / np.where(denom > 1e-9, denom, 1e-9)
+    dxy_lxy2 = np.abs(dxy2) / np.where(denom > 1e-9, denom, 1e-9)
+    return [
+        ("|dxysig1| > 2",     np.abs(dxysig1) > 2),
+        ("|dxysig2| > 2",     np.abs(dxysig2) > 2),
+        ("chi2ndof1 < 3",     chi2ndof1 < 3   ),
+        ("chi2ndof2 < 3",     chi2ndof2 < 3   ),
+        ("dphi < 2.8",        dphi      < 2.8 ),
+        ("log_ratio < 1.25",  log_ratio < 1.25),
+        ("dxy_lxy1 > 0.1",    dxy_lxy1  > 0.1 ),
+        ("dxy_lxy2 > 0.1",    dxy_lxy2  > 0.1 ),
+    ]
+
+n_sig = sig_total_all
+for sv in (1, 2):
+    print(f"\n  SV{sv}:")
+    for cut_name, mask in _dimuon_subcuts(sig, sv):
+        n = int(mask.sum())
+        print(f"  {cut_name:<28} | {n:>8}  {n/n_sig:>8.1%}")
