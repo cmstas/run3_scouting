@@ -694,28 +694,6 @@ for sv in ["SV1", "SV2"]:
     for var in SV_BRANCHES:
         branches[f"{sv}_{var}"] = []
 
-# MU_BRANCHES = [
-#     "pt", "eta", "phi", "ch",
-#     "dxy", "dxyErr", "normChi2", "iso",
-#     "nhitsbeforesv", "isvtx",
-#     # additional muon quality variables
-#     "dxysig", "dz", "dze", "dzsig",
-#     "isGlobal", "isTracker", "isStandAlone",
-#     "pixHits", "stripHits", "pixLayers", "trkLayers",
-#     "saHits", "saMatchedStats",
-#     "muHits", "muChambs", "muCSCDT", "muMatch", "muMatchedStats", "muExpMatchedStats", "muMatchedRPC",
-#     "ecalIso", "hcalIso", "trackIso", "ecalRelIso", "hcalRelIso", "trackRelIso",
-#     "PFIsoChg0p3", "PFIsoAll0p3", "PFRelIsoChg0p3", "PFRelIsoAll0p3", "mindrPF0p3",
-#     "PFIsoChg0p4", "PFRelIsoChg0p4", "PFRelIsoAll0p4", "mindrPF0p4",
-#     "mindr", "maxdr", "mindrJet", "mindphiJet", "mindetaJet",
-#     "ncompatible", "ncompatibletotal",
-#     "nexpectedhits", "nexpectedhitsmultiple", "nexpectedhitsmultipletotal", "nexpectedhitstotal",
-#     "phiCorr",
-# ]
-# N_MU_SLOTS = 4
-# for mu in [f"Mu{i+1}" for i in range(N_MU_SLOTS)]:
-#     for var in MU_BRANCHES:
-#         branches[f"{mu}_{var}"] = []
 
 
 def muattr(t, attr, idx, is_vtx):
@@ -870,9 +848,22 @@ for e in range(firste,laste):
             continue
         nMuSel_noVtx = nMuSel_noVtx+1
         if t.Muon_bestAssocSVOverlapIdx[m]>-1:
+            if applyMaterialVeto:
+                _ovsv = t.SVOverlap_vtxIdxs[t.Muon_bestAssocSVOverlapIdx[m]][0]
+                if t.SV_onModuleWithinUnc[_ovsv] or (abs(t.SV_minDistanceFromDet_x[_ovsv]) < 0.81 and abs(t.SV_minDistanceFromDet_y[_ovsv]) < 3.24 and abs(t.SV_minDistanceFromDet_z[_ovsv]) < 0.0145):
+                    continue
             nMuAss_noVtx = nMuAss_noVtx+1
             nMuAssOverlap_noVtx = nMuAssOverlap_noVtx+1
         elif t.Muon_bestAssocSVIdx[m]>-1:
+            if applyMaterialVeto:
+                _vidx = t.Muon_bestAssocSVIdx[m]
+                _sv_on_module = False
+                for _v in range(len(t.SV_index)):
+                    if t.SV_index[_v] == _vidx:
+                        _sv_on_module = bool(t.SV_onModuleWithinUnc[_v] or (abs(t.SV_minDistanceFromDet_x[_v]) < 0.81 and abs(t.SV_minDistanceFromDet_y[_v]) < 3.24 and abs(t.SV_minDistanceFromDet_z[_v]) < 0.0145))
+                        break
+                if _sv_on_module:
+                    continue
             nMuAss_noVtx = nMuAss_noVtx+1
         else:
             continue
@@ -1012,7 +1003,17 @@ for e in range(firste,laste):
             if not t.Muon_vtx_selected[m]:
                 continue
             nMuSel_vtx += 1
-            if t.Muon_vtx_bestAssocSVVtxIdx[m] > -1:
+            if t.Muon_vtx_bestAssocSVOverlapVtxIdx[m] > -1:
+                if applyMaterialVeto:
+                    _ovsv = t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]
+                    if t.SV_vtx_onModuleWithinUnc[_ovsv] or (abs(t.SV_vtx_minDistanceFromDet_x[_ovsv]) < 0.81 and abs(t.SV_vtx_minDistanceFromDet_y[_ovsv]) < 3.24 and abs(t.SV_vtx_minDistanceFromDet_z[_ovsv]) < 0.0145):
+                        continue
+                nMuAss_vtx += 1
+            elif t.Muon_vtx_bestAssocSVVtxIdx[m] > -1:
+                if applyMaterialVeto:
+                    _vpos = t.Muon_vtx_bestAssocSVVtxIdx[m]
+                    if t.SV_vtx_onModuleWithinUnc[_vpos] or (abs(t.SV_vtx_minDistanceFromDet_x[_vpos]) < 0.81 and abs(t.SV_vtx_minDistanceFromDet_y[_vpos]) < 3.24 and abs(t.SV_vtx_minDistanceFromDet_z[_vpos]) < 0.0145):
+                        continue
                 nMuAss_vtx += 1
             else:
                 continue
@@ -1038,12 +1039,12 @@ for e in range(firste,laste):
             vidx  = -1
             ovpos = -1
             vpos  = -1
-            # Overlapping SVs — commented out until looper output with SVOverlap_vtx_* is available
-            # if t.Muon_vtx_bestAssocSVOverlapVtxIdx[m] > -1 and doOverlappingSV:
-            #     if applyMaterialVeto and (t.SV_vtx_onModuleWithinUnc[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]] or (abs(t.SV_vtx_minDistanceFromDet_x[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]]) < 0.81 and abs(t.SV_vtx_minDistanceFromDet_y[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]]) < 3.24 and abs(t.SV_vtx_minDistanceFromDet_z[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]]) < 0.0145)):
-            #         continue
-            #     ovidx = t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]
-            #     ovpos = ovidx
+            # Overlapping SVs
+            if t.Muon_vtx_bestAssocSVOverlapVtxIdx[m] > -1 and doOverlappingSV:
+                if applyMaterialVeto and (t.SV_vtx_onModuleWithinUnc[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]] or (abs(t.SV_vtx_minDistanceFromDet_x[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]]) < 0.81 and abs(t.SV_vtx_minDistanceFromDet_y[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]]) < 3.24 and abs(t.SV_vtx_minDistanceFromDet_z[t.SVOverlap_vtx_vtxIdxs[t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]][0]]) < 0.0145)):
+                    continue
+                ovidx = t.Muon_vtx_bestAssocSVOverlapVtxIdx[m]
+                ovpos = ovidx
             # Non-overlapping SVs
             if t.Muon_vtx_bestAssocSVVtxIdx[m] > -1:
                 vidx = t.Muon_vtx_bestAssocSVVtxIdx[m]
@@ -1055,20 +1056,20 @@ for e in range(firste,laste):
                     continue
                 if abs(chg + t.Muon_vtx_ch[mm]) > 0:
                     continue
-                # Overlapping SV pair — commented out until looper output with SVOverlap_vtx_* is available
-                # if ovidx > -1 and t.Muon_vtx_bestAssocSVOverlapVtxIdx[mm] == ovidx and ovpos > -1:
-                #     if not (m in dmuidxs_osv_vtx or mm in dmuidxs_osv_vtx):
-                #         dmuvec_osv_vtx.append(t.Muon_vtx_vec[m])
-                #         dmuvec_osv_vtx[-1] = dmuvec_osv_vtx[-1] + t.Muon_vtx_vec[mm]
-                #         dmuidxs_osv_vtx.append(m)
-                #         dmuidxs_osv_vtx.append(mm)
-                #         dmu_muvecdp_osv_vtx.append(ROOT.TLorentzVector())
-                #         dmu_muvecdp_osv_vtx[-1].SetPtEtaPhiM(t.Muon_vtx_pt[m], t.Muon_vtx_eta[m], t.Muon_vtx_phi[m], MUON_MASS)
-                #         dmu_muvecdp_osv_vtx.append(ROOT.TLorentzVector())
-                #         dmu_muvecdp_osv_vtx[-1].SetPtEtaPhiM(t.Muon_vtx_pt[mm], t.Muon_vtx_eta[mm], t.Muon_vtx_phi[mm], MUON_MASS)
-                #         osvvec_vtx.append(ROOT.TVector3())
-                #         osvvec_vtx[-1].SetXYZ(t.SVOverlap_vtx_x[ovpos]-t.PV_x, t.SVOverlap_vtx_y[ovpos]-t.PV_y, t.SVOverlap_vtx_z[ovpos]-t.PV_z)
-                #         osvidx_vtx.append(ovpos)
+                # Overlapping SV pair
+                if ovidx > -1 and t.Muon_vtx_bestAssocSVOverlapVtxIdx[mm] == ovidx and ovpos > -1:
+                    if not (m in dmuidxs_osv_vtx or mm in dmuidxs_osv_vtx):
+                        dmuvec_osv_vtx.append(t.Muon_vtx_vec[m])
+                        dmuvec_osv_vtx[-1] = dmuvec_osv_vtx[-1] + t.Muon_vtx_vec[mm]
+                        dmuidxs_osv_vtx.append(m)
+                        dmuidxs_osv_vtx.append(mm)
+                        dmu_muvecdp_osv_vtx.append(ROOT.TLorentzVector())
+                        dmu_muvecdp_osv_vtx[-1].SetPtEtaPhiM(t.Muon_vtx_pt[m], t.Muon_vtx_eta[m], t.Muon_vtx_phi[m], MUON_MASS)
+                        dmu_muvecdp_osv_vtx.append(ROOT.TLorentzVector())
+                        dmu_muvecdp_osv_vtx[-1].SetPtEtaPhiM(t.Muon_vtx_pt[mm], t.Muon_vtx_eta[mm], t.Muon_vtx_phi[mm], MUON_MASS)
+                        osvvec_vtx.append(ROOT.TVector3())
+                        osvvec_vtx[-1].SetXYZ(t.SVOverlap_vtx_x[ovpos]-t.PV_x, t.SVOverlap_vtx_y[ovpos]-t.PV_y, t.SVOverlap_vtx_z[ovpos]-t.PV_z)
+                        osvidx_vtx.append(ovpos)
                 # Non-overlapping SV pair
                 elif vidx > -1 and t.Muon_vtx_bestAssocSVVtxIdx[mm] == vidx and vpos > -1:
                     if not (m in dmuidxs_vtx or mm in dmuidxs_vtx):
@@ -1083,88 +1084,6 @@ for e in range(firste,laste):
                         svvec_vtx.append(ROOT.TVector3())
                         svvec_vtx[-1].SetXYZ(t.SV_vtx_x[vpos]-t.PV_x, t.SV_vtx_y[vpos]-t.PV_y, t.SV_vtx_z[vpos]-t.PV_z)
                         svidx_vtx.append(vpos)
-
-    # -----------------------------------------------------------------------
-    # Build OR muon collection and fill per-event muon branches
-    # Order: all Vtx muons first, then NoVtx muons not dR-matched to any Vtx muon.
-    # -----------------------------------------------------------------------
-    # or_muons = []  # (is_vtx: bool, idx)
-    # if use_vtx:
-    #     for m in muselidxs_vtx:
-    #         or_muons.append((True, m))
-    # if use_novtx:
-    #     if use_OR:
-    #         _vtx_mu_etas = [t.Muon_vtx_eta[m] for (_, m) in or_muons]
-    #         _vtx_mu_phis = [t.Muon_vtx_phi[m] for (_, m) in or_muons]
-    #         def _mu_matched_to_vtx(eta, phi):
-    #             for ve, vp in zip(_vtx_mu_etas, _vtx_mu_phis):
-    #                 dphi_v = (phi - vp + math.pi) % (2 * math.pi) - math.pi
-    #                 if math.sqrt((eta - ve)**2 + dphi_v**2) < 0.1:
-    #                     return True
-    #             return False
-    #     for m in muselidxs_noVtx:
-    #         if use_OR and _mu_matched_to_vtx(t.Muon_eta[m], t.Muon_phi[m]):
-    #             continue
-    #         or_muons.append((False, m))
-    # for slot, (is_vtx_mu, m) in enumerate(or_muons[:N_MU_SLOTS]):
-    #     mu_label = f"Mu{slot+1}"
-    #     branches[f"{mu_label}_pt"][-1]                      = muattr(t, 'pt',                      m, is_vtx_mu)
-    #     branches[f"{mu_label}_eta"][-1]                     = muattr(t, 'eta',                     m, is_vtx_mu)
-    #     branches[f"{mu_label}_phi"][-1]                     = muattr(t, 'phi',                     m, is_vtx_mu)
-    #     branches[f"{mu_label}_ch"][-1]                      = muattr(t, 'ch',                      m, is_vtx_mu)
-    #     branches[f"{mu_label}_dxy"][-1]                     = muattr(t, 'dxyCorr',                 m, is_vtx_mu)
-    #     branches[f"{mu_label}_dxyErr"][-1]                  = muattr(t, 'dxye',                    m, is_vtx_mu)
-    #     branches[f"{mu_label}_normChi2"][-1]                = muattr(t, 'chi2Ndof',                m, is_vtx_mu)
-    #     branches[f"{mu_label}_iso"][-1]                     = muattr(t, 'PFIsoAll0p4',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_nhitsbeforesv"][-1]           = muattr(t, 'nhitsbeforesv',           m, is_vtx_mu)
-    #     branches[f"{mu_label}_isvtx"][-1]                   = float(is_vtx_mu)
-    #     branches[f"{mu_label}_dxysig"][-1]                  = muattr(t, 'dxysig',                  m, is_vtx_mu)
-    #     branches[f"{mu_label}_dz"][-1]                      = muattr(t, 'dz',                      m, is_vtx_mu)
-    #     branches[f"{mu_label}_dze"][-1]                     = muattr(t, 'dze',                     m, is_vtx_mu)
-    #     branches[f"{mu_label}_dzsig"][-1]                   = muattr(t, 'dzsig',                   m, is_vtx_mu)
-    #     branches[f"{mu_label}_isGlobal"][-1]                = muattr(t, 'isGlobal',                m, is_vtx_mu)
-    #     branches[f"{mu_label}_isTracker"][-1]               = muattr(t, 'isTracker',               m, is_vtx_mu)
-    #     branches[f"{mu_label}_isStandAlone"][-1]            = muattr(t, 'isStandAlone',            m, is_vtx_mu)
-    #     branches[f"{mu_label}_pixHits"][-1]                 = muattr(t, 'pixHits',                 m, is_vtx_mu)
-    #     branches[f"{mu_label}_stripHits"][-1]               = muattr(t, 'stripHits',               m, is_vtx_mu)
-    #     branches[f"{mu_label}_pixLayers"][-1]               = muattr(t, 'pixLayers',               m, is_vtx_mu)
-    #     branches[f"{mu_label}_trkLayers"][-1]               = muattr(t, 'trkLayers',               m, is_vtx_mu)
-    #     branches[f"{mu_label}_saHits"][-1]                  = muattr(t, 'saHits',                  m, is_vtx_mu)
-    #     branches[f"{mu_label}_saMatchedStats"][-1]          = muattr(t, 'saMatchedStats',          m, is_vtx_mu)
-    #     branches[f"{mu_label}_muHits"][-1]                  = muattr(t, 'muHits',                  m, is_vtx_mu)
-    #     branches[f"{mu_label}_muChambs"][-1]                = muattr(t, 'muChambs',                m, is_vtx_mu)
-    #     branches[f"{mu_label}_muCSCDT"][-1]                 = muattr(t, 'muCSCDT',                 m, is_vtx_mu)
-    #     branches[f"{mu_label}_muMatch"][-1]                 = muattr(t, 'muMatch',                 m, is_vtx_mu)
-    #     branches[f"{mu_label}_muMatchedStats"][-1]          = muattr(t, 'muMatchedStats',          m, is_vtx_mu)
-    #     branches[f"{mu_label}_muExpMatchedStats"][-1]       = muattr(t, 'muExpMatchedStats',       m, is_vtx_mu)
-    #     branches[f"{mu_label}_muMatchedRPC"][-1]            = muattr(t, 'muMatchedRPC',            m, is_vtx_mu)
-    #     branches[f"{mu_label}_ecalIso"][-1]                 = muattr(t, 'ecalIso',                 m, is_vtx_mu)
-    #     branches[f"{mu_label}_hcalIso"][-1]                 = muattr(t, 'hcalIso',                 m, is_vtx_mu)
-    #     branches[f"{mu_label}_trackIso"][-1]                = muattr(t, 'trackIso',                m, is_vtx_mu)
-    #     branches[f"{mu_label}_ecalRelIso"][-1]              = muattr(t, 'ecalRelIso',              m, is_vtx_mu)
-    #     branches[f"{mu_label}_hcalRelIso"][-1]              = muattr(t, 'hcalRelIso',              m, is_vtx_mu)
-    #     branches[f"{mu_label}_trackRelIso"][-1]             = muattr(t, 'trackRelIso',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFIsoChg0p3"][-1]            = muattr(t, 'PFIsoChg0p3',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFIsoAll0p3"][-1]            = muattr(t, 'PFIsoAll0p3',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFRelIsoChg0p3"][-1]         = muattr(t, 'PFRelIsoChg0p3',         m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFRelIsoAll0p3"][-1]         = muattr(t, 'PFRelIsoAll0p3',         m, is_vtx_mu)
-    #     branches[f"{mu_label}_mindrPF0p3"][-1]             = muattr(t, 'mindrPF0p3',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFIsoChg0p4"][-1]            = muattr(t, 'PFIsoChg0p4',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFRelIsoChg0p4"][-1]         = muattr(t, 'PFRelIsoChg0p4',         m, is_vtx_mu)
-    #     branches[f"{mu_label}_PFRelIsoAll0p4"][-1]         = muattr(t, 'PFRelIsoAll0p4',         m, is_vtx_mu)
-    #     branches[f"{mu_label}_mindrPF0p4"][-1]             = muattr(t, 'mindrPF0p4',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_mindr"][-1]                   = muattr(t, 'mindr',                   m, is_vtx_mu)
-    #     branches[f"{mu_label}_maxdr"][-1]                   = muattr(t, 'maxdr',                   m, is_vtx_mu)
-    #     branches[f"{mu_label}_mindrJet"][-1]                = muattr(t, 'mindrJet',                m, is_vtx_mu)
-    #     branches[f"{mu_label}_mindphiJet"][-1]              = muattr(t, 'mindphiJet',              m, is_vtx_mu)
-    #     branches[f"{mu_label}_mindetaJet"][-1]              = muattr(t, 'mindetaJet',              m, is_vtx_mu)
-    #     branches[f"{mu_label}_ncompatible"][-1]             = muattr(t, 'ncompatible',             m, is_vtx_mu)
-    #     branches[f"{mu_label}_ncompatibletotal"][-1]        = muattr(t, 'ncompatibletotal',        m, is_vtx_mu)
-    #     branches[f"{mu_label}_nexpectedhits"][-1]           = muattr(t, 'nexpectedhits',           m, is_vtx_mu)
-    #     branches[f"{mu_label}_nexpectedhitsmultiple"][-1]   = muattr(t, 'nexpectedhitsmultiple',   m, is_vtx_mu)
-    #     branches[f"{mu_label}_nexpectedhitsmultipletotal"][-1] = muattr(t, 'nexpectedhitsmultipletotal', m, is_vtx_mu)
-    #     branches[f"{mu_label}_nexpectedhitstotal"][-1]      = muattr(t, 'nexpectedhitstotal',      m, is_vtx_mu)
-    #     branches[f"{mu_label}_phiCorr"][-1]                 = muattr(t, 'phiCorr',                 m, is_vtx_mu)
 
     # -----------------------------------------------------------------------
     # Combined event guard: skip if no usable dimuon candidate from any active collection
@@ -1221,9 +1140,15 @@ for e in range(firste,laste):
             svvec_all.append(svvec_vtx[i])
             svidx_all.append(svidx_vtx[i])
             dimu_type_all.append('vtx')
-        # vtx_osv block — commented out until looper output with SVOverlap_vtx_* is available
-        # for i in range(len(dmuvec_osv_vtx)):
-        #     ...
+        for i in range(len(dmuvec_osv_vtx)):
+            dmuvec_all.append(dmuvec_osv_vtx[i])
+            dmu_muvecdp_all.append(dmu_muvecdp_osv_vtx[2*i])
+            dmu_muvecdp_all.append(dmu_muvecdp_osv_vtx[2*i+1])
+            dmuidxs_all.append(dmuidxs_osv_vtx[2*i])
+            dmuidxs_all.append(dmuidxs_osv_vtx[2*i+1])
+            svvec_all.append(osvvec_vtx[i])
+            svidx_all.append(osvidx_vtx[i])
+            dimu_type_all.append('vtx_osv')
 
     if use_novtx:
         # In OR mode: build (eta,phi) for every Vtx muon used in any Vtx dimuon,
@@ -1270,16 +1195,6 @@ for e in range(firste,laste):
             svvec_all.append(osvvec_noVtx[i])
             svidx_all.append(osvidx_noVtx[i])
             dimu_type_all.append('noVtx_osv')
-        # vtx_osv block — commented out until looper output with SVOverlap_vtx_* is available
-        # for i in range(len(dmuvec_osv_vtx)):
-        #     dmuvec_all.append(dmuvec_osv_vtx[i])
-        #     dmu_muvecdp_all.append(dmu_muvecdp_osv_vtx[2*i])
-        #     dmu_muvecdp_all.append(dmu_muvecdp_osv_vtx[2*i+1])
-        #     dmuidxs_all.append(dmuidxs_osv_vtx[2*i])
-        #     dmuidxs_all.append(dmuidxs_osv_vtx[2*i+1])
-        #     svvec_all.append(osvvec_vtx[i])
-        #     svidx_all.append(osvidx_vtx[i])
-        #     dimu_type_all.append('vtx_osv')
 
     ### Scan analysis initialization
     ## If you put one of the to True, it won't fill.
@@ -1296,7 +1211,7 @@ for e in range(firste,laste):
             continue
         # --- collection-aware dispatch ---
         dimu_type  = dimu_type_all[vn]
-        is_vtx     = (dimu_type == 'vtx')
+        is_vtx     = dimu_type in ('vtx', 'vtx_osv')
         mu1idx     = dmuidxs_all[int(vn*2)]
         mu2idx     = dmuidxs_all[int(vn*2)+1]
         _svvec     = svvec_all[vn]
@@ -1311,15 +1226,15 @@ for e in range(firste,laste):
         elif dimu_type == 'vtx_osv':
             lxy    = t.SVOverlap_vtx_lxy[svidx_all[vn]]
             lz     = abs(t.SVOverlap_vtx_z[svidx_all[vn]])
-            _sv_x  = t.SV_vtx_x[svidx_all[vn]]
-            _sv_y  = t.SV_vtx_y[svidx_all[vn]]
-            _sv_z  = t.SV_vtx_z[svidx_all[vn]]
+            _sv_x  = t.SVOverlap_vtx_x[svidx_all[vn]]
+            _sv_y  = t.SVOverlap_vtx_y[svidx_all[vn]]
+            _sv_z  = t.SVOverlap_vtx_z[svidx_all[vn]]
         elif dimu_type == 'noVtx_osv':
             lxy    = t.SVOverlap_lxy[svidx_all[vn]]
             lz     = abs(t.SVOverlap_z[svidx_all[vn]])
-            _sv_x  = t.SV_x[svidx_all[vn]]
-            _sv_y  = t.SV_y[svidx_all[vn]]
-            _sv_z  = t.SV_z[svidx_all[vn]]
+            _sv_x  = t.SVOverlap_x[svidx_all[vn]]
+            _sv_y  = t.SVOverlap_y[svidx_all[vn]]
+            _sv_z  = t.SVOverlap_z[svidx_all[vn]]
         else:
             lxy    = t.SV_lxy[svidx_all[vn]]
             lz     = abs(t.SV_z[svidx_all[vn]])
