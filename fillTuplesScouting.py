@@ -360,10 +360,10 @@ if not os.path.exists(outdir):
     os.makedirs(outdir)
 
 applyMaterialVeto = not args.noMaterialVeto
-applyMuonIPSel = not args.noMuonIPSel
-applyDiMuonAngularSel = not args.noDiMuonAngularSel
-applyMuonHitSel = not args.noMuonHitSel
-applyDiMuonResonanceMasking = not args.noDiMuonResonanceMasking
+applyMuonIPSel = False            # moved to cut-and-count
+applyDiMuonAngularSel = False     # moved to cut-and-count
+applyMuonHitSel = False           # moved to cut-and-count
+applyDiMuonResonanceMasking = False  # moved to cut-and-count
 applyFourMuonResonanceMasking = not args.noFourMuonResonanceMasking
 applyFourMuonIPSel = not args.noFourMuonIPSel
 applyFourMuonAngularSel = not args.noFourMuonAngularSel
@@ -654,6 +654,9 @@ branches = {}
 SV_BRANCHES = [
     "ptmm", "chi2", "prob", "x", "y", "z", "lxy",
     "xErr", "yErr", "zErr", "dphi_mumu_SV", "d3d_mumu_SV", "a3d_mumu",
+    "dr_mumu", "dphi_mumu", "deta_mumu",
+    "dphisv_mu1", "dphisv_mu2", "deta_mumu_SV",
+    "sina3d_l3d", "sindphi_lxy",
     "mu1_pt", "mu1_eta", "mu1_phi", "mu1_isvtx", "mu1_normChi2", "mu1_dxy", "mu1_dxyErr",
     "mu1_dxysig", "mu1_dz", "mu1_dze", "mu1_dzsig", "mu1_nhitsbeforesv",
     "mu1_isGlobal", "mu1_isTracker", "mu1_isStandAlone",
@@ -1435,6 +1438,14 @@ for e in range(firste,laste):
         branches[f"{_sv_slot}_dphi_mumu_SV"][-1]  = dphisvu
         branches[f"{_sv_slot}_d3d_mumu_SV"][-1]  = a3dsvu
         branches[f"{_sv_slot}_a3d_mumu"][-1]      = a3dmmu
+        branches[f"{_sv_slot}_dr_mumu"][-1]       = drmmu
+        branches[f"{_sv_slot}_dphi_mumu"][-1]     = dpmmu
+        branches[f"{_sv_slot}_deta_mumu"][-1]     = demmu
+        branches[f"{_sv_slot}_dphisv_mu1"][-1]    = dphisv1u
+        branches[f"{_sv_slot}_dphisv_mu2"][-1]    = dphisv2u
+        branches[f"{_sv_slot}_deta_mumu_SV"][-1]  = detasvu
+        branches[f"{_sv_slot}_sina3d_l3d"][-1]    = sina3dsvl3du
+        branches[f"{_sv_slot}_sindphi_lxy"][-1]   = sindpsvlxyu
         branches[f"{_sv_slot}_mu1_pt"][-1]                         = _mu1_pt
         branches[f"{_sv_slot}_mu1_eta"][-1]                        = _mu1_eta_ntup
         branches[f"{_sv_slot}_mu1_phi"][-1]                        = _mu1_phi_ntup
@@ -1910,6 +1921,93 @@ else:
 with uproot.recreate(ntuple_name) as f:
     f["tuples"] = filtered_branches
 
+# ---------------------------------------------------------------------------
+# Cut-and-count: full selection efficiency per lxy bin
+# All cuts are defined here in one place. Operates on filtered_branches,
+# which already has sv1_mask applied (SV1 must be filled).
+# ---------------------------------------------------------------------------
+def cutncount(fb):
+    def _a(key):
+        return np.asarray(fb[key], dtype=float)
+
+    def _passes(sv):
+        lxy        = _a(f"SV{sv}_lxy")
+        xErr       = _a(f"SV{sv}_xErr")
+        yErr       = _a(f"SV{sv}_yErr")
+        zErr       = _a(f"SV{sv}_zErr")
+        chi2ndof   = _a(f"SV{sv}_chi2Ndof")
+        dxysig1    = _a(f"SV{sv}_mu1_dxysig")
+        dxysig2    = _a(f"SV{sv}_mu2_dxysig")
+        dxy1       = _a(f"SV{sv}_mu1_dxy")
+        dxy2       = _a(f"SV{sv}_mu2_dxy")
+        mass       = _a(f"SV{sv}_mass")
+        ptmm       = _a(f"SV{sv}_ptmm")
+        nchi2_1    = _a(f"SV{sv}_mu1_normChi2")
+        nchi2_2    = _a(f"SV{sv}_mu2_normChi2")
+        nhits1     = _a(f"SV{sv}_mu1_nhitsbeforesv")
+        nhits2     = _a(f"SV{sv}_mu2_nhitsbeforesv")
+        dphi_mumu  = _a(f"SV{sv}_dphi_mumu")    # abs(DeltaPhi(mu1,mu2)), stored at fill time
+        deta_mumu  = _a(f"SV{sv}_deta_mumu")    # abs(Eta1-Eta2)
+        a3d_mumu   = _a(f"SV{sv}_a3d_mumu")     # 3D opening angle between muons
+        dphi_sv    = _a(f"SV{sv}_dphi_mumu_SV") # abs(DeltaPhi(dimuon, SV))
+        d3d_sv     = _a(f"SV{sv}_d3d_mumu_SV")  # 3D angle(dimuon, SV)
+
+        # SV quality
+        sv_ok   = ((xErr < 0.05) & (yErr < 0.05) & (zErr < 0.10) &
+                   (lxy > 0) & (lxy < 70) & (chi2ndof < 3))
+        # Muon IP
+        denom   = np.where(lxy * mass / ptmm > 1e-9, lxy * mass / ptmm, 1e-9)
+        ip_ok   = ((np.abs(dxysig1) > 2) & (np.abs(dxysig2) > 2) &
+                   (np.abs(dxy1) / denom > 0.1) & (np.abs(dxy2) / denom > 0.1))
+        # Muon track chi2
+        chi2_ok = (nchi2_1 < 3) & (nchi2_2 < 3)
+        # Excess hits before SV
+        max_hits = np.where(lxy < 11, 0, np.where(lxy < 16, 1, 2))
+        hits_ok  = (nhits1 + nhits2) <= max_hits
+        # Angular
+        safe_dphi = np.where(dphi_mumu > 1e-6, dphi_mumu, 1e-6)
+        safe_deta = np.where(deta_mumu > 1e-6, deta_mumu, 1e-6)
+        ang_ok  = ((dphi_mumu < 0.9 * np.pi) &
+                   (a3d_mumu  < 0.9 * np.pi) &
+                   (dphi_sv   < np.pi / 2)   &
+                   (d3d_sv    < np.pi / 2)   &
+                   (np.log10(safe_deta / safe_dphi) < 1.25))
+        # Resonance masking
+        res_ok  = ~(((mass > 0.41)  & (mass < 0.50))  |
+                    ((mass > 0.51)  & (mass < 0.59))  |
+                    ((mass > 0.731) & (mass < 0.83))  |
+                    ((mass > 0.96)  & (mass < 1.08))  |
+                    ((mass > 2.91)  & (mass < 3.27))  |
+                    ((mass > 3.47)  & (mass < 3.89))  |
+                    ((mass > 8.99)  & (mass < 9.91))  |
+                    ((mass > 9.64)  & (mass < 10.56)) |
+                    ((mass > 9.90)  & (mass < 10.78)) |
+                    ((mass > 81)    & (mass < 101)))
+
+        return sv_ok & ip_ok & chi2_ok & hits_ok & ang_ok & res_ok
+
+    pass1    = _passes(1)
+    sv2_filled = _a("SV2_x") != -1.
+    pass2    = _passes(2) & sv2_filled
+    evt_pass = pass1 | pass2
+    lxy1     = _a("SV1_lxy")
+
+    sample_label = args.inSample if args.inSample != "*" else "all"
+    print(f'\nCut-and-count: {sample_label}')
+    print(f'{"lxy bin":>16} | {"pass/total":>13}  {"eff":>8}')
+    print('-' * 45)
+    for lo, hi, lbl in zip(lxybins[:-1], lxybins[1:], lxybinlabel):
+        bin_mask = (lxy1 >= lo) & (lxy1 < hi)
+        n_tot  = int(bin_mask.sum())
+        n_pass = int((evt_pass & bin_mask).sum())
+        eff    = n_pass / n_tot if n_tot > 0 else float('nan')
+        print(f'{lbl:>16} | {n_pass:>5}/{n_tot:<7}  {eff:>8.3f}')
+    n_tot_all  = len(evt_pass)
+    n_pass_all = int(evt_pass.sum())
+    eff_all    = n_pass_all / n_tot_all if n_tot_all > 0 else float('nan')
+    print(f'{"Total":>16} | {n_pass_all:>5}/{n_tot_all:<7}  {eff_all:>8.3f}')
+
+cutncount(filtered_branches)
 
 if not isData:
     ## Convention for ctau (uniform for every sample)

@@ -85,15 +85,21 @@ def _make_bdt_vars():
         "yErr",
         "z",
         "zErr",
+        "dr_mumu",
+        "dphi_mumu",
+        "deta_mumu",
+        "deta_mumu_SV",
+        "sindphi_lxy",
         # "closestDet_x",
         # "closestDet_y",
         # "closestDet_z",
-        #"a3d_mumu",
+        "a3d_mumu"
     ]
     mu_stems = [
         "dxy",
         # "dxyErr",
         "dxysig",
+        "dxy_lxy",
         "dz",
         # "dze",
         "dzsig",
@@ -225,6 +231,18 @@ for fname in BKG_FILES:
     print(f'  bkg {fname}: {len(df)} events')
 
 df_bkg = pd.concat(bkg_frames, ignore_index=True)
+
+
+def add_dxy_lxy(df):
+    for sv in ("SV1", "SV2"):
+        denom = df[f"{sv}_lxy"] * df[f"{sv}_mass"] / df[f"{sv}_ptmm"]
+        denom = np.where(denom > 1e-9, denom, 1e-9)
+        for mu in ("mu1", "mu2"):
+            df[f"{sv}_{mu}_dxy_lxy"] = np.abs(df[f"{sv}_{mu}_dxy"]) / denom
+
+
+add_dxy_lxy(df_sig)
+add_dxy_lxy(df_bkg)
 
 # ---------------------------------------------------------------------------
 # Lxy binning
