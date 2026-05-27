@@ -47,10 +47,12 @@ if opts.data:
         gtag="124X_dataRun3_Prompt_v10" # latest prompt RECO GT
         #gtag="124X_dataRun3_Prompt_v4"
         #gtag="124X_dataRun3_HLT_v7" # latest HLT GT
-    else:
+    elif '2023' in opts.era:
         #gtag="130X_dataRun3_Prompt_frozen_v3" # latest prompt RECO GT (CMSSW>=13_0_10)
         gtag="130X_dataRun3_Prompt_v4"
         #gtag="130X_dataRun3_HLT_frozen_v3" # latest HLT GT (CMSSW>=13_0_10)
+    elif '2024' in opts.era:
+        gtag = "140X_dataRun3_Prompt_v4"
 else:
     if '2022' in opts.era:
         if not 'postEE' in opts.era:
@@ -202,20 +204,7 @@ if '2022' in opts.era or (opts.data and '2023B' in opts.era) or '2023C-triggerV1
             "L1_SingleEG34er2p5", "L1_SingleEG36er2p5", "L1_SingleEG38er2p5", "L1_SingleEG40er2p5", "L1_SingleJet160er2p5", "L1_SingleJet180", "L1_SingleJet200", "L1_SingleTau120er2p1", "L1_SingleTau130er2p1", "L1_SingleEG42er2p5", "L1_SingleEG45er2p5", "L1_SingleEG60"
         ]
         L1Info = list(set(L1Info))
-elif '2024' in opts.era or '2025' in opts.era:
-    # 2024+: unprescaled DoubleMuon (no PixelTracking in path name) + SingleMuon L1/HLT seeds
-    L1Info = [
-        "L1_DoubleMu_12_5","L1_DoubleMu_15_7",
-        "L1_DoubleMu4p5er2p0_SQ_OS_Mass_Min7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_7to18",
-        "L1_DoubleMu4_SQ_OS_dR_Max1p2","L1_DoubleMu4p5_SQ_OS_dR_Max1p2",
-        "L1_DoubleMu0er1p4_SQ_OS_dR_Max1p4","L1_DoubleMu0er1p5_SQ_OS_dR_Max1p4","L1_DoubleMu8_SQ",
-        "L1_SingleMu22","L1_SingleMu25",
-    ]
-    HLTInfo = [
-        [ 'Run3_DoubleMu_PFScouting', 'DST_PFScouting_DoubleMuon_v*' ],
-        [ 'Run3_SingleMu_PFScouting', 'DST_PFScouting_SingleMuon_v*' ],
-    ]
-else:
+elif ('2023' in opts.era) and ('2023C-triggerV10' not in opts.era):
     # for run >=367621 (during era Run2023C)
     L1Info = ["L1_DoubleMu_12_5","L1_DoubleMu_15_7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_Min7","L1_DoubleMu4p5er2p0_SQ_OS_Mass_7to18","L1_DoubleMu4_SQ_OS_dR_Max1p2","L1_DoubleMu4p5_SQ_OS_dR_Max1p2","L1_DoubleMu0er1p4_SQ_OS_dR_Max1p4","L1_DoubleMu0er1p5_SQ_OS_dR_Max1p4","L1_DoubleMu8_SQ"]
     HLTInfo = [ [ 'Run3_DoubleMu3_PFScouting', 'DST_Run3_DoubleMu3_PFScoutingPixelTracking_v*' ] ]
@@ -265,6 +254,31 @@ else:
             "L1_SingleEG34er2p5", "L1_SingleEG36er2p5", "L1_SingleEG38er2p5", "L1_SingleEG40er2p5", "L1_SingleJet160er2p5", "L1_SingleJet180", "L1_SingleJet200", "L1_SingleTau120er2p1", "L1_SingleTau130er2p1", "L1_SingleEG42er2p5", "L1_SingleEG45er2p5", "L1_SingleEG60"
         ]        
         L1Info = list(set(L1Info))
+elif '2024' in opts.era or '2025' in opts.era:
+    print("Running here")
+    # 2024+: unprescaled DoubleMuon (no PixelTracking in path name) + SingleMuon L1/HLT seeds
+    L1Info = [
+        "L1_DoubleMu_15_7",
+        "L1_DoubleMu4p5er2p0_SQ_OS_Mass_Min7",
+        "L1_DoubleMu4p5er2p0_SQ_OS_Mass_7to18",
+        "L1_DoubleMu8_SQ",
+        "L1_DoubleMu4er2p0_SQ_OS_dR_Max1p6",
+        "L1_DoubleMu0er1p4_SQ_OS_dR_Max1p4",
+        "L1_DoubleMu4p5_SQ_OS_dR_Max1p2",
+        "L1_DoubleMu0_Upt15_Upt7",
+        "L1_DoubleMu0_Upt6_IP_Min1_Upt4"
+    ]
+    # unconstrained pt seeds added in 2024F
+    if opts.era in ["2024F", "2024G", "2024H", "2024I"]:
+        L1Info = L1Info + ["L1_DoubleMu0_Upt6", "L1_DoubleMu0_Upt7", "L1_DoubleMu0_Upt8"]
+    # Single muon seeds (only unprescaled)
+    L1Info = L1Info + ["L1_SingleMu10_SQ14_BMTF", "L1_SingleMu11_SQ14_BMTF"]
+    #
+    HLTInfo = [
+        [ 'Run3_DoubleMu_PFScouting', 'DST_PFScouting_DoubleMuon_v*' ],
+        [ 'Run3_SingleMu_PFScouting', 'DST_PFScouting_SingleMuon_v*' ],
+    ]
+    #L1Info = list(set(L1Info))
 
 do_trigger_objects = not (opts.data or opts.monitor)
 
@@ -280,7 +294,7 @@ process.triggerMaker = cms.EDProducer("TriggerMaker",
             ),
         doL1 = cms.bool(True),
         doTriggerObjects = cms.bool(do_trigger_objects),
-        isMiniAOD = cms.bool('2024' in opts.era or '2025' in opts.era),
+        isMiniAOD = cms.bool(('2024' in opts.era or '2025' in opts.era) and not opts.data),
         #AlgInputTag = cms.InputTag("gtStage2Digis"),  # MiniAOD: use explicit RECO process
         AlgInputTag = cms.InputTag("gtStage2Digis","","RECO"),
         #l1tAlgBlkInputTag = cms.InputTag("gtStage2Digis"),
