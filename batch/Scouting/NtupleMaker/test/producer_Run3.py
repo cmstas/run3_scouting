@@ -337,27 +337,28 @@ process.beamSpotMaker = cms.EDProducer("BeamSpotMaker")
 
 from RecoTracker.MeasurementDet.measurementTrackerEventDefault_cfi import measurementTrackerEventDefault as _measurementTrackerEventDefault
 process.MeasurementTrackerEvent = _measurementTrackerEventDefault.clone()
+
+process.load("EventFilter.L1TRawToDigi.gtStage2Digis_cfi")
+if opts.monitor:
+    process.gtStage2Digis.InputLabel = cms.InputTag( "rawDataCollector", "", "LHC" )
+else:
+    process.gtStage2Digis.InputLabel = cms.InputTag( "hltFEDSelectorL1" )
+
+process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
+#process.patTrigger.triggerResults = cms.InputTag("TriggerResults","","HLT")
+#process.patTrigger.triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT")
+process.patTrigger.stageL1Trigger = cms.uint32(2)
+
 process.offlineBeamSpot = cms.EDProducer("BeamSpotProducer")
 
 if '2024' in opts.era or '2025' in opts.era:
     if do_skim:
-        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
-        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.countvtxNoVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.skimpath_vtx   = cms.Path(process.countmuVtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.skimpath_novtx = cms.Path(process.countmuNoVtx+process.gtStage2Digis+process.countvtxNoVtx+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
         process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('skimpath_vtx', 'skimpath_novtx'))
     else: 
-        process.skimpath = cms.Path(process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
+        process.skimpath = cms.Path(process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.vertexMakerVtx+process.hitMakerVtx+process.hitMakerNoVtx)
 else:
-    #hitMaker not needed (Mario)
-    process.load("EventFilter.L1TRawToDigi.gtStage2Digis_cfi")
-    if opts.monitor:
-        process.gtStage2Digis.InputLabel = cms.InputTag( "rawDataCollector", "", "LHC" )
-    else:
-        process.gtStage2Digis.InputLabel = cms.InputTag( "hltFEDSelectorL1" )
-        process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
-    process.patTrigger.triggerResults = cms.InputTag("TriggerResults","","HLT")
-    process.patTrigger.triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT")
-    process.patTrigger.stageL1Trigger = cms.uint32(2)
-
     if do_skim:
         process.skimpath = cms.Path(process.countmu+process.countvtx+process.gtStage2Digis+process.triggerMaker+process.offlineBeamSpot+process.beamSpotMaker+process.MeasurementTrackerEvent+process.hitMaker)
     else:
