@@ -37,8 +37,11 @@ float partialUnblindingPercentage = 0.1; // 10% of each era
 // SV selection
 bool relaxedSVSel = false;
 float sfSVsel = (relaxedSVSel) ? 5.0 : 1.0;
-float maxXerr=0.05*sfSVsel, maxYerr=0.05*sfSVsel, maxZerr=0.10*sfSVsel, maxChi2=3.0*sfSVsel;
+//float maxXerr=0.05*sfSVsel, maxYerr=0.05*sfSVsel, maxZerr=0.10*sfSVsel, maxChi2=3.0*sfSVsel;
 float maxDXYerr=0.05*sfSVsel, maxD3Derr=0.10*sfSVsel; // for identification of overlapping SVs
+
+// Trigger selection
+bool applyL1 = false;   // set false to skip the L1 requirement
 
 // BToPhi specific
 bool filterByB = true;
@@ -47,6 +50,14 @@ template<class T>
 const T getObject(const Event& ev, const char* prodLabel, const char* outLabel = "") {
   Handle<T> obj;
   obj.getByLabel(ev,prodLabel,outLabel);
+  return *obj.product();
+}
+
+template <typename T>
+const T getObjectSafe(const Event& ev, const char* prodLabel, const char* outLabel = "") {
+  Handle<T> obj;
+  obj.getByLabel(ev, prodLabel, outLabel);
+  if (!obj.isValid()) return T{};
   return *obj.product();
 }
 
@@ -940,20 +951,22 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       nPUTrue = -1;
       wPU = 1.;
       if (isMC) {
-        auto puInfoH = getObject<std::vector<PileupSummaryInfo>>(ev, puInfoLabel);
-        for(size_t i=0;i<puInfoH.size();++i) {
-          if( puInfoH.at(i).getBunchCrossing() == 0) {
-               nPU = puInfoH.at(i).getPU_NumInteractions();
-               nPUTrue = puInfoH.at(i).getTrueNumInteractions();
-               continue;                                          
+        auto puInfoH = getObjectSafe<std::vector<PileupSummaryInfo>>(ev, puInfoLabel);
+        if (puInfoH.size() > 0) {
+          for(size_t i=0;i<puInfoH.size();++i) {
+            if( puInfoH.at(i).getBunchCrossing() == 0) {
+                 nPU = puInfoH.at(i).getPU_NumInteractions();
+                 nPUTrue = puInfoH.at(i).getTrueNumInteractions();
+                 continue;
+            }
           }
+          wPU = lumi_weights.weight(nPUTrue);
         }
-        wPU = lumi_weights.weight(nPUTrue);
       }
 
       // L1 selection
-      auto l1s = getObject<std::vector<bool>>(ev, "triggerMaker", "l1result");
-      auto l1Prescales = getObject<std::vector<double>>(ev, "triggerMaker", "l1prescale");
+      auto l1s = getObjectSafe<std::vector<bool>>(ev, "triggerMaker", "l1result");
+      auto l1Prescales = getObjectSafe<std::vector<double>>(ev, "triggerMaker", "l1prescale");
       passL1 = false;
       for (unsigned int iL1=0; iL1<l1s.size(); ++iL1) {
         l1fired[iL1] = l1s[iL1];
@@ -961,12 +974,12 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
           passL1 = true;
         }
       }
-      if (!passL1)
+      if (applyL1 && !passL1)
 	      continue;
       nL1++;
 
       // HLT selection
-      auto hlts = getObject<std::vector<bool>>(ev, "triggerMaker", "hltresult");
+      auto hlts = getObjectSafe<std::vector<bool>>(ev, "triggerMaker", "hltresult");
       passHLT = false;
       for (auto hlt : hlts) {
         if (hlt==true) {
@@ -979,7 +992,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       nHLT++;
 
       // PV selection
-      auto pvs = getObject<std::vector<Run3ScoutingVertex>>(ev, "hltScoutingPrimaryVertexPacker", "primaryVtx");
+      auto pvs = getObjectSafe<std::vector<Run3ScoutingVertex>>(ev, "hltScoutingPrimaryVertexPacker", "primaryVtx");
       nPV = 0; PV_x = 0; PV_y = 0; PV_z = 0;
 
       nPV = pvs.size();
@@ -1064,16 +1077,16 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       // NoVtx SV loop
       const char* svPackerLabel  = (year == "2024") ? "hltScoutingMuonPackerNoVtx" : "hltScoutingMuonPacker";
       const char* hitMakerLabel  = (year == "2024") ? "hitMakerNoVtx" : "hitMaker";
-      auto svs = getObject<std::vector<Run3ScoutingVertex>>(ev, svPackerLabel, "displacedVtx");
-      auto dvonmodule = getObject<std::vector<bool>>(ev, hitMakerLabel, "dvonmodule");
-      auto dvonmodulewithinunc = getObject<std::vector<bool>>(ev, hitMakerLabel, "dvonmodulewithinunc");
-      auto dvdetxmind = getObject<std::vector<float>>(ev, hitMakerLabel, "dvdetxmind");
-      auto dvdetymind = getObject<std::vector<float>>(ev, hitMakerLabel, "dvdetymind");
-      auto dvdetzmind = getObject<std::vector<float>>(ev, hitMakerLabel, "dvdetzmind");
-      auto dvmindfromdet = getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdet");
-      auto dvmindfromdetx = getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdetx");
-      auto dvmindfromdety = getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdety");
-      auto dvmindfromdetz = getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdetz");
+      auto svs = getObjectSafe<std::vector<Run3ScoutingVertex>>(ev, svPackerLabel, "displacedVtx");
+      auto dvonmodule          = svs.size() > 0 ? getObject<std::vector<bool>>(ev, hitMakerLabel, "dvonmodule") : std::vector<bool>{};
+      auto dvonmodulewithinunc = svs.size() > 0 ? getObject<std::vector<bool>>(ev, hitMakerLabel, "dvonmodulewithinunc") : std::vector<bool>{};
+      auto dvdetxmind          = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvdetxmind") : std::vector<float>{};
+      auto dvdetymind          = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvdetymind") : std::vector<float>{};
+      auto dvdetzmind          = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvdetzmind") : std::vector<float>{};
+      auto dvmindfromdet       = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdet") : std::vector<float>{};
+      auto dvmindfromdetx      = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdetx") : std::vector<float>{};
+      auto dvmindfromdety      = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdety") : std::vector<float>{};
+      auto dvmindfromdetz      = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdetz") : std::vector<float>{};
 
       unsigned int nSVs = svs.size();
       //if (nSVs < 1)
@@ -1152,7 +1165,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         SVs.maxdz.push_back(maxdz);
         SVs.maxdxy.push_back(maxdxy);
         SVs.maxd3d.push_back(maxd3d);
-        SVs.selected.push_back( (xe<maxXerr && ye<maxYerr && ze<maxZerr && chi2/ndof<maxChi2) );
+        SVs.selected.push_back( (chi2/ndof < 10.0) );
       }
       SVs.sort();
 
@@ -1223,17 +1236,17 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
 
       // NoVtx Muon selection
       auto musnoVtx = (year == "2024") ?
-        getObject<std::vector<Run3ScoutingMuon>>(ev, "hltScoutingMuonPackerNoVtx") :
-        getObject<std::vector<Run3ScoutingMuon>>(ev, "hltScoutingMuonPacker");
-      auto jets = getObject<std::vector<Run3ScoutingPFJet>>(ev, "hltScoutingPFPacker");
-      auto pfs = getObject<std::vector<Run3ScoutingParticle>>(ev, "hltScoutingPFPacker");
-      auto nhitsbeforesv = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nhitsbeforesv");
-      auto ncompatible = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "ncompatible");
-      auto ncompatibletotal = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "ncompatibletotal");
-      auto nexpectedhits = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhits");
-      auto nexpectedhitsmultiple = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhitsmultiple");
-      auto nexpectedhitsmultipletotal = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhitsmultipletotal");
-      auto nexpectedhitstotal = getObject<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhitstotal");
+        getObjectSafe<std::vector<Run3ScoutingMuon>>(ev, "hltScoutingMuonPackerNoVtx") :
+        getObjectSafe<std::vector<Run3ScoutingMuon>>(ev, "hltScoutingMuonPacker");
+      auto jets = getObjectSafe<std::vector<Run3ScoutingPFJet>>(ev, "hltScoutingPFPacker");
+      auto pfs = getObjectSafe<std::vector<Run3ScoutingParticle>>(ev, "hltScoutingPFPacker");
+      auto nhitsbeforesv = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nhitsbeforesv");
+      auto ncompatible = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "ncompatible");
+      auto ncompatibletotal = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "ncompatibletotal");
+      auto nexpectedhits = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhits");
+      auto nexpectedhitsmultiple = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhitsmultiple");
+      auto nexpectedhitsmultipletotal = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhitsmultipletotal");
+      auto nexpectedhitstotal = getObjectSafe<std::vector<std::vector<int>>>(ev, hitMakerLabel, "nexpectedhitstotal");
       std::vector<std::vector<int>> vtxIndxVtx;
       std::vector<std::vector<int>> nhitsbeforesv_vtx, ncompatible_vtx, ncompatibletotal_vtx;
       std::vector<std::vector<int>> nexpectedhits_vtx, nexpectedhitsmultiple_vtx, nexpectedhitsmultipletotal_vtx, nexpectedhitstotal_vtx;
@@ -1260,8 +1273,6 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         if (matchedAndSelVtxIdxs.size() < 1)
           continue;
         nMuon_Assoc++;
-        if (!(fabs(mu.eta())<2.4))
-          continue;
 
         float pt=mu.pt(), eta=mu.eta(), phi=mu.phi();
 
@@ -1411,24 +1422,24 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       if (year == "2024") { //If the year is 2024, process Vtx collection
 
         //Vtx SVs
-        auto svsVtx_raw = getObject<std::vector<Run3ScoutingVertex>>(ev, "vertexMakerVtx", "verticesVtx");
-        vtxIndxVtx = getObject<std::vector<std::vector<int>>>(ev, "vertexMakerVtx", "vtxIndxVtx");
-        nhitsbeforesv_vtx       = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nhitsbeforesv");
-        ncompatible_vtx         = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "ncompatible");
-        ncompatibletotal_vtx    = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "ncompatibletotal");
-        nexpectedhits_vtx       = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhits");
-        nexpectedhitsmultiple_vtx          = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhitsmultiple");
-        nexpectedhitsmultipletotal_vtx     = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhitsmultipletotal");
-        nexpectedhitstotal_vtx  = getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhitstotal");
-        auto dvonmodule_vtx = getObject<std::vector<bool>>(ev, "hitMakerVtx", "dvonmodule");
-        auto dvonmodulewithinunc_vtx = getObject<std::vector<bool>>(ev, "hitMakerVtx", "dvonmodulewithinunc");
-        auto dvdetxmind_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvdetxmind");
-        auto dvdetymind_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvdetymind");
-        auto dvdetzmind_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvdetzmind");
-        auto dvmindfromdet_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdet");
-        auto dvmindfromdetx_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdetx");
-        auto dvmindfromdety_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdety");
-        auto dvmindfromdetz_vtx = getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdetz");
+        auto svsVtx_raw = getObjectSafe<std::vector<Run3ScoutingVertex>>(ev, "vertexMakerVtx", "verticesVtx");
+        vtxIndxVtx = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "vertexMakerVtx", "vtxIndxVtx") : std::vector<std::vector<int>>{};
+        nhitsbeforesv_vtx       = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nhitsbeforesv")             : std::vector<std::vector<int>>{};
+        ncompatible_vtx         = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "ncompatible")               : std::vector<std::vector<int>>{};
+        ncompatibletotal_vtx    = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "ncompatibletotal")          : std::vector<std::vector<int>>{};
+        nexpectedhits_vtx       = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhits")             : std::vector<std::vector<int>>{};
+        nexpectedhitsmultiple_vtx         = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhitsmultiple")         : std::vector<std::vector<int>>{};
+        nexpectedhitsmultipletotal_vtx    = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhitsmultipletotal")    : std::vector<std::vector<int>>{};
+        nexpectedhitstotal_vtx  = svsVtx_raw.size() > 0 ? getObject<std::vector<std::vector<int>>>(ev, "hitMakerVtx", "nexpectedhitstotal")        : std::vector<std::vector<int>>{};
+        auto dvonmodule_vtx          = svsVtx_raw.size() > 0 ? getObject<std::vector<bool>>(ev, "hitMakerVtx", "dvonmodule")          : std::vector<bool>{};
+        auto dvonmodulewithinunc_vtx = svsVtx_raw.size() > 0 ? getObject<std::vector<bool>>(ev, "hitMakerVtx", "dvonmodulewithinunc") : std::vector<bool>{};
+        auto dvdetxmind_vtx          = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvdetxmind")         : std::vector<float>{};
+        auto dvdetymind_vtx          = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvdetymind")         : std::vector<float>{};
+        auto dvdetzmind_vtx          = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvdetzmind")         : std::vector<float>{};
+        auto dvmindfromdet_vtx       = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdet")      : std::vector<float>{};
+        auto dvmindfromdetx_vtx      = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdetx")     : std::vector<float>{};
+        auto dvmindfromdety_vtx      = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdety")     : std::vector<float>{};
+        auto dvmindfromdetz_vtx      = svsVtx_raw.size() > 0 ? getObject<std::vector<float>>(ev, "hitMakerVtx", "dvmindfromdetz")     : std::vector<float>{};
 
         for (unsigned int iSV = 0; iSV < svsVtx_raw.size(); ++iSV) {
           const auto& sv = svsVtx_raw[iSV];
@@ -1447,7 +1458,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
           float lxy = TMath::Sqrt((x-PV_x)*(x-PV_x)+(y-PV_y)*(y-PV_y));
           SVsVtx.lxy.push_back(lxy);
           SVsVtx.l3d.push_back(TMath::Sqrt(lxy*lxy+(z-PV_z)*(z-PV_z)));
-          SVsVtx.selected.push_back(xe<maxXerr && ye<maxYerr && ze<maxZerr && chi2/ndof<maxChi2);
+          SVsVtx.selected.push_back(chi2/ndof < 10.0);
           SVsVtx.onModule.push_back(dvonmodule_vtx.at(iSV));
           SVsVtx.onModuleWithinUnc.push_back(dvonmodulewithinunc_vtx.at(iSV));
           SVsVtx.closestDet_x.push_back(dvdetxmind_vtx.at(iSV));
@@ -1558,14 +1569,12 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         }
 
         // Muon Vtx collection
-        auto musVtx = getObject<std::vector<Run3ScoutingMuon>>(ev, "hltScoutingMuonPackerVtx");
+        auto musVtx = getObjectSafe<std::vector<Run3ScoutingMuon>>(ev, "hltScoutingMuonPackerVtx");
 
         nMuon_vtx_Assoc = 0;
         unsigned int nMusVtx = musVtx.size();
         for (unsigned int iMu=0; iMu<nMusVtx; ++iMu) {
           auto mu = musVtx[iMu];
-          if (!(fabs(mu.eta())<2.4))
-            continue;
 
           float pt=mu.pt(), eta=mu.eta(), phi=mu.phi();
           TLorentzVector muVec; muVec.SetPtEtaPhiM(pt, eta, phi, MUON_MASS);

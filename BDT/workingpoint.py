@@ -9,6 +9,7 @@ Usage:
     python BDT/workingpoint.py
 """
 
+import argparse
 import glob
 import re
 import uproot
@@ -46,12 +47,73 @@ plt.rcParams.update({
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-BKG_REJECTION_TARGET = 0.90   # 0.90 = 90% background rejection
+_parser = argparse.ArgumentParser(description="Working point analysis for the scouting BDT.")
+_parser.add_argument("--bkg-rej", type=float, default=0.90,
+                     help="Target background rejection for the working point (0.90 = 90%%).")
+_parser.add_argument("--wp-score", type=float, default=None,
+                     help="Set the BDT score threshold directly, overriding --bkg-rej.")
+_parser.add_argument("--model-tag", default="A", help="Signal scenario tag for output naming.")
+_args = _parser.parse_args()
+
+BKG_REJECTION_TARGET = _args.bkg_rej   # 0.90 = 90% background rejection
+WP_SCORE_OVERRIDE    = _args.wp_score  # if set, used directly as the BDT threshold
 use_conditional      = False
-model_tag            = 'A'
+model_tag            = _args.model_tag
+
+LUMI_FB = 110.0 # 2024 Luminosity
+N_gen = 1000000 # Number of total generated events
+
+# Signal BRANCHING FRACTION from HepData (https://www.hepdata.net/record/ins3083980?version=1)
+SIG_BR = {
+    (4.0,  1.33, 0.1):   0.012003,
+    (4.0,  1.33, 1.0):   0.00083178,
+    (4.0,  1.33, 10.0):  0.00069306,
+    (4.0,  1.33, 100.0): 0.0052651,
+    (4.0,  0.40, 0.1):   0.0039587,
+    (4.0,  0.40, 1.0):   0.00078883,
+    (4.0,  0.40, 10.0):  0.0044838,
+    (4.0,  0.40, 100.0): 0.060461,
+    # (10.0, 1.0, *): not in HepData
+    (1.0,  0.33, 0.1):   0.02281,
+    (1.0,  0.33, 1.0):   0.0029828,
+    (1.0,  0.33, 10.0):  0.016743,
+    (1.0,  0.33, 100.0): 0.14464,
+}
+
+BKG_FILES = [
+    "tuples_QCD_Bin-PT-15to20_Fil-MuEnriched_2024_2024.root",
+    #"tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root", #ZOMBIE FILE 
+    "tuples_QCD_Bin-PT-30to50_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-50to80_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-80to120_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-120to170_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-170to300_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-300to470_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-470to600_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-600to800_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-800to1000_Fil-MuEnriched_2024_2024.root",
+    "tuples_QCD_Bin-PT-1000_Fil-MuEnriched_2024_2024.root",
+]
+
+# Background cross sections [pb] (https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=%2FQCD_*MuEnriched*%2F*Summer24MiniAODv6*%2FMINIAODSIM)
+BKG_XSEC = {
+    "tuples_QCD_Bin-PT-15to20_Fil-MuEnriched_2024_2024.root":    3018000.0,
+    #"tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root":    2701000.0, #ZOMBIE (for now)
+    "tuples_QCD_Bin-PT-30to50_Fil-MuEnriched_2024_2024.root":    1461000.0,
+    "tuples_QCD_Bin-PT-50to80_Fil-MuEnriched_2024_2024.root":    407600.0,
+    "tuples_QCD_Bin-PT-80to120_Fil-MuEnriched_2024_2024.root":   96070.0,
+    "tuples_QCD_Bin-PT-120to170_Fil-MuEnriched_2024_2024.root":  23140.0,
+    "tuples_QCD_Bin-PT-170to300_Fil-MuEnriched_2024_2024.root":  7754.0,
+    "tuples_QCD_Bin-PT-300to470_Fil-MuEnriched_2024_2024.root":  699.6,
+    "tuples_QCD_Bin-PT-470to600_Fil-MuEnriched_2024_2024.root":  67.67,
+    "tuples_QCD_Bin-PT-600to800_Fil-MuEnriched_2024_2024.root":  21.27,
+    "tuples_QCD_Bin-PT-800to1000_Fil-MuEnriched_2024_2024.root": 3.89,
+    "tuples_QCD_Bin-PT-1000_Fil-MuEnriched_2024_2024.root":      1.323,
+}
+PB_TO_FB = 1.0e3   # 1 pb = 1000 fb (for the QCD background cross sections)
 
 _HERE      = Path(__file__).resolve().parent
-tuples_dir = _HERE.parent / "tuples"
+tuples_dir = _HERE.parent / "tuples_parking_nochi2"
 
 FIGSIZE     = (8.5, 6.5)
 N_BINS      = 50
@@ -60,12 +122,7 @@ BKG_FACE    = "#7fc7c4"
 BKG_EDGE    = "#2f5f5d"
 WP_COLOR    = "#9467bd"
 
-# ---------------------------------------------------------------------------
-# File discovery
-# ---------------------------------------------------------------------------
-_SIG_RE = re.compile(
-    r"tuples_Signal_ScenarioA_Par_2024_mpi-(\w+)_mA-(\w+)_ctau-(\w+)mm_2024\.root"
-)
+_SIG_RE = re.compile(r"tuples_Signal_ScenarioA_Par_2024_mpi-(\w+)_mA-(\w+)_ctau-(\w+)mm_2024\.root")
 
 def _p2f(s):
     return float(s.replace("p", "."))
@@ -83,20 +140,6 @@ for fpath in sorted(glob.glob(str(tuples_dir / "tuples_Signal_ScenarioA_Par_2024
 param_grid = [(p[3], p[2], p[1]) for p in sig_file_params]  # (ctau, mA, mpi)
 print(f"Found {len(sig_file_params)} signal files")
 
-BKG_FILES = [
-    "tuples_QCD_Bin-PT-15to20_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-30to50_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-50to80_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-80to120_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-120to170_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-170to300_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-300to470_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-470to600_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-600to800_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-800to1000_Fil-MuEnriched_2024_2024.root",
-    "tuples_QCD_Bin-PT-1000_Fil-MuEnriched_2024_2024.root",
-]
 
 # ---------------------------------------------------------------------------
 # BDT variables — mirrors BDT_training.py
@@ -214,6 +257,23 @@ def compute_class_weights(y):
     n_bkg = (y == 0).sum()
     return np.where(y == 1, n_bkg / n_sig, 1.0)
 
+def asimov_z(sig_eff, br_sig, bkg_effs):
+    """Asimov median discovery significance: Z = sqrt(2((s+b)ln(1+s/b) - s)).
+
+    Yields are built here from cross sections, luminosity and WP efficiencies:
+        s = (sigma*BR) * LUMI_FB * sig_eff
+        b = sum_bins  sigma_bin[pb] * PB_TO_FB * LUMI_FB * bkg_acceptance / N_gen
+
+    sig_eff  : signal efficiency at the WP
+    br_sig   : signal sigma * BR
+    bkg_effs : dict {bkg filename: efficiency at WP for that bkg}
+    """
+    s = br_sig * LUMI_FB * sig_eff
+    b = sum(BKG_XSEC[f] * PB_TO_FB * LUMI_FB * bkg_acceptance / N_gen for f, bkg_acceptance in bkg_effs.items())
+    if b <= 0.0 or s <= 0.0:
+        return 0.0
+    return float(np.sqrt(2.0 * ((s + b) * np.log1p(s / b) - s)))
+
 def add_dxy_lxy(df):
     for sv in ("SV1", "SV2"):
         denom = df[f"{sv}_lxy"] * df[f"{sv}_mass"] / df[f"{sv}_ptmm"]
@@ -221,9 +281,6 @@ def add_dxy_lxy(df):
         for mu in ("mu1", "mu2"):
             df[f"{sv}_{mu}_dxy_lxy"] = np.abs(df[f"{sv}_{mu}_dxy"]) / denom
 
-# ---------------------------------------------------------------------------
-# Load signal
-# ---------------------------------------------------------------------------
 print('Loading signal...')
 sig_frames = []
 for fpath, mpi_val, mA_val, ctau_val in sig_file_params:
@@ -236,12 +293,8 @@ for fpath, mpi_val, mA_val, ctau_val in sig_file_params:
     df['label']      = 1
     sig_frames.append(df)
     print(f'  sig mpi={mpi_val} mA={mA_val} ctau={ctau_val}: {len(df)} events')
-
 df_sig = pd.concat(sig_frames, ignore_index=True)
 
-# ---------------------------------------------------------------------------
-# Load background
-# ---------------------------------------------------------------------------
 print('Loading background...')
 bkg_frames = []
 for fname in BKG_FILES:
@@ -250,6 +303,7 @@ for fname in BKG_FILES:
         continue
     df = read_flat(fpath)
     df['label'] = 0
+    df['bkg_file'] = fname
     bkg_frames.append(df)
     print(f'  bkg {fname}: {len(df)} events')
 
@@ -259,11 +313,12 @@ add_dxy_lxy(df_sig)
 add_dxy_lxy(df_bkg)
 
 # ---------------------------------------------------------------------------
-# Lxy binning
+# Lxy binning (cm)
 # ---------------------------------------------------------------------------
-lxy_bins   = [0.0, 0.2, 1.0, 2.4, 3.1, 7.0, 11.0, 16.0, 70.0]
-lxy_labels = ["0p0to0p2", "0p2to1p0", "1p0to2p4", "2p4to3p1",
-              "3p1to7p0", "7p0to11p0", "11p0to16p0", "16p0to70p0"]
+# lxy_bins   = [0.0, 0.2, 1.0, 2.4, 3.1, 7.0, 11.0, 16.0, 70.0]  # Match Scouting analysis
+# lxy_labels = ["0p0to0p2", "0p2to1p0", "1p0to2p4", "2p4to3p1", "3p1to7p0", "7p0to11p0", "11p0to16p0", "16p0to70p0"]
+lxy_bins   = [0.0, 1.0, 10.0, 100.0] # Match Parking analysis
+lxy_labels = ["0to1", "1to10", "10to100"]
 
 df_sig['lxy_bin'] = pd.cut(df_sig['SV1_lxy'], bins=lxy_bins, labels=lxy_labels, include_lowest=True)
 df_bkg['lxy_bin'] = pd.cut(df_bkg['SV1_lxy'], bins=lxy_bins, labels=lxy_labels, include_lowest=True)
@@ -271,13 +326,15 @@ df_bkg['lxy_bin'] = pd.cut(df_bkg['SV1_lxy'], bins=lxy_bins, labels=lxy_labels, 
 available  = set(df_sig.columns) & set(df_bkg.columns)
 input_vars = [v for v in BDT_VARIABLES if v in available]
 missing    = [v for v in BDT_VARIABLES if v not in available]
+
 if missing:
     print(f'\nWARNING: {len(missing)} BDT variables missing from tuples')
 print(f'Using {len(input_vars)} BDT input variables')
 
+
 cond_vars = ['param_ctau', 'param_mA', 'param_mpi'] if use_conditional else []
 cond_tag  = 'conditional' if use_conditional else 'non_cond'
-out_dir   = _HERE / f'workingpoint_OR_{model_tag}_{cond_tag}'
+out_dir   = _HERE / f'working_point_{BKG_REJECTION_TARGET}'
 os.makedirs(out_dir, exist_ok=True)
 
 # ---------------------------------------------------------------------------
@@ -299,7 +356,6 @@ bdt = XGBClassifier(
     tree_method='hist', n_jobs=4,
 )
 bdt.fit(X_train, y_train, sample_weight=w_train)
-print('  Done.')
 
 # ---------------------------------------------------------------------------
 # Find working point
@@ -309,18 +365,23 @@ fpr, tpr, thresholds = roc_curve(y_test, y_score)
 auc = roc_auc_score(y_test, y_score)
 
 bkg_rej_curve = 1.0 - fpr
-idx           = np.argmin(np.abs(bkg_rej_curve - BKG_REJECTION_TARGET))
-wp_threshold  = thresholds[idx]
-wp_sig_eff    = tpr[idx]
-wp_bkg_rej    = bkg_rej_curve[idx]
+if WP_SCORE_OVERRIDE is not None:
+    wp_threshold = WP_SCORE_OVERRIDE
+    idx          = int(np.argmin(np.abs(thresholds - wp_threshold)))
+    print(f'\nWorking point (BDT score fixed at {wp_threshold:.4f}):')
+else:
+    idx          = int(np.argmin(np.abs(bkg_rej_curve - BKG_REJECTION_TARGET)))
+    wp_threshold = thresholds[idx]
+    print(f'\nWorking point (target bkg rejection = {BKG_REJECTION_TARGET:.0%}):')
+wp_sig_eff = tpr[idx]
+wp_bkg_rej = bkg_rej_curve[idx]
 
-print(f'\nWorking point (target bkg rejection = {BKG_REJECTION_TARGET:.0%}):')
 print(f'  BDT score threshold : {wp_threshold:.4f}')
 print(f'  Signal efficiency   : {wp_sig_eff:.3f}')
 print(f'  Background rejection: {wp_bkg_rej:.3f}')
 
 # ---------------------------------------------------------------------------
-# ROC curve with WP marked
+# ROC curve (with WP)
 # ---------------------------------------------------------------------------
 fig, ax = plt.subplots(figsize=(6, 6), constrained_layout=True)
 ax.plot(fpr, tpr, color='#1f77b4', linewidth=2.0, label=f'Global BDT (AUC = {auc:.3f})')
@@ -354,6 +415,50 @@ print(f'Background: {len(df_bkg_all)} total, {len(df_bkg_pass)} pass WP '
       f'({len(df_bkg_pass)/len(df_bkg_all):.1%})')
 
 # ---------------------------------------------------------------------------
+# Asimov significance at the working point
+# ---------------------------------------------------------------------------
+def _bkg_effs(extra_mask=None):
+    """WP efficiency per background pT bin, optionally within an extra mask."""
+    effs = {}
+    for fname in BKG_XSEC:
+        sel = (df_global['label'] == 0) & (df_global['bkg_file'] == fname)
+        if extra_mask is not None:
+            sel = sel & extra_mask
+        n_tot = int(sel.sum())
+        if n_tot == 0:
+            continue
+        effs[fname] = int((sel & (df_global['score'] > wp_threshold)).sum()) / n_tot
+    return effs
+
+bkg_effs_incl = _bkg_effs()
+bkg_effs_lxy  = {lbl: _bkg_effs(df_global['lxy_bin'] == lbl) for lbl in lxy_labels}
+
+print(f'\nAsimov significance at WP (lumi = {LUMI_FB:.0f}/fb, sigma*BR in pb):')
+print(f'{"mpi":>5} {"mA":>6} {"ctau":>7} | {"Z(incl)":>9} | {"Z(lxy-comb)":>12}')
+print('-' * 50)
+for (mpi_val, mA_val, ctau_val), br in sorted(SIG_BR.items()):
+    sig_sel = ((df_global['label'] == 1) &
+               (df_global['param_mpi']  == mpi_val) &
+               (df_global['param_mA']   == mA_val) &
+               (df_global['param_ctau'] == ctau_val))
+    n_sig = int(sig_sel.sum())
+    if n_sig == 0:
+        continue
+    sig_eff = int((sig_sel & (df_global['score'] > wp_threshold)).sum()) / n_sig
+    z_incl  = asimov_z(sig_eff, br, bkg_effs_incl)
+    # per-lxy-bin significances combined in quadrature
+    z2 = 0.0
+    for lxy_label in lxy_labels:
+        lxy_mask = df_global['lxy_bin'] == lxy_label
+        n_sig_b  = int((sig_sel & lxy_mask).sum())
+        if n_sig_b == 0:
+            continue
+        sig_eff_b = int((sig_sel & lxy_mask & (df_global['score'] > wp_threshold)).sum()) / n_sig_b
+        z2 += asimov_z(sig_eff_b, br, bkg_effs_lxy[lxy_label]) ** 2
+    z_comb = np.sqrt(z2)
+    print(f'{mpi_val:>5g} {mA_val:>6g} {ctau_val:>7g} | {z_incl:>9.3f} | {z_comb:>12.3f}')
+
+# ---------------------------------------------------------------------------
 # Variable distributions after WP cut — one set of plots per (mpi, mA)
 # ---------------------------------------------------------------------------
 mpi_mA_groups = {}
@@ -364,7 +469,6 @@ for (mpi_val, mA_val), ctau_vals in sorted(mpi_mA_groups.items()):
     plot_dir = out_dir / f'mpi{_flabel(mpi_val)}' / f'mA_{_flabel(mA_val)}'
     os.makedirs(plot_dir, exist_ok=True)
 
-    # Gather passed-signal per ctau
     sig_pass = {}
     for ctau_val in sorted(ctau_vals):
         mask = (
@@ -381,9 +485,26 @@ for (mpi_val, mA_val), ctau_vals in sorted(mpi_mA_groups.items()):
         n_pass  = int(mask.sum())
         print(f'  mpi={mpi_val} mA={mA_val} ctau={ctau_val}: {n_pass}/{n_total} pass WP '
               f'({n_pass/n_total:.1%} sig eff.)' if n_total > 0 else '  no events')
+        # Per-lxy-bin breakdown for this signal point
+        for lxy_label in lxy_labels:
+            bin_sel = (
+                (df_global['label']      == 1) &
+                (df_global['param_ctau'] == ctau_val) &
+                (df_global['param_mA']   == mA_val) &
+                (df_global['param_mpi']  == mpi_val) &
+                (df_global['lxy_bin']    == lxy_label)
+            )
+            n_bin_total = int(bin_sel.sum())
+            n_bin_pass  = int((bin_sel & (df_global['score'] > wp_threshold)).sum())
+            if n_bin_total > 0:
+                print(f'      lxy={lxy_label}: {n_bin_pass}/{n_bin_total} pass WP '
+                      f'({n_bin_pass/n_bin_total:.1%} sig eff.)')
+            else:
+                print(f'      lxy={lxy_label}: no events')
         sig_pass[ctau_val] = df_global[mask]
 
-    plot_vars = [v for v in input_vars if v in AXIS_LABELS]
+    #plot_vars = [v for v in input_vars if v in AXIS_LABELS]
+    plot_vars = []
 
     for var in plot_vars:
         b_arr = df_bkg_pass[var].values.astype(float) if var in df_bkg_pass.columns else np.array([])
@@ -556,4 +677,3 @@ ax2.tick_params(direction="in", top=True, right=True, which="both")
 fig.savefig(out_dir / 'WP_lxy_breakdown.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print(f'\nSaved: {out_dir}/WP_lxy_breakdown.png')
-print('\nDone.')

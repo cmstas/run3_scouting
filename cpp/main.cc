@@ -278,9 +278,13 @@ int main(int argc, char **argv) {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Jan-9-2024/Data/Mon2022G/", startFile, nFiles, isCondor, fromCrab);  // 5 files
     process = "MonDataG";
   }
-  if (sampleArg == "LocalTest" && year == "2024") {
-    files.push_back("/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/batch/output_skimmer.root");
-    process = "LocalTest";
+  if (sampleArg == "LocalTestSignal" && year == "2024") {
+    files.push_back("/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/batch/skimmer_test_signal.root");
+    process = "LocalTestSignal";
+  }
+  if (sampleArg == "LocalTestBkg" && year == "2024") {
+    files.push_back("/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/batch/skimmer_test_bkg.root");
+    process = "LocalTestBkg";
   }
   // 2024 QCD background (MuEnriched)
   if ( sampleArg=="QCD_Bin-PT-15to20_Fil-MuEnriched_2024" && year=="2024") {

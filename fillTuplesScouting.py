@@ -64,6 +64,7 @@ parser.add_argument("--noFourMuonAngularSel", default=False, action="store_true"
 parser.add_argument("--noFourMuonIPSel", default=False, action="store_true", help="Do not apply selection on muon IP (Not applied at four-muon level)")
 parser.add_argument("--noFourMuonMassDiffSel", default=False, action="store_true", help="Do not apply selection on fourmuon invariant mass difference")
 parser.add_argument("--noPreSel", default=False, action="store_true", help="Do not fill pre-selection/association histograms")
+parser.add_argument("--noMuonChi2Sel", default=False, action="store_true", help="Drop the muon normChi2<3.0 cut (keep only pt>3.0 and |eta|<2.4) for both Muon and Muon_vtx collections")
 parser.add_argument("--noDiMuon", default=False, action="store_true", help="Do not fill dimuon histograms")
 parser.add_argument("--noFourMuon", default=False, action="store_true", help="Do not fill four-muon histograms for four-muon systems")
 parser.add_argument("--noFourMuonOSV", default=False, action="store_true", help="Do not fill four-muon histograms for four-muon systems from overlapping SVs")
@@ -353,6 +354,7 @@ def getSelectionSF(lxy):
 
 ## Running settings
 indir  = args.inDir.replace("/ceph/cms","")
+is_local = os.path.isdir(args.inDir)
 outdir = args.outDir
 if args.outSuffix!="":
     outdir = outdir+"_"+args.outSuffix
@@ -392,22 +394,23 @@ rndm_partialUnblinding = ROOT.TRandom3(42)
 files = []
 prependtodir = ""
 if not args.condor:
-    prependtodir = "/ceph/cms"
+    prependtodir = "" if is_local else "/ceph/cms"
 else:
     prependtodir = "davs://redirector.t2.ucsd.edu:1095"
 if not args.condor:
+    cephbase = args.inDir if is_local else "/ceph/cms%s"%indir
     if args.inFile!="*" and args.inSample!="*":
         thisfile="output_%s_%s_%s.root"%(args.inSample,args.year,args.inFile)
-        if os.path.isfile("/ceph/cms%s/%s"%(indir,thisfile)):
+        if os.path.isfile("%s/%s"%(cephbase,thisfile)):
             files.append("%s%s/%s"%(prependtodir,indir,thisfile))
     elif args.inSample!="*":
-        for f in os.listdir("/ceph/cms%s"%indir):
+        for f in os.listdir(cephbase):
             print("output_%s_%s_"%(args.inSample,args.year))
-            if ("output_%s_%s_"%(args.inSample,args.year) in f) and os.path.isfile("/ceph/cms%s/%s"%(indir,f)):
+            if ("output_%s_%s_"%(args.inSample,args.year) in f) and os.path.isfile("%s/%s"%(cephbase,f)):
                 files.append("%s%s/%s"%(prependtodir,indir,f))
     else:
-        for f in os.listdir("/ceph/cms%s"%indir):
-            if (args.year in f) and (".root" in f) and os.path.isfile("/ceph/cms%s/%s"%(indir,f)):
+        for f in os.listdir(cephbase):
+            if (args.year in f) and (".root" in f) and os.path.isfile("%s/%s"%(cephbase,f)):
                 files.append("%s%s/%s"%(prependtodir,indir,f))
 else:
     os.system('xrdfs redirector.t2.ucsd.edu:1095 ls %s > filein.txt'%indir)
@@ -826,7 +829,7 @@ for e in range(firste,laste):
 
     # Loop over SVs (noVtx)
     nSV_noVtx = len(t.SV_index)
-    if nSV_noVtx<1:
+    if use_novtx and not use_vtx and nSV_noVtx<1:
         continue
     nSVsel_noVtx = 0
     for v in range(nSV_noVtx):
@@ -847,7 +850,10 @@ for e in range(firste,laste):
     nMuAssOverlap_noVtx = 0
     muselidxs_noVtx = []
     for m in range(nMu_noVtx):
-        if not t.Muon_selected[m]:
+        if args.noMuonChi2Sel:
+            if not (t.Muon_pt[m] > 3.0 and abs(t.Muon_eta[m]) < 2.4):
+                continue
+        elif not t.Muon_selected[m]:
             continue
         nMuSel_noVtx = nMuSel_noVtx+1
         if t.Muon_bestAssocSVOverlapIdx[m]>-1:
@@ -1003,7 +1009,10 @@ for e in range(firste,laste):
     if use_vtx:
         nMu_vtx = len(t.Muon_vtx_selected)
         for m in range(nMu_vtx):
-            if not t.Muon_vtx_selected[m]:
+            if args.noMuonChi2Sel:
+                if not (t.Muon_vtx_pt[m] > 3.0 and abs(t.Muon_vtx_eta[m]) < 2.4):
+                    continue
+            elif not t.Muon_vtx_selected[m]:
                 continue
             nMuSel_vtx += 1
             if t.Muon_vtx_bestAssocSVOverlapVtxIdx[m] > -1:
@@ -1906,7 +1915,7 @@ sv1_mask = np.array(branches["SV1_x"]) != -1.
 filtered_branches = {k: np.array(v)[sv1_mask] for k, v in branches.items()}
 _tuples_dir = os.path.join(
     os.environ.get("STARTDIR", "/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting"),
-    "tuples"
+    "tuples_parking_nochi2" if args.noMuonChi2Sel else "tuples_parking"
 )
 os.makedirs(_tuples_dir, exist_ok=True)
 if args.inSample != "*":
@@ -1921,100 +1930,13 @@ else:
 with uproot.recreate(ntuple_name) as f:
     f["tuples"] = filtered_branches
 
-# ---------------------------------------------------------------------------
-# Cut-and-count: full selection efficiency per lxy bin
-# All cuts are defined here in one place. Operates on filtered_branches,
-# which already has sv1_mask applied (SV1 must be filled).
-# ---------------------------------------------------------------------------
-def cutncount(fb):
-    def _a(key):
-        return np.asarray(fb[key], dtype=float)
-
-    def _passes(sv):
-        lxy        = _a(f"SV{sv}_lxy")
-        xErr       = _a(f"SV{sv}_xErr")
-        yErr       = _a(f"SV{sv}_yErr")
-        zErr       = _a(f"SV{sv}_zErr")
-        chi2ndof   = _a(f"SV{sv}_chi2Ndof")
-        dxysig1    = _a(f"SV{sv}_mu1_dxysig")
-        dxysig2    = _a(f"SV{sv}_mu2_dxysig")
-        dxy1       = _a(f"SV{sv}_mu1_dxy")
-        dxy2       = _a(f"SV{sv}_mu2_dxy")
-        mass       = _a(f"SV{sv}_mass")
-        ptmm       = _a(f"SV{sv}_ptmm")
-        nchi2_1    = _a(f"SV{sv}_mu1_normChi2")
-        nchi2_2    = _a(f"SV{sv}_mu2_normChi2")
-        nhits1     = _a(f"SV{sv}_mu1_nhitsbeforesv")
-        nhits2     = _a(f"SV{sv}_mu2_nhitsbeforesv")
-        dphi_mumu  = _a(f"SV{sv}_dphi_mumu")    # abs(DeltaPhi(mu1,mu2)), stored at fill time
-        deta_mumu  = _a(f"SV{sv}_deta_mumu")    # abs(Eta1-Eta2)
-        a3d_mumu   = _a(f"SV{sv}_a3d_mumu")     # 3D opening angle between muons
-        dphi_sv    = _a(f"SV{sv}_dphi_mumu_SV") # abs(DeltaPhi(dimuon, SV))
-        d3d_sv     = _a(f"SV{sv}_d3d_mumu_SV")  # 3D angle(dimuon, SV)
-
-        # SV quality
-        sv_ok   = ((xErr < 0.05) & (yErr < 0.05) & (zErr < 0.10) &
-                   (lxy > 0) & (lxy < 70) & (chi2ndof < 3))
-        # Muon IP
-        denom   = np.where(lxy * mass / ptmm > 1e-9, lxy * mass / ptmm, 1e-9)
-        ip_ok   = ((np.abs(dxysig1) > 2) & (np.abs(dxysig2) > 2) &
-                   (np.abs(dxy1) / denom > 0.1) & (np.abs(dxy2) / denom > 0.1))
-        # Muon track chi2
-        chi2_ok = (nchi2_1 < 3) & (nchi2_2 < 3)
-        # Excess hits before SV
-        max_hits = np.where(lxy < 11, 0, np.where(lxy < 16, 1, 2))
-        hits_ok  = (nhits1 + nhits2) <= max_hits
-        # Angular
-        safe_dphi = np.where(dphi_mumu > 1e-6, dphi_mumu, 1e-6)
-        safe_deta = np.where(deta_mumu > 1e-6, deta_mumu, 1e-6)
-        ang_ok  = ((dphi_mumu < 0.9 * np.pi) &
-                   (a3d_mumu  < 0.9 * np.pi) &
-                   (dphi_sv   < np.pi / 2)   &
-                   (d3d_sv    < np.pi / 2)   &
-                   (np.log10(safe_deta / safe_dphi) < 1.25))
-        # Resonance masking
-        res_ok  = ~(((mass > 0.41)  & (mass < 0.50))  |
-                    ((mass > 0.51)  & (mass < 0.59))  |
-                    ((mass > 0.731) & (mass < 0.83))  |
-                    ((mass > 0.96)  & (mass < 1.08))  |
-                    ((mass > 2.91)  & (mass < 3.27))  |
-                    ((mass > 3.47)  & (mass < 3.89))  |
-                    ((mass > 8.99)  & (mass < 9.91))  |
-                    ((mass > 9.64)  & (mass < 10.56)) |
-                    ((mass > 9.90)  & (mass < 10.78)) |
-                    ((mass > 81)    & (mass < 101)))
-
-        return sv_ok & ip_ok & chi2_ok & hits_ok & ang_ok & res_ok
-
-    pass1    = _passes(1)
-    sv2_filled = _a("SV2_x") != -1.
-    pass2    = _passes(2) & sv2_filled
-    evt_pass = pass1 | pass2
-    lxy1     = _a("SV1_lxy")
-
-    sample_label = args.inSample if args.inSample != "*" else "all"
-    print(f'\nCut-and-count: {sample_label}')
-    print(f'{"lxy bin":>16} | {"pass/total":>13}  {"eff":>8}')
-    print('-' * 45)
-    for lo, hi, lbl in zip(lxybins[:-1], lxybins[1:], lxybinlabel):
-        bin_mask = (lxy1 >= lo) & (lxy1 < hi)
-        n_tot  = int(bin_mask.sum())
-        n_pass = int((evt_pass & bin_mask).sum())
-        eff    = n_pass / n_tot if n_tot > 0 else float('nan')
-        print(f'{lbl:>16} | {n_pass:>5}/{n_tot:<7}  {eff:>8.3f}')
-    n_tot_all  = len(evt_pass)
-    n_pass_all = int(evt_pass.sum())
-    eff_all    = n_pass_all / n_tot_all if n_tot_all > 0 else float('nan')
-    print(f'{"Total":>16} | {n_pass_all:>5}/{n_tot_all:<7}  {eff_all:>8.3f}')
-
-cutncount(filtered_branches)
 
 if not isData:
     ## Convention for ctau (uniform for every sample)
     if reweightFrom > 0 and reweightTo > 0:
         foname = foname.replace("ctau-%imm"%reweightFrom, "ctau-%.2fmm"%(reweightTo))
         foname = foname.replace("ctau-%ip0mm"%reweightFrom, "ctau-%.2fmm"%(reweightTo)) # In case we have p0 in the name
-    else:
+    elif 'ctau-' in foname:
         ctau_string = foname.split('ctau-')[1].split('mm')[0]
         if 'p' in ctau_string:
             ctau_string_ = ctau_string.replace('p','.')
