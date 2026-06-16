@@ -32,7 +32,8 @@ data=False
 #ntuple_version = "vhahm_8p0"
 #ntuple_version = "vdqcd_final_8p0"
 #ntuple_version = "btophi_extra_8p0"
-ntuple_version = "_dqcd_2024"
+#ntuple_version = "_dqcd_2024"
+ntuple_version = "_minBias_2024"
 
 # Setup working environment
 import os

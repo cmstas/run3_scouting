@@ -10,6 +10,7 @@ Usage:
 """
 
 import argparse
+import gc
 import glob
 import re
 import uproot
@@ -53,15 +54,25 @@ _parser.add_argument("--bkg-rej", type=float, default=0.90,
 _parser.add_argument("--wp-score", type=float, default=None,
                      help="Set the BDT score threshold directly, overriding --bkg-rej.")
 _parser.add_argument("--model-tag", default="A", help="Signal scenario tag for output naming.")
+_parser.add_argument("--weigh-bkg", action=argparse.BooleanOptionalAction, default=True,
+                     help="Apply cross-section (sigma/N_gen) weights to background events in "
+                          "training, the WP/ROC determination and the per-lxy breakdown. "
+                          "Use --no-weigh-bkg to treat all background events with unit weight.")
 _args = _parser.parse_args()
 
 BKG_REJECTION_TARGET = _args.bkg_rej   # 0.90 = 90% background rejection
 WP_SCORE_OVERRIDE    = _args.wp_score  # if set, used directly as the BDT threshold
 use_conditional      = False
 model_tag            = _args.model_tag
+WEIGH_BKG            = _args.weigh_bkg  # cross-section weight the background?
 
 LUMI_FB = 110.0 # 2024 Luminosity
-N_gen = 1000000 # Number of total generated events
+
+# PLACEHOLDER signal production cross section [pb] -- NOT physical. Used only to
+# scale the Asimov signal yield for sensitivity tests (SIG_BR holds dimensionless
+# branching fractions). Replace with the real production xsec (e.g. SM ggH) before
+# quoting any significance.
+SIG_XSEC_PB = 1.0
 
 # Signal BRANCHING FRACTION from HepData (https://www.hepdata.net/record/ins3083980?version=1)
 SIG_BR = {
@@ -78,6 +89,26 @@ SIG_BR = {
     (1.0,  0.33, 1.0):   0.0029828,
     (1.0,  0.33, 10.0):  0.016743,
     (1.0,  0.33, 100.0): 0.14464,
+}
+
+# Number of generated events per signal point (mpi, mA, ctau) -> N_gen
+SIG_NGEN = {
+    (10.0, 1.0,  0.1):   997140,
+    (10.0, 1.0,  1.0):   999293,
+    (10.0, 1.0,  10.0):  980749,
+    (10.0, 1.0,  100.0): 954880,
+    (4.0,  1.33, 0.1):   987256,
+    (4.0,  1.33, 1.0):   932645,
+    (4.0,  1.33, 10.0):  978670,
+    (4.0,  1.33, 100.0): 951079,
+    (4.0,  0.40, 0.1):   903440,
+    (4.0,  0.40, 1.0):   998576,
+    (4.0,  0.40, 10.0):  952631,
+    (4.0,  0.40, 100.0): 997861,
+    (1.0,  0.33, 0.1):   916220,
+    (1.0,  0.33, 1.0):   955918,
+    (1.0,  0.33, 10.0):  934864,
+    (1.0,  0.33, 100.0): 998564,
 }
 
 BKG_FILES = [
@@ -109,6 +140,22 @@ BKG_XSEC = {
     "tuples_QCD_Bin-PT-600to800_Fil-MuEnriched_2024_2024.root":  21.27,
     "tuples_QCD_Bin-PT-800to1000_Fil-MuEnriched_2024_2024.root": 3.89,
     "tuples_QCD_Bin-PT-1000_Fil-MuEnriched_2024_2024.root":      1.323,
+}
+
+# Number of generated events per background sample (from DAS nevents)
+BKG_NGEN = {
+    "tuples_QCD_Bin-PT-15to20_Fil-MuEnriched_2024_2024.root":    125036760,
+    #"tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root":    93304586, #ZOMBIE (for now)
+    "tuples_QCD_Bin-PT-30to50_Fil-MuEnriched_2024_2024.root":    95305920,
+    "tuples_QCD_Bin-PT-50to80_Fil-MuEnriched_2024_2024.root":    107449521,
+    "tuples_QCD_Bin-PT-80to120_Fil-MuEnriched_2024_2024.root":   94128199,
+    "tuples_QCD_Bin-PT-120to170_Fil-MuEnriched_2024_2024.root":  99824346,
+    "tuples_QCD_Bin-PT-170to300_Fil-MuEnriched_2024_2024.root":  94338762,
+    "tuples_QCD_Bin-PT-300to470_Fil-MuEnriched_2024_2024.root":  79815908,
+    "tuples_QCD_Bin-PT-470to600_Fil-MuEnriched_2024_2024.root":  71786916,
+    "tuples_QCD_Bin-PT-600to800_Fil-MuEnriched_2024_2024.root":  85842835,
+    "tuples_QCD_Bin-PT-800to1000_Fil-MuEnriched_2024_2024.root": 81930100,
+    "tuples_QCD_Bin-PT-1000_Fil-MuEnriched_2024_2024.root":      87293168,
 }
 PB_TO_FB = 1.0e3   # 1 pb = 1000 fb (for the QCD background cross sections)
 
@@ -252,24 +299,38 @@ def read_flat(path):
         branches  = [b for b in _LOAD_BRANCHES if b in available]
         return t.arrays(branches, library='pd')
 
-def compute_class_weights(y):
-    n_sig = (y == 1).sum()
-    n_bkg = (y == 0).sum()
-    return np.where(y == 1, n_bkg / n_sig, 1.0)
+def compute_sample_weights(df):
+    y = df['label'].values
+    w = np.ones(len(df), dtype=float)
+
+    bkg_mask = (y == 0)
+    if WEIGH_BKG:
+        # Cross-section reweighting for background: each event weighted by sigma / N_gen
+        # (no luminosity -- only the relative normalization across the QCD pT bins matters).
+        # The 'xsec_weight' column is set at load time.
+        w[bkg_mask] = df.loc[bkg_mask, 'xsec_weight'].values
+    # else: background stays at unit weight.
+
+    # Class balancing: scale signal so total signal weight == total background weight.
+    n_sig   = int((y == 1).sum())
+    sum_bkg = float(w[bkg_mask].sum())
+    if n_sig > 0 and sum_bkg > 0:
+        w[y == 1] = sum_bkg / n_sig
+    return w
 
 def asimov_z(sig_eff, br_sig, bkg_effs):
     """Asimov median discovery significance: Z = sqrt(2((s+b)ln(1+s/b) - s)).
 
-    Yields are built here from cross sections, luminosity and WP efficiencies:
-        s = (sigma*BR) * LUMI_FB * sig_eff
-        b = sum_bins  sigma_bin[pb] * PB_TO_FB * LUMI_FB * bkg_acceptance / N_gen
+    Yields are built here from cross sections, luminosity and WP acceptances:
+        s = SIG_XSEC_PB * PB_TO_FB * BR * LUMI_FB * sig_eff
+        b = sum_bins  sigma_bin[pb] * PB_TO_FB * LUMI_FB * bkg_acceptance
 
-    sig_eff  : signal efficiency at the WP
-    br_sig   : signal sigma * BR
-    bkg_effs : dict {bkg filename: efficiency at WP for that bkg}
+    sig_eff  : signal acceptance at the WP (n_pass / N_gen)
+    br_sig   : signal branching fraction (dimensionless)
+    bkg_effs : dict {bkg filename: WP acceptance (n_pass / N_gen) for that bkg}
     """
-    s = br_sig * LUMI_FB * sig_eff
-    b = sum(BKG_XSEC[f] * PB_TO_FB * LUMI_FB * bkg_acceptance / N_gen for f, bkg_acceptance in bkg_effs.items())
+    s = SIG_XSEC_PB * PB_TO_FB * br_sig * LUMI_FB * sig_eff
+    b = sum(BKG_XSEC[f] * PB_TO_FB * LUMI_FB * bkg_acceptance for f, bkg_acceptance in bkg_effs.items())
     if b <= 0.0 or s <= 0.0:
         return 0.0
     return float(np.sqrt(2.0 * ((s + b) * np.log1p(s / b) - s)))
@@ -304,8 +365,13 @@ for fname in BKG_FILES:
     df = read_flat(fpath)
     df['label'] = 0
     df['bkg_file'] = fname
+    # Cross-section reweighting (no lumi): per-event weight = sigma / N_gen.
+    df['xsec_weight'] = BKG_XSEC[fname] / BKG_NGEN[fname]
     bkg_frames.append(df)
-    print(f'  bkg {fname}: {len(df)} events')
+    if WEIGH_BKG:
+        print(f'  bkg {fname}: {len(df)} events ({df["xsec_weight"].sum():.4g} xsec-weighted)')
+    else:
+        print(f'  bkg {fname}: {len(df)} events')
 
 df_bkg = pd.concat(bkg_frames, ignore_index=True)
 
@@ -340,12 +406,14 @@ os.makedirs(out_dir, exist_ok=True)
 # ---------------------------------------------------------------------------
 # Train global BDT
 # ---------------------------------------------------------------------------
-print('\nTraining global BDT...')
+print(f'\nTraining global BDT... (background weighting: '
+      f'{"sigma/N_gen (xsec)" if WEIGH_BKG else "OFF -- unit weight"})')
 df_global = pd.concat([df_sig, df_bkg], ignore_index=True)
 
 X_g = df_global[input_vars + cond_vars]
 y_g = df_global['label']
-w_g = compute_class_weights(y_g.values)
+w_g = compute_sample_weights(df_global)
+df_global['weight'] = w_g
 
 X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
     X_g, y_g, w_g, test_size=0.3, random_state=42, stratify=y_g)
@@ -361,8 +429,8 @@ bdt.fit(X_train, y_train, sample_weight=w_train)
 # Find working point
 # ---------------------------------------------------------------------------
 y_score = bdt.predict_proba(X_test)[:, 1]
-fpr, tpr, thresholds = roc_curve(y_test, y_score)
-auc = roc_auc_score(y_test, y_score)
+fpr, tpr, thresholds = roc_curve(y_test, y_score, sample_weight=w_test)
+auc = roc_auc_score(y_test, y_score, sample_weight=w_test)
 
 bkg_rej_curve = 1.0 - fpr
 if WP_SCORE_OVERRIDE is not None:
@@ -413,50 +481,62 @@ df_bkg_pass = df_global[(df_global['label'] == 0) & (df_global['score'] > wp_thr
 df_bkg_all  = df_global[df_global['label'] == 0]
 print(f'Background: {len(df_bkg_all)} total, {len(df_bkg_pass)} pass WP '
       f'({len(df_bkg_pass)/len(df_bkg_all):.1%})')
+if WEIGH_BKG:
+    w_all  = df_bkg_all['weight'].sum()
+    w_pass = df_bkg_pass['weight'].sum()
+    print(f'            weighted (xsec): {w_all:.4g} total, {w_pass:.4g} pass WP '
+          f'({w_pass/w_all:.1%})')
 
 # ---------------------------------------------------------------------------
-# Asimov significance at the working point
+# Asimov significance at the working point  -- DISABLED for now (revisit later)
 # ---------------------------------------------------------------------------
-def _bkg_effs(extra_mask=None):
-    """WP efficiency per background pT bin, optionally within an extra mask."""
-    effs = {}
-    for fname in BKG_XSEC:
-        sel = (df_global['label'] == 0) & (df_global['bkg_file'] == fname)
-        if extra_mask is not None:
-            sel = sel & extra_mask
-        n_tot = int(sel.sum())
-        if n_tot == 0:
-            continue
-        effs[fname] = int((sel & (df_global['score'] > wp_threshold)).sum()) / n_tot
-    return effs
-
-bkg_effs_incl = _bkg_effs()
-bkg_effs_lxy  = {lbl: _bkg_effs(df_global['lxy_bin'] == lbl) for lbl in lxy_labels}
-
-print(f'\nAsimov significance at WP (lumi = {LUMI_FB:.0f}/fb, sigma*BR in pb):')
-print(f'{"mpi":>5} {"mA":>6} {"ctau":>7} | {"Z(incl)":>9} | {"Z(lxy-comb)":>12}')
-print('-' * 50)
-for (mpi_val, mA_val, ctau_val), br in sorted(SIG_BR.items()):
-    sig_sel = ((df_global['label'] == 1) &
-               (df_global['param_mpi']  == mpi_val) &
-               (df_global['param_mA']   == mA_val) &
-               (df_global['param_ctau'] == ctau_val))
-    n_sig = int(sig_sel.sum())
-    if n_sig == 0:
-        continue
-    sig_eff = int((sig_sel & (df_global['score'] > wp_threshold)).sum()) / n_sig
-    z_incl  = asimov_z(sig_eff, br, bkg_effs_incl)
-    # per-lxy-bin significances combined in quadrature
-    z2 = 0.0
-    for lxy_label in lxy_labels:
-        lxy_mask = df_global['lxy_bin'] == lxy_label
-        n_sig_b  = int((sig_sel & lxy_mask).sum())
-        if n_sig_b == 0:
-            continue
-        sig_eff_b = int((sig_sel & lxy_mask & (df_global['score'] > wp_threshold)).sum()) / n_sig_b
-        z2 += asimov_z(sig_eff_b, br, bkg_effs_lxy[lxy_label]) ** 2
-    z_comb = np.sqrt(z2)
-    print(f'{mpi_val:>5g} {mA_val:>6g} {ctau_val:>7g} | {z_incl:>9.3f} | {z_comb:>12.3f}')
+# def _bkg_effs(extra_mask=None):
+#     """WP acceptance per background pT bin (n_pass / N_gen), optionally within an extra mask."""
+#     effs = {}
+#     for fname in BKG_XSEC:
+#         sel = (df_global['label'] == 0) & (df_global['bkg_file'] == fname)
+#         if extra_mask is not None:
+#             sel = sel & extra_mask
+#         n_pass = int((sel & (df_global['score'] > wp_threshold)).sum())
+#         if n_pass == 0:
+#             continue
+#         effs[fname] = n_pass / BKG_NGEN[fname]
+#     return effs
+#
+# bkg_effs_incl = _bkg_effs()
+# bkg_effs_lxy  = {lbl: _bkg_effs(df_global['lxy_bin'] == lbl) for lbl in lxy_labels}
+#
+# print(f'\nAsimov significance at WP (lumi = {LUMI_FB:.0f}/fb, '
+#       f'PLACEHOLDER sig xsec = {SIG_XSEC_PB:g} pb, BR from HepData limits):')
+# print(f'{"mpi":>5} {"mA":>6} {"ctau":>7} | {"Z(incl)":>9} | {"Z(lxy 0to1)":>12}| {"Z(lxy 1to10)":>15}| {"Z(lxy 10to100)":>18}')
+# print('-' * 50)
+# for (mpi_val, mA_val, ctau_val), br in sorted(SIG_BR.items()):
+#     sig_sel = ((df_global['label'] == 1) &
+#                (df_global['param_mpi']  == mpi_val) &
+#                (df_global['param_mA']   == mA_val) &
+#                (df_global['param_ctau'] == ctau_val))
+#     n_sig = int(sig_sel.sum())
+#     if n_sig == 0:
+#         continue
+#     n_gen_sig = SIG_NGEN[(mpi_val, mA_val, ctau_val)]
+#     sig_eff = int((sig_sel & (df_global['score'] > wp_threshold)).sum()) / n_gen_sig
+#     z_incl  = asimov_z(sig_eff, br, bkg_effs_incl)
+#     z0to1 = 0
+#     z1to10 = 0
+#     z10to100 = 0
+#     for lxy_label in lxy_labels:
+#         lxy_mask = df_global['lxy_bin'] == lxy_label
+#         n_sig_b  = int((sig_sel & lxy_mask).sum())
+#         if n_sig_b == 0:
+#             continue
+#         sig_eff_b = int((sig_sel & lxy_mask & (df_global['score'] > wp_threshold)).sum()) / n_gen_sig
+#         if lxy_label=="0to1":
+#             z0to1 = asimov_z(sig_eff_b, br, bkg_effs_lxy[lxy_label])
+#         elif lxy_label=="1to10":
+#             z1to10 = asimov_z(sig_eff_b, br, bkg_effs_lxy[lxy_label])
+#         elif lxy_label=="10to100":
+#             z10to100 = asimov_z(sig_eff_b, br, bkg_effs_lxy[lxy_label])
+#     print(f'{mpi_val:>5g} {mA_val:>6g} {ctau_val:>7g} | {z_incl:>9.3f} | {z0to1:>1.3f} | {z1to10:>13.3f} | {z10to100:>15.3f}')
 
 # ---------------------------------------------------------------------------
 # Variable distributions after WP cut — one set of plots per (mpi, mA)
@@ -634,8 +714,10 @@ if _sig_lxy_lines:
 # ---------------------------------------------------------------------------
 # Signal efficiency & background rejection per lxy bin at the WP
 # ---------------------------------------------------------------------------
-print(f'\n{"lxy bin":>14} | {"sig_eff":>8} | {"bkg_rej":>8}')
-print('-' * 38)
+_wgt_hdr = "bkg pass (xs-wgt)" if WEIGH_BKG else "bkg pass (unit-wgt)"
+print(f'\n{"lxy bin":>14} | {"sig_eff":>8} | {"bkg_rej":>8} | '
+      f'{"bkg pass (raw)":>16} | {_wgt_hdr:>20}')
+print('-' * 80)
 
 eff_data = []
 for lxy_label in lxy_labels:
@@ -643,8 +725,19 @@ for lxy_label in lxy_labels:
     bkg_bin = df_global[(df_global['label'] == 0) & (df_global['lxy_bin'] == lxy_label)]
 
     sig_eff = (sig_bin['score'] > wp_threshold).sum() / len(sig_bin) if len(sig_bin) > 0 else float('nan')
-    bkg_rej_bin = 1.0 - (bkg_bin['score'] > wp_threshold).sum() / len(bkg_bin) if len(bkg_bin) > 0 else float('nan')
-    print(f'{lxy_label:>14} | {sig_eff:>8.3f} | {bkg_rej_bin:>8.3f}')
+    n_bkg_total = len(bkg_bin)
+    pass_mask   = bkg_bin['score'] > wp_threshold
+    n_bkg_pass  = int(pass_mask.sum())
+    if n_bkg_total > 0:
+        # 'weight' already reflects WEIGH_BKG (xsec weights if on, unit weights if off).
+        w_tot       = bkg_bin['weight'].sum()
+        w_pass      = bkg_bin.loc[pass_mask, 'weight'].sum()
+        bkg_rej_bin = 1.0 - w_pass / w_tot
+    else:
+        w_tot = w_pass = 0.0
+        bkg_rej_bin = float('nan')
+    print(f'{lxy_label:>14} | {sig_eff:>8.3f} | {bkg_rej_bin:>8.3f} | '
+          f'{n_bkg_pass:>7}/{n_bkg_total:<8} | {w_pass:>9.4g}/{w_tot:<9.4g}')
     eff_data.append((lxy_label, sig_eff, bkg_rej_bin))
 
 # Bar chart: sig eff and bkg rej per lxy bin
