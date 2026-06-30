@@ -1,14 +1,10 @@
 #!/bin/bash
 
 # Submit the BDT working-point job to HTCondor (UCSD UAF).
-#
-# Usage:
-#   sh condor/BDT_onCondor.sh ['notar']
-#
-#   notar : skip rebuilding package_BDT.tar.gz (reuse the existing one)
-#
-# Output: when each job finishes, condor delivers its results unpacked to
-#   <repo>/BDT/working_point_<bkgrej>/   (no manual extraction needed).
+
+#Usage: sh condor/BDT_onCondor.sh
+
+#Output: /BDT/working_point_<bkgrej>/.
 
 export STARTDIR=$PWD
 mkdir -p condor/plotting_logs

@@ -1,13 +1,6 @@
 #!/bin/bash
 
-# Worker-node executable for the BDT working-point job.
-# All arguments are forwarded verbatim to BDT/workingpoint.py.
-#
-# Inputs (delivered by HTCondor into $_CONDOR_SCRATCH_DIR):
-#   package_BDT.tar.gz       -> ScoutingRun3/BDT/*.py
-#   tuples_parking_nochi2/   -> input ROOT tuples (directory)
-# Output:
-#   bdt_output.tar.gz        -> contains BDT/working_point_* (pulled back to submit dir)
+# Worker-node executable for the BDT
 
 set -e
 
@@ -30,7 +23,7 @@ export MPLCONFIGDIR="$_CONDOR_SCRATCH_DIR/mplconfig"
 export XDG_CACHE_HOME="$_CONDOR_SCRATCH_DIR/cache"
 mkdir -p "$MPLCONFIGDIR" "$XDG_CACHE_HOME"
 
-# Reassemble the layout workingpoint.py expects: BDT/ and its sibling tuples dir.
+# Reassemble the layout workingpoint.py expects: BDT/ and tuples dir.
 tar xzf package_BDT.tar.gz
 mv tuples_parking_nochi2 ScoutingRun3/.
 
@@ -44,9 +37,6 @@ RC=$?
 echo "=== workingpoint.py exit code: $RC"
 [ $RC -ne 0 ] && exit $RC
 
-# Expose the output dir(s) at the scratch top so HTCondor transfers them back
-# directly (it transfers directories recursively). With one --bkg-rej per job
-# there is exactly one working_point_* dir; the .sub remaps it into BDT/.
 cd "$_CONDOR_SCRATCH_DIR/ScoutingRun3/BDT"
 echo "=== Output dirs produced:"; ls -d working_point_* 2>/dev/null || echo "  (none found!)"
 mv working_point_* "$_CONDOR_SCRATCH_DIR/"
