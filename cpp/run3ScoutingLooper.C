@@ -570,6 +570,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("PV_y", &PV_y);
   tout->Branch("PV_z", &PV_z);
 
+  //Gen particle branches
   tout->Branch("GenPart_pt", &GenParts.pt);
   tout->Branch("GenPart_eta", &GenParts.eta);
   tout->Branch("GenPart_phi", &GenParts.phi);
@@ -587,6 +588,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("GenB_pt", &GenB_pt);
   tout->Branch("GenB_eta", &GenB_eta);
 
+  //NoVtx SV branches
   tout->Branch("SV_index", &SVs.index);
   tout->Branch("SV_ndof", &SVs.ndof);
   tout->Branch("SV_x", &SVs.x);
@@ -621,6 +623,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("SV_minDistanceFromDet_y", &SVs.minDistanceFromDet_y);
   tout->Branch("SV_minDistanceFromDet_z", &SVs.minDistanceFromDet_z);
 
+  //NoVtx OSV branches
   tout->Branch("SVOverlap_vtxIdxs", &SVOverlaps.vtxIdxs);
   tout->Branch("SVOverlap_x", &SVOverlaps.x);
   tout->Branch("SVOverlap_y", &SVOverlaps.y);
@@ -628,6 +631,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("SVOverlap_lxy", &SVOverlaps.lxy);
   tout->Branch("SVOverlap_l3d", &SVOverlaps.l3d);
 
+  //NoVtx Muon branches
   tout->Branch("nMuon_Assoc", &nMuon_Assoc);
   tout->Branch("nMuon_vtx_Assoc", &nMuon_vtx_Assoc);
   tout->Branch("Muon_vtxIdxs", &Muons.vtxIdxs);
@@ -693,7 +697,50 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("Muon_nexpectedhitsmultipletotal", &Muons.nexpectedhitsmultipletotal);
   tout->Branch("Muon_nexpectedhitstotal", &Muons.nexpectedhitstotal);
 
-  // Muon_vtx branches (2024: hltScoutingMuonPackerVtx — muons only, no SVs stored)
+  //Vtx SV branches (2024 only)
+  tout->Branch("SV_vtx_ndof", &SVsVtx.ndof);
+  tout->Branch("SV_vtx_x", &SVsVtx.x);
+  tout->Branch("SV_vtx_y", &SVsVtx.y);
+  tout->Branch("SV_vtx_z", &SVsVtx.z);
+  tout->Branch("SV_vtx_xe", &SVsVtx.xe);
+  tout->Branch("SV_vtx_ye", &SVsVtx.ye);
+  tout->Branch("SV_vtx_ze", &SVsVtx.ze);
+  tout->Branch("SV_vtx_chi2", &SVsVtx.chi2);
+  tout->Branch("SV_vtx_prob", &SVsVtx.prob);
+  tout->Branch("SV_vtx_chi2Ndof", &SVsVtx.chi2Ndof);
+  tout->Branch("SV_vtx_lxy", &SVsVtx.lxy);
+  tout->Branch("SV_vtx_l3d", &SVsVtx.l3d);
+  tout->Branch("SV_vtx_selected", &SVsVtx.selected);
+  tout->Branch("SV_vtx_onModule", &SVsVtx.onModule);
+  tout->Branch("SV_vtx_onModuleWithinUnc", &SVsVtx.onModuleWithinUnc);
+  tout->Branch("SV_vtx_closestDet_x", &SVsVtx.closestDet_x);
+  tout->Branch("SV_vtx_closestDet_y", &SVsVtx.closestDet_y);
+  tout->Branch("SV_vtx_closestDet_z", &SVsVtx.closestDet_z);
+  tout->Branch("SV_vtx_minDistanceFromDet", &SVsVtx.minDistanceFromDet);
+  tout->Branch("SV_vtx_minDistanceFromDet_x", &SVsVtx.minDistanceFromDet_x);
+  tout->Branch("SV_vtx_minDistanceFromDet_y", &SVsVtx.minDistanceFromDet_y);
+  tout->Branch("SV_vtx_minDistanceFromDet_z", &SVsVtx.minDistanceFromDet_z);
+  tout->Branch("SV_vtx_index", &SVsVtx.origIdx);
+  tout->Branch("SV_vtx_mindx", &SVsVtx.mindx);
+  tout->Branch("SV_vtx_mindy", &SVsVtx.mindy);
+  tout->Branch("SV_vtx_mindz", &SVsVtx.mindz);
+  tout->Branch("SV_vtx_mindxy", &SVsVtx.mindxy);
+  tout->Branch("SV_vtx_mind3d", &SVsVtx.mind3d);
+  tout->Branch("SV_vtx_maxdx", &SVsVtx.maxdx);
+  tout->Branch("SV_vtx_maxdy", &SVsVtx.maxdy);
+  tout->Branch("SV_vtx_maxdz", &SVsVtx.maxdz);
+  tout->Branch("SV_vtx_maxdxy", &SVsVtx.maxdxy);
+  tout->Branch("SV_vtx_maxd3d", &SVsVtx.maxd3d);
+
+  //Vtx OSV branches
+  tout->Branch("SVOverlap_vtx_vtxIdxs", &SVOverlapVtxs.vtxIdxs);
+  tout->Branch("SVOverlap_vtx_x",   &SVOverlapVtxs.x);
+  tout->Branch("SVOverlap_vtx_y",   &SVOverlapVtxs.y);
+  tout->Branch("SVOverlap_vtx_z",   &SVOverlapVtxs.z);
+  tout->Branch("SVOverlap_vtx_lxy", &SVOverlapVtxs.lxy);
+  tout->Branch("SVOverlap_vtx_l3d", &SVOverlapVtxs.l3d);
+
+  //Vtx Muon branches
   tout->Branch("Muon_vtx_vtxIdxs", &MuonsVtx.vtxIdxs);
   tout->Branch("Muon_vtx_saHits", &MuonsVtx.saHits);
   tout->Branch("Muon_vtx_saMatchedStats", &MuonsVtx.saMatchedStats);
@@ -757,47 +804,6 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("Muon_vtx_phiCorr", &MuonsVtx.phiCorr);
   tout->Branch("Muon_vtx_dxyCorr", &MuonsVtx.dxyCorr);
 
-  tout->Branch("SVOverlap_vtx_vtxIdxs", &SVOverlapVtxs.vtxIdxs);
-  tout->Branch("SVOverlap_vtx_x",   &SVOverlapVtxs.x);
-  tout->Branch("SVOverlap_vtx_y",   &SVOverlapVtxs.y);
-  tout->Branch("SVOverlap_vtx_z",   &SVOverlapVtxs.z);
-  tout->Branch("SVOverlap_vtx_lxy", &SVOverlapVtxs.lxy);
-  tout->Branch("SVOverlap_vtx_l3d", &SVOverlapVtxs.l3d);
-
-  // SVs from Vtx muon collection (2024 only)
-  tout->Branch("SV_vtx_ndof", &SVsVtx.ndof);
-  tout->Branch("SV_vtx_x", &SVsVtx.x);
-  tout->Branch("SV_vtx_y", &SVsVtx.y);
-  tout->Branch("SV_vtx_z", &SVsVtx.z);
-  tout->Branch("SV_vtx_xe", &SVsVtx.xe);
-  tout->Branch("SV_vtx_ye", &SVsVtx.ye);
-  tout->Branch("SV_vtx_ze", &SVsVtx.ze);
-  tout->Branch("SV_vtx_chi2", &SVsVtx.chi2);
-  tout->Branch("SV_vtx_prob", &SVsVtx.prob);
-  tout->Branch("SV_vtx_chi2Ndof", &SVsVtx.chi2Ndof);
-  tout->Branch("SV_vtx_lxy", &SVsVtx.lxy);
-  tout->Branch("SV_vtx_l3d", &SVsVtx.l3d);
-  tout->Branch("SV_vtx_selected", &SVsVtx.selected);
-  tout->Branch("SV_vtx_onModule", &SVsVtx.onModule);
-  tout->Branch("SV_vtx_onModuleWithinUnc", &SVsVtx.onModuleWithinUnc);
-  tout->Branch("SV_vtx_closestDet_x", &SVsVtx.closestDet_x);
-  tout->Branch("SV_vtx_closestDet_y", &SVsVtx.closestDet_y);
-  tout->Branch("SV_vtx_closestDet_z", &SVsVtx.closestDet_z);
-  tout->Branch("SV_vtx_minDistanceFromDet", &SVsVtx.minDistanceFromDet);
-  tout->Branch("SV_vtx_minDistanceFromDet_x", &SVsVtx.minDistanceFromDet_x);
-  tout->Branch("SV_vtx_minDistanceFromDet_y", &SVsVtx.minDistanceFromDet_y);
-  tout->Branch("SV_vtx_minDistanceFromDet_z", &SVsVtx.minDistanceFromDet_z);
-  tout->Branch("SV_vtx_index", &SVsVtx.origIdx);
-  tout->Branch("SV_vtx_mindx", &SVsVtx.mindx);
-  tout->Branch("SV_vtx_mindy", &SVsVtx.mindy);
-  tout->Branch("SV_vtx_mindz", &SVsVtx.mindz);
-  tout->Branch("SV_vtx_mindxy", &SVsVtx.mindxy);
-  tout->Branch("SV_vtx_mind3d", &SVsVtx.mind3d);
-  tout->Branch("SV_vtx_maxdx", &SVsVtx.maxdx);
-  tout->Branch("SV_vtx_maxdy", &SVsVtx.maxdy);
-  tout->Branch("SV_vtx_maxdz", &SVsVtx.maxdz);
-  tout->Branch("SV_vtx_maxdxy", &SVsVtx.maxdxy);
-  tout->Branch("SV_vtx_maxd3d", &SVsVtx.maxd3d);
 
   // Event setup
   TRandom3 rndm_partialUnblinding(42);
@@ -867,8 +873,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       SVOverlapVtxs.clear();
       MuonsVtx.clear();
       iEv++;
-      //if (iEv > 10)
-      //  break;
+
       bar.progress(iEv, nEventsFile);
 
       auto evAux = ev.eventAuxiliary();

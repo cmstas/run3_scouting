@@ -79,6 +79,7 @@ args = parser.parse_args()
 use_novtx = args.collection in ('noVtx', 'both', 'OR')
 use_vtx   = args.collection in ('Vtx', 'both', 'OR')
 use_OR    = (args.collection == 'OR')
+OR_SV_DLXY_MAX = 0.1
 
 # Functions for selection
 def applyDiMuonSelection(vec):
@@ -222,6 +223,9 @@ def getweight(era, ngen, frac=1.0, xsec=1000):
     if era=="2023BPix":
         print(f"Getting {era}: Normalize to {frac*9.525199061}")
         return frac*9.525199061*xsec/ngen
+    if era=="2024":
+        print(f"Getting {era}: Normalize to {frac*109.95}")
+        return frac*109.95*xsec/ngen
 
 # Get closest from list
 def getClosest(val, values):
@@ -420,7 +424,7 @@ else:
         if args.inFile!="*" and args.inSample!="*":
             thisfile="output_%s_%s_%s.root"%(args.inSample,args.year,args.inFile)
             if thisfile in f:
-                files.append("%s/%s"%(prependtodir,thisfile))
+                files.append("%s/%s"%(prependtodir,f))
         elif args.inSample!="*":
             if "output_%s_%s_"%(args.inSample,args.year) in f:
                 files.append("%s/%s"%(prependtodir,f))
@@ -446,7 +450,8 @@ efilter = 1.0
 lumiweight = 1.0
 sampleTag = args.inSample.replace('Signal_', '').split('_202')[0]
 unblind_frac = 1.0 if args.unblind else 0.1
-if not isData and args.weightMC and 'DileptonMinBias' not in args.inSample:
+
+if not isData and args.weightMC and 'MinBias' not in args.inSample and 'QCD' not in args.inSample:
     counts = ROOT.TH1F("totals", "", 1, 0, 1)
     print("Simulations: Getting counts")
     if "HTo2ZdTo2mu2x" in sampleTag:
@@ -524,9 +529,9 @@ if not isData and args.weightMC and 'DileptonMinBias' not in args.inSample:
         lumiweight = getweight("2023BPix", ncounts/efilter, unblind_frac)
     elif "2023" in files[0] and args.year=="2023":
         lumiweight = getweight("2023", ncounts/efilter, unblind_frac)
-    #if ("ScenarioA" in sampleTag or "ScenarioB1" in sampleTag) and "2023" in files[0]:
-    #    print("PROVISIONAL: Running DQCD in 2023 with only 2023")
-    #    lumiweight = unblind_frac*(5.557004785+11.503479528+9.525199061)*1000.0/(ncounts/efilter)
+    elif "2024" in files[0] and args.year=="2024":
+        lumiweight = getweight("2024", ncounts/efilter, unblind_frac)
+
     print("Total number of counts: {}".format(ncounts))
     print("Filter efficiency (generation): {}".format(efilter))
     print("Lumiweight: {}".format(lumiweight))
@@ -687,7 +692,6 @@ SV_BRANCHES = [
     "mu2_nexpectedhits", "mu2_nexpectedhitsmultiple", "mu2_nexpectedhitsmultipletotal", "mu2_nexpectedhitstotal",
     "mu2_phiCorr",
     "mass",
-    # additional SV quality variables
     "ndof", "chi2Ndof", "l3d",
     "mindx", "mindy", "mindz", "mindxy", "mind3d",
     "maxdx", "maxdy", "maxdz", "maxdxy", "maxd3d",
@@ -727,9 +731,6 @@ for e in range(firste,laste):
     for sv in ["SV1", "SV2"]:
         for var in SV_BRANCHES:
             branches[f"{sv}_{var}"].append(-1.)
-    # for mu in [f"Mu{i+1}" for i in range(N_MU_SLOTS)]:
-    #     for var in MU_BRANCHES:
-    #         branches[f"{mu}_{var}"].append(-1.)
 
     # Access event
     t.GetEntry(e)
@@ -767,7 +768,6 @@ for e in range(firste,laste):
     if 'BToPhi' in sampleTag and applyBweights and not isData:
         cset = correctionlib.CorrectionSet.from_file("data/b-hadron_weights.json")
         bweight = cset['PT_weight'].evaluate(t.GenB_pt, 'nominal')
-
 
     # Event info
     event_weight = lumiweight*bweight*puweight
@@ -975,12 +975,6 @@ for e in range(firste,laste):
                     svidx_noVtx.append(vpos)
 
 
-    dmuidxs_all_noVtx = dmuidxs_osv_noVtx+dmuidxs_noVtx
-    dmuvec_all_noVtx = dmuvec_osv_noVtx+dmuvec_osv_noVtx
-    dmu_muvecdp_all_noVtx = dmu_muvecdp_osv_noVtx+dmu_muvecdp_noVtx
-    svidx_all_noVtx = osvidx_noVtx+svidx_noVtx
-    svvec_all_noVtx = osvvec_noVtx+svvec_noVtx
-
     # -----------------------------------------------------------------------
     # Vtx SV loop
     # -----------------------------------------------------------------------
@@ -1114,6 +1108,7 @@ for e in range(firste,laste):
     # geometrically matched to a Vtx SV can be dropped in OR mode.
     # -----------------------------------------------------------------------
     _or_vtx_sv_vecs = []
+    _or_vtx_sv_lxy  = []
     if use_OR:
         for vi in _vtx_sv_selected_idxs:
             _or_vtx_sv_vecs.append(ROOT.TVector3(
@@ -1121,12 +1116,13 @@ for e in range(firste,laste):
                 t.SV_vtx_y[vi] - t.PV_y,
                 t.SV_vtx_z[vi] - t.PV_z
             ))
+            _or_vtx_sv_lxy.append(t.SV_vtx_lxy[vi])
 
-        def _matched_sv_to_vtx(sv_vec):
-            for vsv in _or_vtx_sv_vecs:
+        def _matched_sv_to_vtx(sv_vec, sv_lxy):
+            for vsv, vsv_lxy in zip(_or_vtx_sv_vecs, _or_vtx_sv_lxy):
                 deta = sv_vec.PseudoRapidity() - vsv.PseudoRapidity()
                 dphi_val = (sv_vec.Phi() - vsv.Phi() + math.pi) % (2 * math.pi) - math.pi
-                if math.sqrt(deta**2 + dphi_val**2) < 0.3:
+                if math.sqrt(deta**2 + dphi_val**2) < 0.1 and abs(sv_lxy - vsv_lxy) < OR_SV_DLXY_MAX:
                     return True
             return False
 
@@ -1181,7 +1177,7 @@ for e in range(firste,laste):
             if use_OR and (_matched_to_vtx(t.Muon_eta[mi],  t.Muon_phi[mi]) or
                            _matched_to_vtx(t.Muon_eta[mii], t.Muon_phi[mii])):
                 continue
-            if use_OR and _matched_sv_to_vtx(svvec_noVtx[i]):
+            if use_OR and _matched_sv_to_vtx(svvec_noVtx[i], t.SV_lxy[svidx_noVtx[i]]):
                 continue
             dmuvec_all.append(dmuvec_noVtx[i])
             dmu_muvecdp_all.append(dmu_muvecdp_noVtx[2*i])
@@ -1197,7 +1193,7 @@ for e in range(firste,laste):
             if use_OR and (_matched_to_vtx(t.Muon_eta[mi],  t.Muon_phi[mi]) or
                            _matched_to_vtx(t.Muon_eta[mii], t.Muon_phi[mii])):
                 continue
-            if use_OR and _matched_sv_to_vtx(osvvec_noVtx[i]):
+            if use_OR and _matched_sv_to_vtx(osvvec_noVtx[i], t.SVOverlap_lxy[osvidx_noVtx[i]]):
                 continue
             dmuvec_all.append(dmuvec_osv_noVtx[i])
             dmu_muvecdp_all.append(dmu_muvecdp_osv_noVtx[2*i])
@@ -1591,7 +1587,6 @@ for e in range(firste,laste):
         branches[f"{_sv_slot}_closestDet_y"][-1]            = svattr(t, 'closestDet_y',          _svi, is_vtx) if _sv_direct else -1.
         branches[f"{_sv_slot}_closestDet_z"][-1]            = svattr(t, 'closestDet_z',          _svi, is_vtx) if _sv_direct else -1.
 
-        #
         # Lifetime reweighting
         tweight = 1.0
         if (reweightTo > 0 and reweightFrom > 0 and not isData):
