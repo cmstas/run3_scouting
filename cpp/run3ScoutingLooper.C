@@ -30,8 +30,8 @@ using namespace fwlite;
 #include "tools/goodrun.h"
 #include "tools/tqdm.h"
 
-// Partial unblinding
-bool doPartialUnblinding = false;
+
+bool doPartialUnblinding = true;
 float partialUnblindingPercentage = 0.1; // 10% of each era
 
 // SV selection
@@ -42,6 +42,7 @@ float maxDXYerr=0.05*sfSVsel, maxD3Derr=0.10*sfSVsel; // for identification of o
 
 // Trigger selection
 bool applyL1 = false;   // set false to skip the L1 requirement
+bool requireAtLeastOneSV = true;
 
 // BToPhi specific
 bool filterByB = true;
@@ -511,7 +512,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   TTree* tout = new TTree("tout","Run3ScoutingTree");
   TH1F* counts = new TH1F("counts", "", 1, 0, 1);
   TH1F* sum2Weights = new TH1F("sum2Weights", "", 1, 0, 1);
-  TH1F* cutflow = new TH1F("cutflow", "", 8, 0, 8);  
+  TH1F* cutflow = new TH1F("cutflow", "", 9, 0, 9);
 
   // Branch variables
   unsigned int run, lumi, evtn;
@@ -862,6 +863,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
     int nL1 = 0;
     int nHLT = 0;
     int nPreMu = 0;
+    int nSV = 0;
     for (ev.toBegin(); ! ev.atEnd(); ++ev) {
       
       //Clear all variables
@@ -1752,6 +1754,11 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       nPreMu++;
       if (Muons.pt.size() < 2 && MuonsVtx.pt.size() < 2)
         continue;
+
+      if (requireAtLeastOneSV && SVs.x.empty() && SVsVtx.x.empty())
+        continue;
+      nSV++;
+
       Muons.sort();
       MuonsVtx.sort();
 
@@ -1766,6 +1773,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
     std::cout << "Events pass L1: " << nL1 <<  "\n";
     std::cout << "Events pass HLT: " << nHLT <<  "\n";
     std::cout << "Events pre-mu: " << nPreMu <<  "\n";
+    std::cout << "Events with >=1 SV: " << nSV <<  "\n";
     std::cout << "Events saved: " << nSaved <<  "\n";
     std::cout<<"\n\n";
 
@@ -1777,6 +1785,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
     cutflow->SetBinContent(6, cutflow->GetBinContent(6) + nL1);
     cutflow->SetBinContent(7, cutflow->GetBinContent(7) + nHLT);
     cutflow->SetBinContent(8, cutflow->GetBinContent(8) + nPreMu);
+    cutflow->SetBinContent(9, cutflow->GetBinContent(9) + nSV);
 
   }
 

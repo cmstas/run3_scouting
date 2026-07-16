@@ -70,10 +70,12 @@ parser.add_argument("--noFourMuon", default=False, action="store_true", help="Do
 parser.add_argument("--noFourMuonOSV", default=False, action="store_true", help="Do not fill four-muon histograms for four-muon systems from overlapping SVs")
 parser.add_argument("--noOverlappingSV", default=False, action="store_true", help="Do not use overlapping vertices for anything and just use simple SVs")
 parser.add_argument("--noSeed", default=[], nargs="+", help="Exclude L1 seeds from the acceptance")
+parser.add_argument("--requireL1", default=False, action="store_true", help="Require the event to pass L1 (looper 'passL1' branch) before filling. Apply consistently to data and MC.")
+parser.add_argument("--tupleDir", default="", help="Output subdirectory name for the tuples (under STARTDIR); default tuples_parking[_nochi2] per --noMuonChi2Sel.")
 parser.add_argument("--noHistos", default=False, action="store_true", help="Skip histogram filling")
 parser.add_argument("--noSF", default=False, action="store_true", help="Dont apply SF")
 parser.add_argument("--doGen", default=False, action="store_true", help="Fill generation information histograms")
-parser.add_argument("--collection", default="both", choices=["noVtx", "Vtx", "both", "OR"],
+parser.add_argument("--collection", default="OR", choices=["noVtx", "Vtx", "both", "OR"],
                     help="Vertex collection to use: 'noVtx', 'Vtx', 'both' (union), or 'OR' (Vtx-preferred, unique muons via dR matching)")
 args = parser.parse_args()
 use_novtx = args.collection in ('noVtx', 'both', 'OR')
@@ -703,6 +705,8 @@ SV_BRANCHES = [
 for sv in ["SV1", "SV2"]:
     for var in SV_BRANCHES:
         branches[f"{sv}_{var}"] = []
+# Event-level branches (one value per event, not per SV slot).
+branches["passL1"] = []
 
 
 
@@ -731,11 +735,16 @@ for e in range(firste,laste):
     for sv in ["SV1", "SV2"]:
         for var in SV_BRANCHES:
             branches[f"{sv}_{var}"].append(-1.)
+    branches["passL1"].append(-1.)   # event-level; overwritten with the real value below
 
     # Access event
     t.GetEntry(e)
     #if e%1000==0:
     #    print("At entry %d"%e)
+    # Store the looper L1 decision per event so it can be cut on downstream.
+    branches["passL1"][-1] = float(t.passL1)
+    if args.requireL1 and not t.passL1:
+        continue
     if len(args.noSeed) > 0:
         passL1 = evaluateSeeds(t, effL1seeds)
         if not passL1:
@@ -1908,9 +1917,10 @@ import uproot
 
 sv1_mask = np.array(branches["SV1_x"]) != -1.
 filtered_branches = {k: np.array(v)[sv1_mask] for k, v in branches.items()}
+_tuples_subdir = args.tupleDir if args.tupleDir else ("tuples_parking_nochi2" if args.noMuonChi2Sel else "tuples_parking")
 _tuples_dir = os.path.join(
     os.environ.get("STARTDIR", "/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting"),
-    "tuples_parking_nochi2" if args.noMuonChi2Sel else "tuples_parking"
+    _tuples_subdir
 )
 os.makedirs(_tuples_dir, exist_ok=True)
 if args.inSample != "*":

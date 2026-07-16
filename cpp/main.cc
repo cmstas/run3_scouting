@@ -52,16 +52,22 @@ std::vector<TString> getFiles(const std::string inputDir, const int startFile, c
     else
       fullInputDir = "/ceph/cms"+inputDir;
     const fs::path dir{fullInputDir};
-    for (auto const& file : fs::directory_iterator{dir}) {
+  
+    fs::recursive_directory_iterator it{dir}, end;
+    for (; it != end; ++it) {
+      if (it->is_directory()) {
+	std::string dname = it->path().filename().string();
+	if (dname=="log" || dname=="failed" || dname=="temp")
+	  it.disable_recursion_pending();
+	continue;
+      }
+      if (!TString(it->path().c_str()).Contains(".root"))
+	continue;
       if (iFile<startFile) {
 	iFile++;
 	continue;
       }
-      if (!TString(file.path()).Contains(".root"))
-	continue;
-      else {
-	files.push_back(TString(file.path()));
-      }
+      files.push_back(TString(it->path().c_str()));
       iFile++;
       if (iFile == startFile+nFiles)
 	break;
@@ -150,6 +156,10 @@ int main(int argc, char **argv) {
   if ( sampleArg=="DataD" && year=="2023") {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/May-24-2024/Data/2023D/", startFile, nFiles, isCondor, fromCrab);
     process = "DataD";
+  }
+  if ( sampleArg=="DataE" && year=="2024") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/May-27-2026/Data/2024E/", startFile, nFiles, isCondor, fromCrab);
+    process = "DataE";
   }
   //
   // Sample list: Monte Carlo
@@ -334,6 +344,11 @@ int main(int argc, char **argv) {
   if ( sampleArg=="QCD_Bin-PT-1000_Fil-MuEnriched_2024" && year=="2024") {
     files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-1000_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
     process = "QCD_Bin-PT-1000_Fil-MuEnriched_2024";
+  }
+  // 2024 MinBias background (InclusiveDileptonMinBias)
+  if ( sampleArg=="MinBias_Fil-DoubleMuOS43_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_minBias_2024/InclusiveDileptonMinBias_Fil-DoubleMuOS43_TuneCP5Plus_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "MinBias_Fil-DoubleMuOS43_2024";
   }
   // 2024 Signal ScenarioA — mpi-1
   if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p25_ctau-0p1mm" && year=="2024") {
