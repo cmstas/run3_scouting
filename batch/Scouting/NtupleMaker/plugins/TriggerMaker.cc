@@ -80,6 +80,8 @@ void TriggerMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
   if (doL1_){
     l1GtUtils_->retrieveL1(iEvent, iSetup, algToken_);
+
+
     for (auto const& l1seed:l1Seeds_){
       bool l1htbit = 0;
       double prescale = -1;
@@ -88,7 +90,6 @@ void TriggerMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
       l1_result->push_back(l1htbit);
       l1_name->push_back(l1seed);
       l1_prescale->push_back(prescale);
-      //std::cout << l1seed << " " << l1htbit << " " << prescale << std::endl;
     }
   }
 

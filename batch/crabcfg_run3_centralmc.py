@@ -637,6 +637,32 @@ if (len(sys.argv)>2):
                 crabCommand('submit', config=config, dryrun=False)
             except (HTTPException, ClientException) as e:
                 print('{} cant be launched! Skipping... ({})'.format(short_name, e))
+    elif "minBias_2024" in sys.argv[2]:
+        if era != "2024":
+            print("minBias_2024 only supported for era=2024"); quit()
+        ntuple_version_mb = "_minBias_2024"
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v' + ntuple_version_mb
+        config.Data.inputDBS = 'global'
+        config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = 10
+        config.Data.publication = False
+        inputfile = 'data/datasets_dqcd_2024_background.txt'
+        with open(inputfile,'r') as f:
+            dataset_list = f.readlines()
+        for dataset_name in dataset_list:
+            dataset_name = dataset_name.strip()
+            if not dataset_name or dataset_name[0] == '#':
+                continue
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams = ["era={}".format(era), "data=False", "background=True"]
+            config_list[-1].Data.inputDataset = dataset_name
+            short_name = dataset_name.split('/')[1].split('_TuneCP5')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_{}'.format(short_name, era, ntuple_version_mb)
+            print(config)
+            try:
+                crabCommand('submit', config=config, dryrun=False)
+            except (HTTPException, ClientException) as e:
+                print('{} cant be launched! Skipping... ({})'.format(short_name, e))
     #elif "[signal]" in sys.argv[2]: (<--- Add additional signals here)
     else:
         quit()
