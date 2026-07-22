@@ -75,8 +75,7 @@ parser.add_argument("--tupleDir", default="", help="Output subdirectory name for
 parser.add_argument("--noHistos", default=False, action="store_true", help="Skip histogram filling")
 parser.add_argument("--noSF", default=False, action="store_true", help="Dont apply SF")
 parser.add_argument("--doGen", default=False, action="store_true", help="Fill generation information histograms")
-parser.add_argument("--collection", default="OR", choices=["noVtx", "Vtx", "both", "OR"],
-                    help="Vertex collection to use: 'noVtx', 'Vtx', 'both' (union), or 'OR' (Vtx-preferred, unique muons via dR matching)")
+parser.add_argument("--collection", default="OR", choices=["noVtx", "Vtx", "both", "OR"], help="Vertex collection to use: 'noVtx', 'Vtx', 'both' (union), or 'OR' (Vtx-preferred, unique muons via dR matching)")
 args = parser.parse_args()
 use_novtx = args.collection in ('noVtx', 'both', 'OR')
 use_vtx   = args.collection in ('Vtx', 'both', 'OR')
@@ -705,8 +704,11 @@ SV_BRANCHES = [
 for sv in ["SV1", "SV2"]:
     for var in SV_BRANCHES:
         branches[f"{sv}_{var}"] = []
-# Event-level branches (one value per event, not per SV slot).
+
 branches["passL1"] = []
+EVENT_COUNT_BRANCHES = ["nMuons_NoVtx", "nMuons_Vtx", "nSVs_NoVtx", "nSVs_Vtx"]
+for _cb in EVENT_COUNT_BRANCHES:
+    branches[_cb] = []
 
 
 
@@ -736,6 +738,8 @@ for e in range(firste,laste):
         for var in SV_BRANCHES:
             branches[f"{sv}_{var}"].append(-1.)
     branches["passL1"].append(-1.)   # event-level; overwritten with the real value below
+    for _cb in EVENT_COUNT_BRANCHES:
+        branches[_cb].append(-1.)    # event-level; overwritten with the real value below
 
     # Access event
     t.GetEntry(e)
@@ -743,6 +747,8 @@ for e in range(firste,laste):
     #    print("At entry %d"%e)
     # Store the looper L1 decision per event so it can be cut on downstream.
     branches["passL1"][-1] = float(t.passL1)
+    for _cb in EVENT_COUNT_BRANCHES:
+        branches[_cb][-1] = float(getattr(t, _cb))
     if args.requireL1 and not t.passL1:
         continue
     if len(args.noSeed) > 0:

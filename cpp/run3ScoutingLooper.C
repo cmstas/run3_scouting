@@ -520,6 +520,10 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   bool passL1, passHLT;
   float nPV, PV_x, PV_y, PV_z;
   float GenB_pt, GenB_eta;
+  int nMuons_NoVtx;
+  int nMuons_Vtx;
+  int nSVs_NoVtx;
+  int nSVs_Vtx;
   //float ct1 = -1.0, ct2 = -1.0;
   GenPart GenParts;
   SV SVs;
@@ -590,6 +594,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("GenB_eta", &GenB_eta);
 
   //NoVtx SV branches
+  tout->Branch("nSVs_NoVtx", &nSVs_NoVtx);
   tout->Branch("SV_index", &SVs.index);
   tout->Branch("SV_ndof", &SVs.ndof);
   tout->Branch("SV_x", &SVs.x);
@@ -633,6 +638,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("SVOverlap_l3d", &SVOverlaps.l3d);
 
   //NoVtx Muon branches
+  tout->Branch("nMuons_NoVtx", &nMuons_NoVtx);
   tout->Branch("nMuon_Assoc", &nMuon_Assoc);
   tout->Branch("nMuon_vtx_Assoc", &nMuon_vtx_Assoc);
   tout->Branch("Muon_vtxIdxs", &Muons.vtxIdxs);
@@ -699,6 +705,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("Muon_nexpectedhitstotal", &Muons.nexpectedhitstotal);
 
   //Vtx SV branches (2024 only)
+  tout->Branch("nSVs_Vtx", &nSVs_Vtx);
   tout->Branch("SV_vtx_ndof", &SVsVtx.ndof);
   tout->Branch("SV_vtx_x", &SVsVtx.x);
   tout->Branch("SV_vtx_y", &SVsVtx.y);
@@ -742,6 +749,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
   tout->Branch("SVOverlap_vtx_l3d", &SVOverlapVtxs.l3d);
 
   //Vtx Muon branches
+  tout->Branch("nMuons_Vtx", &nMuons_Vtx);
   tout->Branch("Muon_vtx_vtxIdxs", &MuonsVtx.vtxIdxs);
   tout->Branch("Muon_vtx_saHits", &MuonsVtx.saHits);
   tout->Branch("Muon_vtx_saMatchedStats", &MuonsVtx.saMatchedStats);
@@ -1096,9 +1104,6 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       auto dvmindfromdetz      = svs.size() > 0 ? getObject<std::vector<float>>(ev, hitMakerLabel, "dvmindfromdetz") : std::vector<float>{};
 
       unsigned int nSVs = svs.size();
-      //if (nSVs < 1)
-      //  continue;
-
       for (unsigned int iSV=0; iSV<nSVs; ++iSV) {
         auto sv = svs[iSV];
         if (!(sv.isValidVtx()))
@@ -1175,6 +1180,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         SVs.selected.push_back( (chi2/ndof < 10.0) );
       }
       SVs.sort();
+      nSVs_NoVtx = (int)SVs.x.size();
 
       //Overlapping NoVtx SVs
       for (unsigned int iSV=0; iSV<SVs.x.size(); ++iSV) {
@@ -1258,6 +1264,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
       std::vector<std::vector<int>> nhitsbeforesv_vtx, ncompatible_vtx, ncompatibletotal_vtx;
       std::vector<std::vector<int>> nexpectedhits_vtx, nexpectedhitsmultiple_vtx, nexpectedhitsmultipletotal_vtx, nexpectedhitstotal_vtx;
       unsigned int nMusnoVtx = musnoVtx.size();
+      nMuons_NoVtx = (int)nMusnoVtx;
       nMuon_Assoc=0;
 
       for (unsigned int iMu=0; iMu<nMusnoVtx; ++iMu) {
@@ -1426,6 +1433,8 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         Muons.mindetaJet.push_back(mindetaJet);
       }
 
+      nMuons_Vtx = 0;
+      nSVs_Vtx   = 0;
       if (year == "2024") { //If the year is 2024, process Vtx collection
 
         //Vtx SVs
@@ -1515,7 +1524,8 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
           SVsVtx.maxd3d.push_back(maxd3d_v);
         }
         SVsVtx.sort();
-        
+        nSVs_Vtx = (int)SVsVtx.x.size();
+
         //Overlapping Vtx SVs
         for (unsigned int iSV=0; iSV<SVsVtx.x.size(); ++iSV) {
           if (SVsVtx.selected[iSV]==0)
@@ -1580,6 +1590,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
 
         nMuon_vtx_Assoc = 0;
         unsigned int nMusVtx = musVtx.size();
+        nMuons_Vtx = (int)nMusVtx;
         for (unsigned int iMu=0; iMu<nMusVtx; ++iMu) {
           auto mu = musVtx[iMu];
 
