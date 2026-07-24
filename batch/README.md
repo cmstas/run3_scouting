@@ -73,8 +73,6 @@ python3 crabcfg_run3_centralmc.py [era] [signal]
 cd batch
 . install_cmssw.sh 2024central # This should create a CMSSW_15_0_2 rel (if it already existed before the previous step, delete it before doing .install)
 cmsRun Scouting/NtupleMaker/test/producer_Run3.py data=False era=2024  inputs=/store/mc/RunIII2024Summer24MiniAODv6/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p25-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/150X_mcRun3_2024_realistic_v2-v2/2560000/883f003e-5660-4d9d-be26-5099dad5aed8.root nevents=100 output=/tmp/skimmer_test_signal.root
-python3 crabcfg_run3_centralmc.py 2024 DQCD_sig # Dark shower signals, reading from data/datasets_dqcd_2024_signal.txt
-python3 crabcfg_run3_centralmc.py 2024 DQCD_bkg # QCD and MinBias background, reading from data/datasets_dqcd_2024_background.txt
 ```
 
 ### Full run (crab) on 2024 central signal MC:
