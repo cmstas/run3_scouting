@@ -5,15 +5,17 @@ Trains the global BDT, finds the BDT score threshold at a configurable
 background rejection target, then plots input variable distributions for
 events passing the working point cut (signal vs background).
 
-Usage:
-    python BDT/workingpoint.py
+Usage (e.g):
+    python3 BDT/workingpoint.py --bkg minbias --tuples-dir tuples_L1_info --require-l1
 """
 
 import argparse
 import gc
 import glob
+import json
 import re
 import uproot
+import xgboost
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -62,8 +64,12 @@ _parser.add_argument("--table", action=argparse.BooleanOptionalAction, default=T
                           "has that FPR, then tabulate p0 = 1 - Phi(Z) (with Z) per signal w"
                           "point. Writes .tex per (mpi, mA). "
                           "Default: on; pass --no-table to skip.")
-_parser.add_argument("--fpr-targets", type=float, nargs="+", default=[1e-1, 1e-2, 1e-3, 1e-4],
-                     help="Target false-positive rates (rows of the --table output).")
+_parser.add_argument("--fpr-targets", type=float, nargs="+", default=[1e-4],
+                     help="Target false-positive rate(s), i.e. background-efficiency working "
+                          "point(s). One BDT-score threshold is computed per target (rows of "
+                          "the --table output; one significance line per target). Accepts a "
+                          "space-separated list, e.g. --fpr-targets 1e-4 1e-3 1e-2 1e-1. "
+                          "Default: 1e-4 (the highest-significance operating point).")
 _parser.add_argument("--mass-window-gev", type=float, default=1.0,
                      help="ABSOLUTE SV1 dimuon mass window half-width in GeV. Used only when "
                           "--mass-window-rel is 0. Signal and background yields are counted "
@@ -101,9 +107,6 @@ MASS_WINDOW_ACTIVE   = bool((MASS_WINDOW_REL and MASS_WINDOW_REL > 0.0) or
                             (MASS_WINDOW_GEV and MASS_WINDOW_GEV > 0.0))
 REQUIRE_L1           = _args.require_l1        # keep only passL1 != 0 events (sig + bkg)
 TUPLES_SUBDIR        = _args.tuples_dir        # tuple directory name under the repo root
-# The tuples_L1_info re-fill is UNSKIMMED (full filled tuple), whereas the parking_nochi2
-# MinBias is the 1/6 skim; the MinBias BKG_FRACTION skim factor is dropped accordingly.
-MINBIAS_UNSKIMMED    = ("tuples_L1_info" in TUPLES_SUBDIR)
 
 def _mass_window_halfwidth(mA):
     """SV1 dimuon mass window half-width around mA [GeV].
@@ -157,18 +160,13 @@ BR_A_MUMU = {
 # Trigger label shown in the significance-plot header.
 TRIGGER_LABEL = "Scouting Asymptotic Significance"
 
-# Cut-and-count operating points are auto-loaded from BDT/cnc_tables/ further below
-# (CNC_POINTS is built by _load_cnc_fullrange_points once the parser helpers exist).
-# Nothing is hand-typed: run `python3 BDT/cutncount.py --bkg {qcd,minbias}` to (re)generate
-# the tables, and both the full-range and per-lxy points are read straight from them.
-
 MINBIAS_FILES = [
     "tuples_MinBias_Fil-DoubleMuOS43_2024_2024.root",
 ]
 
 QCD_FILES = [
     "tuples_QCD_Bin-PT-15to20_Fil-MuEnriched_2024_2024.root",
-    #"tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root", #ZOMBIE FILE
+    "tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root",
     "tuples_QCD_Bin-PT-30to50_Fil-MuEnriched_2024_2024.root",
     "tuples_QCD_Bin-PT-50to80_Fil-MuEnriched_2024_2024.root",
     "tuples_QCD_Bin-PT-80to120_Fil-MuEnriched_2024_2024.root",
@@ -184,7 +182,7 @@ QCD_FILES = [
 # Background cross sections [pb] (https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=%2FQCD_*MuEnriched*%2F*Summer24MiniAODv6*%2FMINIAODSIM)
 BKG_XSEC = {
     "tuples_QCD_Bin-PT-15to20_Fil-MuEnriched_2024_2024.root":    3018000.0,
-    #"tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root":    2701000.0, #ZOMBIE (for now)
+    "tuples_QCD_Bin-PT-20to30_Fil-MuEnriched_2024_2024.root":    2701000.0,
     "tuples_QCD_Bin-PT-30to50_Fil-MuEnriched_2024_2024.root":    1461000.0,
     "tuples_QCD_Bin-PT-50to80_Fil-MuEnriched_2024_2024.root":    407600.0,
     "tuples_QCD_Bin-PT-80to120_Fil-MuEnriched_2024_2024.root":   96070.0,
@@ -217,20 +215,8 @@ BKG_NGEN = {
 }
 
 
-# Fraction of the generated MiniAOD sample actually represented by the on-disk tuple.
-# Two independent factors:
-#   (a) looper coverage: only 114,448,466 of 409,318,867 events were processed -- the looper
-#       run was cancelled mid-way (66 of ~127 file-groups; 528/1013 input files, 2026-07-03).
-#   (b) skim: skim_minbias.C kept the first 1/6 of the filled tuple (6,431,840 / 38,583,328).
-#   (a) looper coverage: 114,448,466 / 409,318,867 events processed (run cancelled mid-way).
-#   (b) skim: skim_minbias.C kept the first 1/6 (6,431,840 / 38,583,328) -- ONLY for the
-#       parking_nochi2 tuple. The tuples_L1_info re-fill is unskimmed, so (b) drops out there.
-_MINBIAS_LOOPER_COV  = 114448466 / 409318867          # ~= 0.2796
-_MINBIAS_SKIM_FRAC   = 6431840 / 38583328             # ~= 0.1667 (skimmed tuple only)
-BKG_FRACTION = {
-    "tuples_MinBias_Fil-DoubleMuOS43_2024_2024.root":
-        _MINBIAS_LOOPER_COV * (1.0 if MINBIAS_UNSKIMMED else _MINBIAS_SKIM_FRAC),
-}
+_MINBIAS_LOOPER_COV  = 114448466 / 409318867 # ~= 0.2796
+BKG_FRACTION = {"tuples_MinBias_Fil-DoubleMuOS43_2024_2024.root":_MINBIAS_LOOPER_COV}
 
 def _bkg_fraction(fname):
     return BKG_FRACTION.get(fname, 1.0)
@@ -277,10 +263,6 @@ def _parse_cnc_lxy_table(path):
         out[left.strip()] = (eff, rej)
     return out
 
-# Cut-and-count tables (BDT/cnc_tables/mpi*_mA*/cnc_ctau-*mm_<bkg>*.txt) are parsed
-# directly -- both the full-range operating points (CNC_POINTS) and the per-lxy-bin
-# points come straight from these files, so nothing is hand-typed. The '<bkg>*' glob
-# also matches the mass-window suffix cutncount adds (e.g. _qcd_mwinRel0p1.txt).
 _CNC_DIR       = _HERE / "cnc_tables"
 _CNC_SUBDIR_RE = re.compile(r"^mpi(\w+)_mA(\w+)$")
 
@@ -327,7 +309,7 @@ def _load_cnc_lxy_points(bkg):
             pts.setdefault((mpi_v, mA_v), {}).setdefault(lbl, {})[ctau_v] = (eff, rej)
     return pts
 
-# Full-range C&C operating points, auto-loaded per background tag (was hardcoded).
+# Full-range C&C operating points, auto-loaded per background tag
 CNC_POINTS = {
     "_minBias": _load_cnc_fullrange_points("minbias"),
     "_QCD":     _load_cnc_fullrange_points("qcd"),
@@ -338,8 +320,6 @@ MASS_COLORS = ["#d62728", "#ff7f0e", "#2ca02c", "#1f77b4", "#e377c2"]
 BKG_FACE    = "#7fc7c4"
 BKG_EDGE    = "#2f5f5d"
 
-# Trailing (?:_\w+)? matches the event-range suffix the L1-info tuples carry
-# (e.g. ..._2024_0To999999.root); the parking_nochi2 names end plainly at _2024.root.
 _SIG_RE = re.compile(r"tuples_Signal_ScenarioA_Par_2024_mpi-(\w+)_mA-(\w+)_ctau-(\w+)mm_2024(?:_\w+)?\.root")
 
 def _p2f(s):
@@ -397,9 +377,6 @@ def read_flat(path):
         available = set(t.keys())
         branches  = [b for b in _LOAD_BRANCHES if b in available]
         df = t.arrays(branches, library='pd')
-    # All loaded branches are scalar doubles; store them as float32 to halve the
-    # in-memory footprint (and every downstream copy: df_global, X_g, the
-    # train/test split, the XGBoost matrix). Negligible precision loss for the BDT.
     return df.astype('float32')
 
 def apply_l1(df, src):
@@ -418,7 +395,7 @@ def compute_sample_weights(df):
     bkg_mask = (y == 0)
     w[bkg_mask] = df.loc[bkg_mask, 'xsec_weight'].values
 
-    # Class balancing: scale signal so total signal weight == total background weight.
+    # Class balancing
     n_sig   = int((y == 1).sum())
     sum_bkg = float(w[bkg_mask].sum())
     if n_sig > 0 and sum_bkg > 0:
@@ -429,7 +406,6 @@ def compute_sample_weights(df):
 def add_dxy_lxy(df):
     for sv in ("SV1", "SV2"):
         denom = df[f"{sv}_lxy"] * df[f"{sv}_mass"] / df[f"{sv}_ptmm"]
-        # float32 fill so np.where doesn't upcast denom (and the derived columns) to float64.
         denom = np.where(denom > 1e-9, denom, np.float32(1e-9))
         for mu in ("mu1", "mu2"):
             df[f"{sv}_{mu}_dxy_lxy"] = np.abs(df[f"{sv}_{mu}_dxy"]) / denom
@@ -472,8 +448,6 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
         df = apply_l1(read_flat(fpath), fname)
         df['label'] = 0
         df['bkg_file'] = fname
-        # Cross-section reweighting (no lumi): per-event weight = sigma / (frac * N_gen).
-        # For a pre-skimmed file (frac < 1) this normalizes the skim to the full sample.
         df['xsec_weight'] = BKG_XSEC[fname] / _eff_ngen(fname)
         bkg_frames.append(df)
 
@@ -537,9 +511,8 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
     w_g = compute_sample_weights(df_global)
     df_global['weight'] = w_g
 
-    X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
-        X_g, y_g, w_g, test_size=0.3, random_state=42, stratify=y_g)
-    # X_g is only needed to build the split; drop it (train/test hold their copies).
+    X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(X_g, y_g, w_g, test_size=0.3, random_state=42, stratify=y_g)
+
     del X_g
     gc.collect()
 
@@ -556,6 +529,47 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
     y_score = bdt.predict_proba(X_test)[:, 1]
     fpr, tpr, thresholds = roc_curve(y_test, y_score, sample_weight=w_test)
     auc = roc_auc_score(y_test, y_score, sample_weight=w_test)
+
+    # ---------------------------------------------------------------------------
+    # Persist the trained model so it can be APPLIED TO DATA later (see BDT/apply_bdt_to_data.py)
+    # ---------------------------------------------------------------------------
+    _model_dir = out_dir / "models"
+    os.makedirs(_model_dir, exist_ok=True)
+    _l1_tag     = "_L1req" if REQUIRE_L1 else ""
+    _model_stub = f"bdt_global{OUT_TAG}{_l1_tag}"
+    _model_path = _model_dir / f"{_model_stub}.json"
+    bdt.save_model(str(_model_path))
+
+    # Working-point thresholds: BDT score cut giving each target FPR on the
+    # xsec-weighted background ROC (closest grid point; same rule as the table).
+    _wp_thresholds = {}
+    for f_t in sorted(_args.fpr_targets, reverse=True):
+        _j = int(np.argmin(np.abs(fpr - f_t)))
+        _wp_thresholds[f"{f_t:g}"] = {
+            "threshold":    float(thresholds[_j]),
+            "fpr_achieved": float(fpr[_j]),
+            "tpr_achieved": float(tpr[_j]),
+        }
+
+    _manifest = {
+        "model_file":      _model_path.name,
+        "features":        list(input_vars + cond_vars),  # EXACT training column order
+        "conditional":     bool(use_conditional),
+        "cond_vars":       list(cond_vars),
+        "bkg":             OUT_TAG.lstrip("_"),
+        "require_l1":      bool(REQUIRE_L1),
+        "tuples_subdir":   TUPLES_SUBDIR,
+        "auc":             float(auc),
+        "mass_window_rel": float(MASS_WINDOW_REL),
+        "mass_window_gev": float(MASS_WINDOW_GEV),
+        "wp_thresholds":   _wp_thresholds,
+        "xgboost_version": xgboost.__version__,
+    }
+    _manifest_path = _model_dir / f"{_model_stub}_manifest.json"
+    with open(_manifest_path, "w") as _mf:
+        json.dump(_manifest, _mf, indent=2)
+    print(f"[workingpoint] saved BDT model    -> {_model_path}")
+    print(f"[workingpoint] saved BDT manifest -> {_manifest_path}")
 
     # Single output directory holding the FPR-scanned significance tables/plots.
     if True:
@@ -579,10 +593,7 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
         ax.plot(fpr, tpr, color='#1f77b4', linewidth=2.0, label=f'Global BDT (AUC = {auc:.3f})')
         ax.plot([0, 1], [0, 1], 'k--', alpha=0.4, linewidth=1.0)
 
-        # Overlay the cut-and-count operating points (restricted to the CNC_LXY_DIRS
-        # mass points to avoid clutter) at (1-bkg_rej, sig_eff). One distinct colour per
-        # (mpi, mA, ctau) point; marker distinguishes the background. One legend entry
-        # per point; all ctau of a point share x (bkg_rej is background-only).
+        # Overlay the cut-and-count points
         _cnc_marker = {"_minBias": "X", "_QCD": "P"}
         _cnc_points = sorted({(mpi, mA, c) for tag, _sf, _ls, _lbl in SUB_BKGS
                               for (mpi, mA, c) in CNC_POINTS.get(tag, {})
@@ -612,7 +623,7 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
         plt.close(fig)
 
         # ---------------------------------------------------------------------------
-        # Feature importance (XGBoost gain), top-N input variables
+        # Feature importance, top-N input variables
         # ---------------------------------------------------------------------------
         feat_names = list(input_vars + cond_vars)
         importances = np.asarray(bdt.feature_importances_, dtype=float)
@@ -637,12 +648,6 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
             _fi_lines.append(f'{r:>4}  {importances[i]:>10.5f}  {feat_names[i]}')
         (out_dir / f'feature_importance_globalBDT{OUT_TAG}.txt').write_text('\n'.join(_fi_lines) + '\n')
 
-        # ---------------------------------------------------------------------------
-        # ROC curve split by SV1 lxy bin (same global BDT, test set partitioned):
-        # one plot PER lxy bin, saved into that bin's per-mass-point directory, with
-        # that mass point's cut-and-count operating points overlaid (one per ctau).
-        # ---------------------------------------------------------------------------
-        # lxy_bin for the test rows, aligned positionally to y_score/y_test.
         lxy_test  = df_global.loc[X_test.index, 'lxy_bin'].to_numpy()
         y_test_a  = np.asarray(y_test)
         w_test_a  = np.asarray(w_test)
@@ -658,8 +663,6 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
             auc_b = roc_auc_score(y_test_a[m], y_score[m], sample_weight=w_test_a[m])
             _bin_roc[lxy_label] = (fpr_b, tpr_b, auc_b)
 
-        # One plot per (C&C mass point, lxy bin): the bin's ROC curve + that mass
-        # point's cut-and-count points, one distinct colour/legend entry per ctau.
         _cnc_lxy  = _load_cnc_lxy_points(_cnc_bkg_for_tag(OUT_TAG))
         _cnc_cmap = plt.get_cmap('tab10')
         for (mpi_p, mA_p), per_bin in sorted(_cnc_lxy.items()):
@@ -752,7 +755,7 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
         _MASS_WINDOW_CACHE  = {}
 
         def _signal_mass_window(key):
-            #Mass-dependent window [mA - W(mA), mA + W(mA)]; W is relative or absolute
+            #Mass-dependent window
             if not MASS_WINDOW_ACTIVE: #if no window is selected, scan over all the mass range
                 return None
             if key in _MASS_WINDOW_CACHE:
@@ -780,21 +783,11 @@ for BKG_FILES, OUT_TAG in [(ACTIVE_FILES, OUT_TAG)]:
                 out = m if out is None else (out & m)
             return out
 
-        # ---------------------------------------------------------------------------
-        # Asimov significance table (one-sided p0 = 1 - Phi(Z), with Z)
-        # ---------------------------------------------------------------------------
-        # Rows  = target FPRs; for each, the BDT threshold is the one at which the
-        #         xsec-weighted SV-selected QCD has that false-positive rate.
-        # Cols  = signal points (ctau, for each (mpi, mA)).
-        # Cells = p0 = 1 - Phi(Z) with the Gaussian/Asimov Z in parentheses, where
-        #         S = L * sigma_ggH*B(H->psipsi) * BR_cascade * (n_pass/N_gen)
-        #         B = FPR * L * sum_q sigma_q * eff_q^SV  (== xsec-weighted bkg above cut)
+       
         def _counts_above_thr(scores, t):
             return int(np.count_nonzero(scores > t))
 
         def _bkg_b_at(t, extra_mask=None, files=None):
-            #xsec-weighted background yield with score > t. `files` restricts the sum to one
-            #sub-background (e.g. only MinBias or only QCD); None = all loaded backgrounds.
             base = (df_global['label'] == 0)
             if extra_mask is not None:
                 base = base & extra_mask

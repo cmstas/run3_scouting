@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <exception>
 #include <filesystem>
 #include <numeric>
 #include <string>
@@ -858,7 +859,9 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
         std::cout << "File is in zombie state, skipping..." << std::endl;
 	continue;
     }
-    auto nEventsFile = ((TTree*)file->Get("Events"))->GetEntries();
+    TTree* evtree = (TTree*)file->Get("Events");
+    if (!evtree) { std::cout << "No Events tree in file, skipping..." << std::endl; file->Close(); continue; }
+    auto nEventsFile = evtree->GetEntries();
     std::cout << "Input events: " << nEventsFile <<  "\n";
     Event ev(file);
 
@@ -872,6 +875,7 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
     int nHLT = 0;
     int nPreMu = 0;
     int nSV = 0;
+    try {
     for (ev.toBegin(); ! ev.atEnd(); ++ev) {
       
       //Clear all variables
@@ -1775,6 +1779,11 @@ void run3ScoutingLooper(std::vector<TString> inputFiles, TString year, TString p
 
       tout->Fill();
       nSaved++;
+    }
+    } catch (const std::exception& e) {
+      std::cout << "WARNING: read error in " << inputFile << " at event " << iEv
+                << " (" << e.what() << ") -- skipping rest of file, keeping "
+                << nSaved << " saved" << std::endl;
     }
     iFile++;
     std::cout << "Events saved: " << nSaved <<  "\n";

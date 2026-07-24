@@ -21,11 +21,14 @@ make
 ## 2024 Condor
 
 ```bash
+cd cpp
 source setup.sh 2024_el8
 make rootDict   # first time only
 make
+cd ..
 export STARTDIR=$(pwd)
 export SCOUTINGOUTPUTDIR=<your_output_subdir>
+export X509_USER_PROXY=$(voms-proxy-info --path)
 bash condor/create_package_2024.sh
 condor_submit condor/runScoutingLooper_DQCD_2024_onCondor.sub
 ```
