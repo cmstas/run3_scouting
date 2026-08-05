@@ -43,6 +43,8 @@ function stageout {
     fi
 }
 
+# local_base="/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/cpp"
+
 ulimit -s unlimited
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmssw-el8
@@ -53,6 +55,14 @@ tar xvf package.tar.gz
 cd ScoutingRun3/cpp
 echo $OUTDIR $YEAR $PROCESS $STARTFILE $NFILES $ISCONDOR $FROMCRAB
 ./main.exe $OUTDIR $YEAR $PROCESS $STARTFILE $NFILES $ISCONDOR $FROMCRAB
+LOOPER_STATUS=$?
+
+# A crashed looper leaves a truncated, never-closed TTree in $OUTDIR. Staging it out
+# would publish it to the T2 as if it were a complete result.
+if [ $LOOPER_STATUS -ne 0 ]; then
+    echo "main.exe exited with code $LOOPER_STATUS -- refusing to stage out"
+    exit $LOOPER_STATUS
+fi
 
 for FILE in $(ls $OUTDIR);
 do
@@ -61,4 +71,15 @@ do
   COPY_SRC="file://`pwd`/${OUTDIR}/$FILE"
   COPY_DEST="davs://redirector.t2.ucsd.edu:1095/store/group/Run3Scouting/${OUTDIR}/$FILE"
   stageout $COPY_SRC $COPY_DEST
-done;
+done
+
+# HTCondor local transfer (commented out — files go to T2 ceph instead)
+# cp ${OUTDIR}/*.root ../../
+
+# Local cp to /home/users (commented out — /home/users not mounted on worker nodes)
+# LOCAL_OUTDIR="${LOCAL_BASE}/${OUTDIR}"
+# mkdir -p ${LOCAL_OUTDIR}
+# for FILE in $(ls $OUTDIR); do
+#   echo "Copying $FILE to ${LOCAL_OUTDIR}/"
+#   cp ${OUTDIR}/$FILE ${LOCAL_OUTDIR}/
+# done

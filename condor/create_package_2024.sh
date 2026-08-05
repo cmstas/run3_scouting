@@ -13,6 +13,17 @@ cd tmp_create_package
 
 mkdir -p ScoutingRun3
 cp ../*.py ../data ../utils ScoutingRun3/. -r
-tar -cf - --exclude=temp_data* ../cpp | tar -xf - -C ScoutingRun3/.
+# Exclude bulky/transient output dirs so the package stays code-only (~2 MB).
+# looperOutput* is critical: it can hold 100+ GB of outputs (and stuck .nfs handles)
+# that would otherwise be tarred in and hang/bloat the build.
+tar -cf - \
+    --exclude='temp_data*' \
+    --exclude='looperOutput*' \
+    --exclude='timetest' \
+    --exclude='test' \
+    --exclude='test_output' \
+    --exclude='logs_minBias' \
+    --exclude='*.nfs*' \
+    ../cpp | tar -xf - -C ScoutingRun3/.
 tar -chJf package.tar.gz ScoutingRun3
 mv package.tar.gz ../.
