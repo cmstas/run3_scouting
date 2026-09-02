@@ -32,8 +32,8 @@ data=False
 #ntuple_version = "vhahm_8p0"
 #ntuple_version = "vdqcd_final_8p0"
 #ntuple_version = "btophi_extra_8p0"
-#ntuple_version = "_dqcd_2024"
-ntuple_version = "_minBias_2024"
+ntuple_version = "_dqcd_2024"
+#ntuple_version = "_minBias_2024"
 
 # Setup working environment
 import os
@@ -368,6 +368,34 @@ if (len(sys.argv)>2):
             else:
                 print(config)
                 crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+    elif "DQCD_sig_private" in sys.argv[2]:
+        # Private ScenarioA signals produced by garciaja, published to phys03/USER
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_private_v'+ntuple_version
+        config.Data.inputDBS = 'phys03'
+        config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = int(10)
+        config.Data.publication = True
+        config.Data.outputDatasetTag = "private-Skim_final_{era}-v2".format(era=era)
+        inputfile = 'data/datasets_dqcd_2024_signal_private.txt'
+        with open(inputfile,'r') as f:
+            dataset_list = f.readlines()
+        for dataset_name in dataset_list:
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False","isMiniAOD=False",]
+            print(dataset_name)
+            if dataset_name[0]=='#':
+                continue
+            config_list[-1].Data.inputDataset = dataset_name.strip()
+            model_name = dataset_name.split('-')[1]
+            t = dataset_name.split('ctau-')[1].split('-')[0]
+            mA = dataset_name.split('mA-')[1].split('-')[0]
+            mpi = dataset_name.split('mpi-')[1].split('/')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm{}'.format(model_name, era, mpi, mA, t, ntuple_version)
+            print(config)
+            try:
+                crabCommand('submit', config = config, dryrun = False)
+            except:
+                print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
     elif "DQCD_sig" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v'+ntuple_version
         #config.Data.inputDBS = 'phys03'

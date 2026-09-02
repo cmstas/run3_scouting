@@ -13,6 +13,7 @@ opts.register('output',     "output.root", mytype = vpstring)
 opts.register('inputs',     "",            mytype = vpstring) # comma separated list of input files
 opts.register('nevents',    -1,            mytype = vpint)
 opts.register('testL1',     False,         mytype = vpbool)
+opts.register('isMiniAOD',  True,          mytype = vpbool) # set False for private RAW/HLT samples
 opts.parseArguments()
 
 def convert_fname(fname):
@@ -123,9 +124,9 @@ process.out = cms.OutputModule("PoolOutputModule",
         "keep *_triggerMaker_*_*",
         ] + out_keep_hit + [
         "keep *_beamSpotMaker_*_*",
-        #"keep *_genParticles_*_HLT",       # AOD; in MiniAOD gen particles are prunedGenParticles::PAT
-        "keep *_prunedGenParticles_*_PAT",
-        #"keep *_addPileupInfo_*_*",        # AOD; in MiniAOD it is slimmedAddPileupInfo::PAT
+        "keep *_genParticles_*_HLT",        # private-HLT inputs (un-pruned)
+        "keep *_prunedGenParticles_*_PAT",  # central MiniAOD inputs
+        "keep *_addPileupInfo_*_*",         # private-HLT PU info
         "keep *_slimmedAddPileupInfo_*_PAT",
         ]),
      basketSize = cms.untracked.int32(128*1024), # 128kb basket size instead of ~30kb default
@@ -293,8 +294,8 @@ process.triggerMaker = cms.EDProducer("TriggerMaker",
             usePathStatus = cms.bool(False),
             ),
         doL1 = cms.bool(True),
-        doTriggerObjects = cms.bool(do_trigger_objects),
-        isMiniAOD = cms.bool(('2024' in opts.era or '2025' in opts.era) and not opts.data),
+        doTriggerObjects = cms.bool(do_trigger_objects and opts.isMiniAOD),
+        isMiniAOD = cms.bool(('2024' in opts.era or '2025' in opts.era) and not opts.data and opts.isMiniAOD),
         #AlgInputTag = cms.InputTag("gtStage2Digis"),
         #AlgInputTag = cms.InputTag("gtStage2Digis","","RECO"),
         #l1tAlgBlkInputTag = cms.InputTag("gtStage2Digis"),
