@@ -7,6 +7,7 @@ using namespace std;
 TriggerMaker::TriggerMaker(const edm::ParameterSet& iConfig) :
   doL1_(iConfig.getParameter<bool>("doL1")),
   doTriggerObjects_(iConfig.getParameter<bool>("doTriggerObjects")),
+  isMiniAOD_(iConfig.getParameter<bool>("isMiniAOD")),
   triggerCache_(triggerExpression::Data(iConfig.getParameterSet("triggerConfiguration"), consumesCollector())),
   vtriggerAlias_(iConfig.getParameter<vector<string>>("triggerAlias")),
   vtriggerSelection_(iConfig.getParameter<vector<string>>("triggerSelection")),
@@ -22,9 +23,10 @@ TriggerMaker::TriggerMaker(const edm::ParameterSet& iConfig) :
   }
 
   if (doTriggerObjects_) {
-    // triggerPrescaleToken = consumes<pat::PackedTriggerPrescales>(edm::InputTag("patTrigger"));
-    // triggerObjectsToken = consumes<pat::TriggerObjectStandAloneCollection>(edm::InputTag("selectedPatTrigger"));
-    triggerObjectsToken = consumes<pat::TriggerObjectStandAloneCollection>(edm::InputTag("patTrigger"));
+    edm::InputTag trigObjTag = isMiniAOD_
+        ? edm::InputTag("slimmedPatTrigger", "", "PAT")
+        : edm::InputTag("patTrigger");
+    triggerObjectsToken = consumes<pat::TriggerObjectStandAloneCollection>(trigObjTag);
     triggerResultsToken = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","", "HLT"));
 
     produces<std::vector<std::string> >("trigObjsfilters").setBranchAlias("trigObjs_filters");
@@ -78,6 +80,8 @@ void TriggerMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
   if (doL1_){
     l1GtUtils_->retrieveL1(iEvent, iSetup, algToken_);
+
+
     for (auto const& l1seed:l1Seeds_){
       bool l1htbit = 0;
       double prescale = -1;
@@ -86,7 +90,6 @@ void TriggerMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
       l1_result->push_back(l1htbit);
       l1_name->push_back(l1seed);
       l1_prescale->push_back(prescale);
-      //std::cout << l1seed << " " << l1htbit << " " << prescale << std::endl;
     }
   }
 
@@ -115,13 +118,13 @@ void TriggerMaker::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
       for(unsigned int i = 0; i < nTriggers; ++i){
           const string& name = triggerNames_.triggerName(i);
           //should check this part further
-          if (name.find("DST_Run3_PFScoutingPixelTracking") != std::string::npos || name.find("DST_Run3_DoubleMu3_PFScoutingPixelTracking") != std::string::npos) {
+          if (name.find("DST_Run3_PFScoutingPixelTracking") != std::string::npos || name.find("DST_Run3_DoubleMu3_PFScoutingPixelTracking") != std::string::npos || name.find("DST_PFScouting_DoubleMuon") != std::string::npos) {
               itrig = i;
               break;
           }
       }
       if (itrig < 0) {
-          throw cms::Exception("TriggerMaker::produce: Couldn't find DST_Run3_PFScoutingPixelTracking or DST_Run3_DoubleMu3_PFScoutingPixelTracking in the list of triggers");
+          throw cms::Exception("TriggerMaker::produce: Couldn't find DST_Run3_PFScoutingPixelTracking or DST_Run3_DoubleMu3_PFScoutingPixelTracking or DST_PFScouting_DoubleMuon in the list of triggers");
       }
 
       pat::TriggerObjectStandAlone TO;

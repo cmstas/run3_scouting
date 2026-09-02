@@ -1,5 +1,7 @@
 from CRABClient.UserUtilities import config #, getUsernameFromSiteDB
 from CRABAPI.RawCommand import crabCommand
+from http.client import HTTPException
+from CRABClient.ClientExceptions import ClientException
 
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
 #config = config()
@@ -17,6 +19,8 @@ if ("2022") in era:
     year=2022
 elif ("2023") in era:
     year=2023
+elif ("2024") in era:
+    year=2024
 else:
     quit()
 
@@ -24,9 +28,12 @@ else:
 data=False
 
 # ntuple version defined now
-ntuple_version = "vhahm_8p0"
-ntuple_version = "vdqcd_final_8p0"
+
+#ntuple_version = "vhahm_8p0"
+#ntuple_version = "vdqcd_final_8p0"
 #ntuple_version = "btophi_extra_8p0"
+ntuple_version = "_dqcd_2024"
+#ntuple_version = "_minBias_2024"
 
 # Setup working environment
 import os
@@ -361,13 +368,44 @@ if (len(sys.argv)>2):
             else:
                 print(config)
                 crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
-    elif "DQCD" in sys.argv[2]:
-        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privQCD_v'+ntuple_version # DB no
+    elif "DQCD_sig_private" in sys.argv[2]:
+        # Private ScenarioA signals produced by garciaja, published to phys03/USER
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_private_v'+ntuple_version
         config.Data.inputDBS = 'phys03'
         config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = int(10)
+        config.Data.publication = True
+        config.Data.outputDatasetTag = "private-Skim_final_{era}-v2".format(era=era)
+        inputfile = 'data/datasets_dqcd_2024_signal_private.txt'
+        with open(inputfile,'r') as f:
+            dataset_list = f.readlines()
+        for dataset_name in dataset_list:
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams=["era={}".format(era),"data=False","isMiniAOD=False",]
+            print(dataset_name)
+            if dataset_name[0]=='#':
+                continue
+            config_list[-1].Data.inputDataset = dataset_name.strip()
+            model_name = dataset_name.split('-')[1]
+            t = dataset_name.split('ctau-')[1].split('-')[0]
+            mA = dataset_name.split('mA-')[1].split('-')[0]
+            mpi = dataset_name.split('mpi-')[1].split('/')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm{}'.format(model_name, era, mpi, mA, t, ntuple_version)
+            print(config)
+            try:
+                crabCommand('submit', config = config, dryrun = False)
+            except:
+                print('centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{} cant be launched! Skipping...'.format(model_name, era, mpi, mA, t, ntuple_version))
+    elif "DQCD_sig" in sys.argv[2]:
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v'+ntuple_version
+        #config.Data.inputDBS = 'phys03'
+        config.Data.inputDBS = 'global'
+        #config.Data.splitting = 'FileBased'
+        config.Data.splitting = 'EventAwareLumiBased'
+        config.Data.unitsPerJob = int(10e4)
         config.Data.publication = True
         config.Data.unitsPerJob = int(20) # Increased to match 10 jobs per file aprox
-        config.Data.outputDatasetTag = "private-Skim_{era}-v2".format(era=era)
+        config.Data.outputDatasetTag = "private-Skim_final_{era}-v2".format(era=era)
         if era=="2022":
             inputfile = 'data/datasets_dqcd_2022_1000mm.txt'
         if era=="2022postEE":
@@ -376,6 +414,8 @@ if (len(sys.argv)>2):
             inputfile = 'data/datasets_dqcd_2023_1000mm.txt'
         if era=="2023BPix":
             inputfile = 'data/datasets_dqcd_2023BPix_1000mm.txt'
+        if era=="2024":
+            inputfile = 'data/datasets_dqcd_2024_signal.txt'
         with open(inputfile,'r') as f:
             dataset_list = f.readlines()
         for dataset_name in dataset_list:
@@ -384,12 +424,22 @@ if (len(sys.argv)>2):
             print(dataset_name)
             if dataset_name[0]=='#':
                 continue
-            config_list[-1].Data.inputDataset = dataset_name[:-1]
-            model_name = 'S'+dataset_name.split('_')[0][2:]
-            mpi = dataset_name.split('mpi_')[1].split('_')[0]
-            mA = dataset_name.split('mA_')[1].split('_')[0]
-            t = dataset_name.split('ctau_')[1].split('/')[0]
-            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(model_name, era, mpi, mA, t, ntuple_version)
+                
+            if era == "2024":
+                config_list[-1].Data.inputDataset = dataset_name.strip()
+                model_name = dataset_name.split('-')[1]
+                t = dataset_name.split('ctau-')[1].split('-')[0]
+                mA = dataset_name.split('mA-')[1].split('-')[0]
+                mpi = dataset_name.split('mpi-')[1].split('_')[0]
+            else:
+                config_list[-1].Data.inputDataset = dataset_name[:-1]
+                model_name = 'S'+dataset_name.split('_')[0][2:]
+                mpi = dataset_name.split('mpi_')[1].split('_')[0]
+                mA = dataset_name.split('mA_')[1].split('_')[0]
+                t = dataset_name.split('ctau_')[1].split('/')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm{}'.format(model_name, era, mpi, mA, t, ntuple_version)
+            config_list[-1].Data.inputDataset = dataset_name.strip()
+
             print(config)
             try:
                 crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
@@ -498,7 +548,7 @@ if (len(sys.argv)>2):
             # No 2023 eras for the moment, when adding them, you have to run . install_cmssw.sh 2023central first
             config_list[-1].General.requestName = 'centralSkim__{}_{}_mpi-{}_mA-{}_ctau-{}mm_{}'.format(signal, era, mpi, mA, t, ntuple_version)
             print(config)
-            crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+            crabCommand('submit', config = config, dryrun = True) ## dryrun = True for local test
     elif "ScenarioB1" in sys.argv[2]:
         config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_privScenarioA_v'+ntuple_version # DB no
         config.Data.inputDBS = 'phys03'
@@ -590,6 +640,57 @@ if (len(sys.argv)>2):
             crabCommand('submit', config = config_list[-1], dryrun = False) ## dryrun = True for local test
             #print(config)
             #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+    elif "DQCD_bkg" in sys.argv[2]:
+        if era != "2024":
+            print("DQCD_bkg only supported for era=2024"); quit()
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v'+ntuple_version
+        config.Data.inputDBS = 'global'
+        config.Data.splitting = 'EventAwareLumiBased'
+        config.Data.unitsPerJob = int(10e4)
+        config.Data.publication = False
+        inputfile = 'data/datasets_dqcd_2024_background.txt'
+        with open(inputfile,'r') as f:
+            dataset_list = f.readlines()
+        for dataset_name in dataset_list:
+            dataset_name = dataset_name.strip()
+            if not dataset_name or dataset_name[0] == '#':
+                continue
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams = ["era={}".format(era), "data=False", "background=True"]
+            config_list[-1].Data.inputDataset = dataset_name
+            short_name = dataset_name.split('/')[1].split('_TuneCP5')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_{}'.format(short_name, era, ntuple_version)
+            print(config)
+            try:
+                crabCommand('submit', config=config, dryrun=False)
+            except (HTTPException, ClientException) as e:
+                print('{} cant be launched! Skipping... ({})'.format(short_name, e))
+    elif "minBias_2024" in sys.argv[2]:
+        if era != "2024":
+            print("minBias_2024 only supported for era=2024"); quit()
+        ntuple_version_mb = "_minBias_2024"
+        config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v' + ntuple_version_mb
+        config.Data.inputDBS = 'global'
+        config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = 10
+        config.Data.publication = False
+        inputfile = 'data/datasets_dqcd_2024_background.txt'
+        with open(inputfile,'r') as f:
+            dataset_list = f.readlines()
+        for dataset_name in dataset_list:
+            dataset_name = dataset_name.strip()
+            if not dataset_name or dataset_name[0] == '#':
+                continue
+            config_list.append(config)
+            config_list[-1].JobType.pyCfgParams = ["era={}".format(era), "data=False", "background=True"]
+            config_list[-1].Data.inputDataset = dataset_name
+            short_name = dataset_name.split('/')[1].split('_TuneCP5')[0]
+            config_list[-1].General.requestName = 'centralSkim__{}_{}_{}'.format(short_name, era, ntuple_version_mb)
+            print(config)
+            try:
+                crabCommand('submit', config=config, dryrun=False)
+            except (HTTPException, ClientException) as e:
+                print('{} cant be launched! Skipping... ({})'.format(short_name, e))
     #elif "[signal]" in sys.argv[2]: (<--- Add additional signals here)
     else:
         quit()

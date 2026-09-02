@@ -1,0 +1,38 @@
+universe        = vanilla
+executable      = $ENV(STARTDIR)/condor/fillTuples_executable.sh
+output          = $ENV(STARTDIR)/condor/plotting_logs/filltuples.$(ClusterId).$(ProcId).out
+error           = $ENV(STARTDIR)/condor/plotting_logs/filltuples.$(ClusterId).$(ProcId).err
+log             = $ENV(STARTDIR)/condor/plotting_logs/filltuples.$(ClusterId).log
+
+# Fresh CMSSW env is set up inside the el8 image by the executable; do NOT import
+# the submit-side environment (it points at /home/users CMSSW, not mounted on workers).
+getenv = False
++DESIRED_Sites = "T2_US_UCSD"
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64"
+requirements = (GLIDEIN_Site =!= "UCSDT2-C") && (HAS_SINGULARITY == True)
+
+# The looper outputs are streamed from T2 over xrootd (fillTuplesScouting --condor),
+# so the only input shipped is the tiny code package. The X509 proxy is required for
+# the redirector reads.
+transfer_input_files = $ENV(STARTDIR)/package_fillTuples.tar.gz
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+x509userproxy = $ENV(X509_USER_PROXY)
+use_x509userproxy = True
+
+transfer_output_files  = $ENV(FILLTUPLES_TUPLEDIR), outputHistograms_2024
+
+# Per-file jobs are small (one looper file streamed into a TChain).
+# ROOT.EnableImplicitMT(2) -> 2 cpus.
+request_memory = 4000
+request_cpus   = 2
+request_disk   = 2000000
+
+JobBatchName = "ScoutingFillTuples"
+
+# One job per input file. $(SAMPLE)/$(INFILE) come from the auto-generated list:
+# --inSample matches output_<sample>_<year>_*.root, --inFile picks the one range.
+# --condor and --outDir are appended by the executable.
+arguments = --inDir $ENV(FILLTUPLES_INDIR) --inSample $(SAMPLE) --inFile $(INFILE) --year 2024 --noMuonChi2Sel --tupleDir $ENV(FILLTUPLES_TUPLEDIR) --collection $ENV(FILLTUPLES_COLLECTION)
+
+queue SAMPLE, INFILE from $ENV(STARTDIR)/condor/fillTuples_samples.txt

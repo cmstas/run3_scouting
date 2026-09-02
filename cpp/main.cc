@@ -52,16 +52,22 @@ std::vector<TString> getFiles(const std::string inputDir, const int startFile, c
     else
       fullInputDir = "/ceph/cms"+inputDir;
     const fs::path dir{fullInputDir};
-    for (auto const& file : fs::directory_iterator{dir}) {
+  
+    fs::recursive_directory_iterator it{dir}, end;
+    for (; it != end; ++it) {
+      if (it->is_directory()) {
+	std::string dname = it->path().filename().string();
+	if (dname=="log" || dname=="failed" || dname=="temp")
+	  it.disable_recursion_pending();
+	continue;
+      }
+      if (!TString(it->path().c_str()).Contains(".root"))
+	continue;
       if (iFile<startFile) {
 	iFile++;
 	continue;
       }
-      if (!TString(file.path()).Contains(".root"))
-	continue;
-      else {
-	files.push_back(TString(file.path()));
-      }
+      files.push_back(TString(it->path().c_str()));
       iFile++;
       if (iFile == startFile+nFiles)
 	break;
@@ -74,7 +80,7 @@ std::vector<TString> getFiles(const std::string inputDir, const int startFile, c
     else
       fullInputDir = inputDir;
     std::string command;
-    command = "xrdfs redirector.t2.ucsd.edu:1095 ls ";
+    command = "python3 recursive_xrdls.py ";
     command += fullInputDir;
     command += " > infiles.txt";
     std::system(command.c_str());
@@ -150,6 +156,10 @@ int main(int argc, char **argv) {
   if ( sampleArg=="DataD" && year=="2023") {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/May-24-2024/Data/2023D/", startFile, nFiles, isCondor, fromCrab);
     process = "DataD";
+  }
+  if ( sampleArg=="DataE" && year=="2024") {
+    files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/May-27-2026/Data/2024E/", startFile, nFiles, isCondor, fromCrab);
+    process = "DataE";
   }
   //
   // Sample list: Monte Carlo
@@ -278,9 +288,416 @@ int main(int argc, char **argv) {
     files = getFiles("/ceph/cms/store/group/Run3Scouting/Run3ScoutingSamples/Jan-9-2024/Data/Mon2022G/", startFile, nFiles, isCondor, fromCrab);  // 5 files
     process = "MonDataG";
   }
+  if (sampleArg == "LocalTestSignal" && year == "2024") {
+    files.push_back("/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/batch/skimmer_test_signal.root");
+    process = "LocalTestSignal";
+  }
+  if (sampleArg == "LocalTestBkg" && year == "2024") {
+    files.push_back("/home/users/garciaja/fullRun3/CMSSW_15_0_2/src/run3_scouting/batch/skimmer_test_bkg.root");
+    process = "LocalTestBkg";
+  }
+  // 2024 QCD background (MuEnriched)
+  if ( sampleArg=="QCD_Bin-PT-15to20_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-15to20_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-15to20_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-20to30_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-20to30_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-20to30_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-30to50_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-30to50_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-30to50_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-50to80_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-50to80_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-50to80_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-80to120_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-80to120_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-80to120_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-120to170_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-120to170_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-120to170_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-170to300_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-170to300_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-170to300_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-300to470_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-300to470_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-300to470_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-470to600_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-470to600_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-470to600_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-600to800_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-600to800_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-600to800_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-800to1000_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-800to1000_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-800to1000_Fil-MuEnriched_2024";
+  }
+  if ( sampleArg=="QCD_Bin-PT-1000_Fil-MuEnriched_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_dqcd_2024/QCD_Bin-PT-1000_Fil-MuEnriched_TuneCP5_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "QCD_Bin-PT-1000_Fil-MuEnriched_2024";
+  }
+  // 2024 MinBias background (InclusiveDileptonMinBias)
+  if ( sampleArg=="MinBias_Fil-DoubleMuOS43_2024" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_bkg2024_v_minBias_2024/InclusiveDileptonMinBias_Fil-DoubleMuOS43_TuneCP5Plus_13p6TeV_pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = "MinBias_Fil-DoubleMuOS43_2024";
+  }
+  // 2024 Signal ScenarioA — mpi-1
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p25_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p25-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p25_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p25-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p25_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p25-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p25_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p25-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p33_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p33-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p33_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p33-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p33_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p33-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p33_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p33-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p45_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p45-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p45_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p45-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p45_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p45-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-1_mA-0p45_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p45-mpi-1_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  // 2024 Signal ScenarioA — mpi-2
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p25_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p25-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p25_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p25-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p25_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p25-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p25_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p25-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p40_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p40-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p40_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p40-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p40_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p40-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p40_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p40-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p50_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p50-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p50_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p50-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p50_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p50-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p50_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p50-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p67_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p67-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p67_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p67-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p67_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p67-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p67_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p67-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p90_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p90-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p90_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p90-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p90_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p90-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-2_mA-0p90_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p90-mpi-2_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  // 2024 Signal ScenarioA — mpi-4
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p25_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p25-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p25_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p25-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p25_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p25-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p25_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p25-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p40_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p40-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p40_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p40-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p40_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p40-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p40_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p40-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p80_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p80-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p80_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p80-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p80_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p80-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-0p80_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p80-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p33_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-1p33-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p33_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-1p33-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p33_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-1p33-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p33_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-1p33-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p90_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-1p90-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p90_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-1p90-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p90_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-1p90-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-4_mA-1p90_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-1p90-mpi-4_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  // 2024 Signal ScenarioA — mpi-5
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-0p50_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-0p50-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-0p50_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-0p50-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-0p50_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-0p50-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-0p50_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-0p50-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p00_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-1p00-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p00_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-1p00-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p00_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-1p00-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p00_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-1p00-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p67_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-1p67-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p67_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-1p67-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p67_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-1p67-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-1p67_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-1p67-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-2p40_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-2p40-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-2p40_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-2p40-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-2p40_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-2p40-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-5_mA-2p40_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-2p40-mpi-5_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  // 2024 Signal ScenarioA — mpi-10
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-1p00_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-1p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-1p00_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-1p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-1p00_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-1p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-1p00_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-1p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-2p00_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-2p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-2p00_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-2p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-2p00_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-2p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-2p00_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-2p00-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-3p33_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-3p33-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-3p33_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-3p33-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-3p33_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-3p33-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-3p33_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-3p33-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-4p90_ctau-0p1mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-0p1-mA-4p90-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-4p90_ctau-1p0mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-1p0-mA-4p90-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-4p90_ctau-10mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-10-mA-4p90-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
+  if ( sampleArg=="Signal_ScenarioA_Par_2024_mpi-10_mA-4p90_ctau-100mm" && year=="2024") {
+    files = getFiles("/store/group/Run3Scouting/RAWScouting_DQCD_sig2024_v_dqcd_2024/GluGluHToDarkShowers-ScenarioA_Par-ctau-100-mA-4p90-mpi-10_TuneCP5_13p6TeV_powheg-pythia8/", startFile, nFiles, isCondor, fromCrab);
+    process = sampleArg;
+  }
   std::cout << "################################## \n";
   std::cout << "Number of files to process: " << files.size() << "\n";
   std::cout << "################################## \n";
+  if (files.empty()) {
+    std::cerr << "No files found for sample " << sampleArg << " year " << year << ". Exiting.\n";
+    return 1;
+  }
   run3ScoutingLooper(files, year, process, outdir, "_"+std::to_string(startFile)+"To"+std::to_string(startFile+nFiles-1));
 
   return 0;

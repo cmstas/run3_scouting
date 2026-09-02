@@ -13,13 +13,19 @@ if ("2022") in era:
     year=2022
 elif ("2023") in era:
     year=2023
+elif ("2024") in era:
+    year=2024
+elif ("2025") in era:
+    year=2025
 else:
     quit()
 
 data=False
 config.JobType.pyCfgParams=["era={}".format(era),"data=False",]
-if era in ["2022B", "2022C", "2022D", "2022E", "2022F", "2022G", "2023B", "2023C", "2023D"]:
+if era in ["2022B", "2022C", "2022D", "2022E", "2022F", "2022G", "2023B", "2023C", "2023D", "2024C", "2024D", "2024E", "2024F", "2024G", "2024H", "2024I"]:
+    print("Era identified")
     data=True
+
 
 extra=""
 if (len(sys.argv)>2):
@@ -27,9 +33,15 @@ if (len(sys.argv)>2):
         extra=sys.argv[2]+"_"+sys.argv[3]
         config.Data.inputDataset = '/ScoutingPFMonitor/Run{}-v1/RAW'.format(era)
         config.JobType.pyCfgParams=["era={}".format(era+"-triggerV10"),"data=True","monitor=True"]  
-    elif (data and "PFMonitor" not in sys.argv[2]): #triggerV10
+    elif (data and "PFMonitor" not in sys.argv[2] and (year==2022 or year==2023)): # Data in 2022 and 2023
+        print("A")
         extra=sys.argv[2]
         config.Data.inputDataset = '/ScoutingPFRun3/Run{}-v1/RAW'.format(era)
+        config.JobType.pyCfgParams=["era={}".format(era+"-"+extra),"data=True",]
+    elif (data and "PFMonitor" not in sys.argv[2] and (year==2024 or year==2025)): # Data in 2024 and 2025
+        print("B")
+        extra=sys.argv[2]
+        config.Data.inputDataset = '/ScoutingPFRun3/Run{}-v1/HLTSCOUT'.format(era)
         config.JobType.pyCfgParams=["era={}".format(era+"-"+extra),"data=True",]
     elif(data): #PFMonitor
         extra=sys.argv[2]
@@ -44,9 +56,9 @@ elif(data): #other data
 else:
     quit()
 
-ntuple_version = "5"
+ntuple_version = "2p0"
 
-config.General.requestName = 'skim4__{}_{}_{}'.format(
+config.General.requestName = 'skim__{}_{}_{}'.format(
         era,
         extra,
         ntuple_version,
@@ -64,7 +76,7 @@ config.JobType.psetName = 'Scouting/NtupleMaker/test/producer_Run3.py'
 config.Data.splitting = 'EventAwareLumiBased'
 
 if (data):
-    config.Data.unitsPerJob = int(10e6/3)
+    config.Data.unitsPerJob = int(10e7/3)
 else:
     config.Data.unitsPerJob = int(10e4)
 
@@ -84,6 +96,13 @@ if (data and year==2023):
 
 if (data and year==2022):
    config.Data.lumiMask = "data/Cert_Collisions2022_355100_362760_Golden.json"
+
+if (data and year==2024):
+   config.Data.lumiMask = "data/Cert_Collisions2024_378981_386951_Golden.json"
+
+if (data and year==2025):
+   config.Data.lumiMask = "data/Cert_Collisions2025_391658_398903_Golden.json"
+
 
 #edit the area and user name
 config.Data.outLFNDirBase = '/store/group/Run3Scouting/RAWScouting_'+ntuple_version # DB no

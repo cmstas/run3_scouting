@@ -1,5 +1,5 @@
-#ifndef NTUPLEMAKER_TRIGGERMAKER_H
-#define NTUPLEMAKER_TRIGGERMAKER_H
+#ifndef NTUPLEMAKER_VERTEXMAKER_H
+#define NTUPLEMAKER_VERTEXMAKER_H
 
 // system include files
 #include <memory>
@@ -52,6 +52,13 @@
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateOnSurface.h"
 #include "TrackingTools/TransientTrack/interface/GsfTransientTrack.h"
 #include "TrackingTools/TransientTrack/interface/TrackTransientTrack.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackBase.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
 
 #include "DataFormats/GeometrySurface/interface/RectangularPlaneBounds.h"
 #include "DataFormats/GeometrySurface/interface/TrapezoidalPlaneBounds.h"
@@ -60,14 +67,10 @@
 
 #include "TLorentzVector.h"
 
-// for quick debugging. remove later
-// https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp
-// #include "extra/json.hpp"
-
-class HitMaker : public edm::stream::EDProducer<> {
+class VertexMaker : public edm::stream::EDProducer<> {
 public:
-  explicit HitMaker(const edm::ParameterSet&);
-  ~HitMaker();
+  explicit VertexMaker(const edm::ParameterSet&);
+  ~VertexMaker();
 
 private:
   virtual void beginJob();
@@ -75,25 +78,10 @@ private:
   virtual void endJob();
   virtual void beginRun(const edm::Run&, const edm::EventSetup&);
 
-  std::vector<float> getMinDetDistance(const GeomDet *det,  Local3DPoint point, GlobalPoint& retPoint);
+  reco::TrackBase::CovarianceMatrix getCovariance(const Run3ScoutingMuon mu);
 
-  edm::EDGetToken muonToken_;
-  edm::EDGetToken dvToken_;
-  edm::EDGetToken measurementTrackerEventToken_;
-  edm::EDGetToken vtxIndxToken_;
-
-  edm::ESHandle<MeasurementTracker> measurementTracker_;
-  edm::ESHandle<MagneticField> magfield_;
-  edm::ESHandle<GlobalTrackingGeometry> theGeo_;
-  
-  edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> magFieldToken_;
-  edm::ESGetToken<GlobalTrackingGeometry, GlobalTrackingGeometryRecord> trackingGeometryToken_;
-  edm::ESGetToken<MeasurementTracker, CkfComponentsRecord> measurementTrackerToken_; 
-  edm::ESGetToken<TrackerTopology, TrackerTopologyRcd> trackerTopologyToken_;
- 
-  edm::ESHandle<Propagator> propagatorHandle_;
-  edm::ESGetToken<Propagator, TrackingComponentsRecord> propagatorToken_;
-
+  edm::EDGetToken muonVtxToken_;
+  edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> theTransientTrackBuilderToken_;
 
 };
 
